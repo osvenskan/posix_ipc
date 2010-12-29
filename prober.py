@@ -151,8 +151,8 @@ def sniff_mq_existence(linker_options):
 
 def sniff_mq_prio_max():
     # MQ_PRIO_MAX is #defined in limits.h on all of the systems that I 
-    # checked that support message queues at all. (I checked 2 Linux boxes
-    # and my OpenSolaris install.) 
+    # checked that support message queues at all. (I checked 2 Linux boxes,
+    # OpenSolaris and FreeBSD 8.0.) 
     
     # 32 = minimum allowable max priority per POSIX; systems are permitted
     # to define a larger value.
