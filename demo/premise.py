@@ -17,10 +17,6 @@ import posix_ipc
 
 # Utils for this demo
 import utils
-if PY_MAJOR_VERSION > 2:
-    import utils_for_3 as flex_utils
-else:
-    import utils_for_2 as flex_utils
 
 
 utils.say("Oooo 'ello, I'm Mrs. Premise!")
@@ -81,8 +77,8 @@ for i in range(params["ITERATIONS"]):
     try:
         assert(s == hashlib.md5(what_i_wrote).hexdigest())
     except AssertionError:
-        flex_utils.raise_error(AssertionError, 
-                        "Shared memory corruption after %d iterations." % i)
+        utils.raise_error(AssertionError, 
+                          "Shared memory corruption after %d iterations." % i)
         
     # MD5 the reply and write back to Mrs. Conclusion.
     if PY_MAJOR_VERSION > 2:

@@ -46,16 +46,12 @@ filenames = (
     "demo/utils.c",
     "demo/utils.h",
     "demo/utils.py",
-    "demo/utils_for_2.py",
-    "demo/utils_for_3.py",
     "demo2/ReadMe.txt",
     "demo2/SampleIpcConversation.png",
     "demo2/cleanup.py",
     "demo2/conclusion.py",
     "demo2/premise.py",
     "demo2/utils.py",
-    "demo2/utils_for_2.py",
-    "demo2/utils_for_3.py",
     "demo2/params.txt",
 )
 
