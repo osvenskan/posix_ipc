@@ -1,0 +1,354 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+
+<head>
+	<meta name="author" content="Philip Semanchuk">
+	<meta name="copyright" content="All contents &copy; 2008 Philip Semanchuk">
+	<meta name="keywords" content="python posix ipc semaphore shared memory message queue">
+	
+    <title>The posix_ipc Module for POSIX IPC Under Python -- Version History</title>
+
+    <style type="text/css">
+        li { 
+            margin-top: .67em;
+            margin-bottom: .67em;
+        }
+
+        pre { margin-left: 2em; }        
+    </style>
+</head>
+
+<body>
+
+<h2>Version History</h2>
+
+<p>This is the version history for the 
+<a href="http://semanchuk.com/philip/posix_ipc/">posix_ipc
+module</a>.</p>
+
+<ul id="history">
+
+    <li><strong><span id="current">Current</span> &ndash; 0.8.1 (15 Mar 2010) &ndash;</strong>
+        <p>Fixed a sloppy declaration that caused a compile error under
+            Cygwin 1.7.1. Thanks to Jill McCutcheon for the bug report.
+        </p>
+    </li>
+            
+
+    <li>0.8.0 (2 Mar 2010) &ndash;
+        <ul>
+            <li>Fixed message queue support detection in FreeBSD and
+                the platform-specific documentation about FreeBSD.
+            </li>
+            
+            <li>Rearranged the documentation and split the history 
+                (which you're reading now) into a separate file.
+            </li>
+            
+            <li>I fixed two small bugs related to the confusing 
+                message queue constants. The bugs and associated changes are 
+                explained below. The explanation is really long not 
+                because the changes were big (they weren't), but because
+                they and rationale behind them are subtle.
+            
+                <p>Fixing these bugs was made easier by this realization &ndash;
+                    on all of the systems to which I have access that implement 
+                    message queues (FreeBSD, OpenSolaris, Linux, and Windows + 
+                    Cygwin), all except Linux implement them as 
+                    memory-mapped files or something similar. On these
+                    non-Linux systems, the
+                    maximum queue message count and size are pretty darn big 
+                    (<tt>LONG_MAX</tt>). Therefore, only on Linux is anyone likely to 
+                    encounter limits to message queue size and content.
+                </p>
+        
+                <p>The first bug I fixed was related to four message queue
+                    constants mentioned in <tt>posix_ipc</tt> documentation:
+                    <tt>QUEUE_MESSAGES_MAX</tt>, 
+                    <tt>QUEUE_MESSAGES_MAX_DEFAULT</tt>, 
+                    <tt>QUEUE_MESSAGE_SIZE_MAX</tt> and 
+                    <tt>QUEUE_MESSAGE_SIZE_MAX_DEFAULT</tt>. All four were defined
+                     in the <tt>C</tt>
+                    code, but the two <tt>XXX_DEFAULT</tt> constants weren't exposed on 
+                    the Python side. 
+                </p>
+    
+                <p>The second bug was that under Linux, <tt>QUEUE_MESSAGES_MAX</tt> and 
+                    <tt>QUEUE_MESSAGE_SIZE_MAX</tt> were permanently fixed to their 
+                    values at <tt>posix_ipc</tt>'s compile/install time even if the 
+                    relevant system values changed later. Thanks to Kyle Tippetts 
+                    for bringing this to my attention. 
+                </p>
+    
+                <p><tt>QUEUE_MESSAGES_MAX_DEFAULT</tt> was arbitrarily limited to 
+                    (at most) 1024. This wasn't a bug, just a bad choice.
+                </p>
+        
+                <p>I made a few changes in order to fix these problems &ndash;</p>
+
+                <ol>
+                    <li>The constants <tt>QUEUE_MESSAGES_MAX</tt> and 
+                        <tt>QUEUE_MESSAGE_SIZE_MAX</tt>
+                        <strong>have been deleted</strong> since they were only sure to 
+                        be accurate on systems where they were irrelevant. Furthermore, 
+                        Linux (the only place where they matter) exposes these values 
+                        through the file system (in 
+                        <tt>/proc/sys/fs/mqueue/msg_max</tt> and 
+                        <tt>/proc/sys/fs/mqueue/msgsize_max</tt> respectively) so Python
+                        apps that need them can read them without any help 
+                        from <tt>posix_ipc</tt>.
+                    </li>
+
+                    <li><tt>QUEUE_MESSAGES_MAX_DEFAULT</tt> and 
+                        <tt>QUEUE_MESSAGE_SIZE_MAX_DEFAULT</tt> are now exposed to 
+                        Python as they should have been all along. 
+                        <tt>QUEUE_MESSAGES_MAX_DEFAULT</tt> is now set to 
+                        <tt>LONG_MAX</tt> on all platforms except Linux, where
+                        it's set at compile time from <tt>/proc/sys/fs/mqueue/msg_max</tt>. 
+                    </li>
+                    <li><tt>QUEUE_MESSAGE_SIZE_MAX_DEFAULT</tt> remains at the fairly 
+                        arbitrary value of 8k. It's not a good idea to make it too big
+                        since a buffer of this size is allocated every time 
+                        <tt>MessageQueue.receive()</tt> is called. Under Linux, I 
+                        check the contents of <tt>/proc/sys/fs/mqueue/msgsize_max</tt>
+                        and make <tt>QUEUE_MESSAGE_SIZE_MAX_DEFAULT</tt> smaller if 
+                        necessary.
+                    </li>
+                </ol>
+            </li>
+        </ul>
+    </li>
+
+    <li>0.7.0 (21 Feb 2010) &ndash;
+        <p>Added Python 3.1 support.</p>
+    </li>
+            
+    <li>0.6.3 (15 Feb 2009) &ndash;
+    	<ul>
+            <li>Fixed a bug where creating an IPC object with invalid
+                parameters would correctly raise a <tt>ValueError</tt>, but 
+                with a message that may or may not have correctly identified
+                the cause. (My code was making an educated guess that was
+                sometimes wrong.)
+                
+                <p>As of this version, if initialization of an IPC object 
+                    fails with the error code <tt>EINVAL</tt>, 
+                    <tt>posix_ipc</tt> raises a <tt>ValueError</tt>
+                    with the vague-but-correct message "Invalid parameter(s)".
+                </p>
+            </li>
+            <li>Cleaned up the code a little internally.</li>
+        </ul>
+    </li>
+            
+    <li>0.6.2 (30 Dec 2009) &ndash;
+        <p>Fixed a bug where a <tt>MessageQueue</tt>'s <tt>mode</tt>
+            attribute returned garbage. Grazie to Stefano Debenedetti for
+            the bug report.
+        </p>
+    </li>
+            
+    <li>0.6.1 (29 Nov 2009) &ndash;
+        <p>There were no functional changes to the module in this version, but 
+        I added the convenience function <tt>close_fd()</tt> and fixed 
+        some docmentation and demo bugs/sloppiness.
+        </p>
+    	<ul>
+            <li>Added the convenience function <tt>SharedMemory.close_fd()</tt>.
+                Thanks to Kyle Tippetts for pointing out the usefulness
+                of this.
+            </li>
+            <li>Added the module attributes <tt>__version__</tt>, 
+                <tt>__copyright__</tt>, <tt>__author__</tt> and 
+                <tt>__license__</tt>.
+            </li>
+    	    <li>Fixed the license info embedded in <tt>posix_ipc_module.c</tt>
+    	        which was still referring to GPL.
+            <li>Replaced <tt>file()</tt> in <tt>setup.py</tt> with 
+                <tt>open()</tt>/<tt>close()</tt>.</li>
+
+            <li>Demo changes &ndash;
+                <ul>
+                    <li>Made the demo a bit faster, especially for large
+                        shared memory chunks. Thanks to Andrew Trevorrow
+                        for the suggestion and patch.
+                    </li>
+                    <li>Fixed a bug in premise.c; it wasn't closing the semaphore.</li>
+                    <li>Fixed a bug in premise.py; it wasn't closing the 
+                        shared memory's file descriptor. 
+                    </li>
+                    <li>Fixed bugs in conclusion.py; it wasn't closing the 
+                        shared memory's file descriptor, the semaphore or 
+                        the mapfile.
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+        
+    <li>0.6 (5 Oct 2009) &ndash;
+    	<ul>
+    	    <li>Relicensed from the GPL to a BSD license to celebrate the
+    	        one year anniversary of this module.
+            <li>Updated Cygwin info.</li>
+        </ul>
+    </li>
+        
+    <li>0.5.5 (17 Sept 2009) &ndash;
+    	<ul>
+    	    <li>Set <tt>MQ_MAX_MESSAGES</tt> and <tt>MQ_MAX_MESSAGE_SIZE</tt> to 
+    	        <tt>LONG_MAX</tt> under cygwin.
+    	        (Danke to René Liebscher.)
+    	    </li>
+    	    <li>Surrounded the <tt>#define PAGE_SIZE</tt> in probe_results.h with 
+    	        <tt>#ifndef/#endif</tt> because it is already defined on some systems.
+    	        (Danke to René Liebscher, again.)
+    	    </li>
+            <li>Minor documentation changes.</li>
+        </ul>
+    </li>
+        
+    <li>0.5.4 (21 Jun 2009) &ndash;
+    	<ul>
+    	    <li>Added SignalError.</li>
+    	    <li>Fixed a bug where 
+    	        <a href="http://groups.google.com/group/comp.lang.python/browse_thread/thread/ada39e984dfc3da6/fd6becbdce91a6be?#fd6becbdce91a6be">Python 
+    	        would generate an uncatchable
+    	        KeyboardInterrupt when Ctrl-C was hit during a wait</a>
+    	        (e.g. <tt>sem.acquire()</tt>).
+
+    	        <p>Thanks to Maciek W. for reporting the problem and to 
+    	            Piet van Oostrum and Greg for help with a solution.
+    	        </p>
+            </li>
+            <li>Minor documentation changes.</li>
+        </ul>
+    </li>
+        
+    <li>0.5.3 (8 Mar 2009) &ndash;
+    	<ul>
+    	    <li>Added automatic generation of names.</li>
+    	    <li>Changed status to beta.</li>
+        </ul>
+    </li>
+        
+    <li>0.5.2 (12 Feb 2009) &ndash;
+    	<ul>
+    	    <li>Fixed a memory leak in <tt>MessageQueue.receive()</tt>.</li>
+    	    <li>Fixed a bug where the name of the <tt>MessageQueue</tt> 
+    	        <tt>current_messages</tt> attribute didn't match the name
+    	        given in the documentation.
+    	    </li>
+    	    <li>Added the VERSION attribute to the module.</li>
+    	    <li>Fixed a documentation bug that said message queue 
+    	        notifications were not yet supported.
+    	    </li>
+        </ul>
+    </li>
+        
+    <li>0.5.1 (8 Feb 2009) &ndash;
+    	<ul>
+    	    <li>Fixed outdated info in setup.py that was showing up 
+    	        in the Python package index. Updated README while I
+    	        was at it.
+    	    </li>
+        </ul>
+    </li>
+        
+    <li>0.5 (8 Feb 2009) &ndash;
+    	<ul>
+    	    <li>Added the message queue notification feature.</li>
+    	    <li>Added a <tt>mode</tt> attribute to each type.</li>
+    	    <li>Added <tt>str()</tt> and <tt>repr()</tt> support to 
+    	        each object.
+    	    </li>
+    	    <li>Added a demo for message queues.</li>
+    	    <li>Fixed some minor documentation problems and added
+    	        some information (esp. about Windows + Cygwin).
+    	    </li>
+        </ul>
+    </li>
+        
+    <li>0.4 (9 Jan 2009) &ndash;
+    	<ul>
+    	    <li>Added message queue support.</li>
+    	    <li>Fixed the poor choices I'd made for names for classes and
+    	        errors by removing the leading "Posix" and "PosixIpc". 
+    	    </li>
+    	    <li>Simplified the prober and expanded it (for message
+    	        queue support).
+    	    </li>
+    	    <li>Cleaned up this documentation.</li>
+        </ul>
+    </li>
+        
+    <li>0.3.2 (4 Jan 2009) &ndash;
+    	<ul>
+    	    <li>Fixed an uninitialized value passed to PyMem_Free() when
+    	        invalid params were passed to either constructor. 
+    	    </li>
+        </ul>
+    </li>
+        
+    <li>0.3.1 (1 Jan 2009) &ndash;
+     	<ul>
+    	    <li>Fixed a big bug where the custom exceptions defined by this
+    	        module weren't visible.
+    	    </li>
+    	    <li>Fixed a compile complaint about the redefinition of 
+    	        <tt>SEM_VALUE_MAX</tt> on Linux (Ubuntu) that I introduced
+    	        in the previous version.
+    	    </li>
+    	    <li>Fixed a bug in the demo program premise.c where I wasn't
+    	        closing the file descriptor associated with the shared
+    	        memory.
+    	    </li>
+    	    <li>Added the <tt>PAGE_SIZE</tt> attribute. This was already
+    	        available in the mmap module that you need to use shared
+    	        memory anyway, but adding it makes the interface more 
+    	        consistent with the <tt>sysv_ipc</tt> module.
+    	    </li>
+    	</ul>
+    </li>
+
+    <li>0.3 (19 Dec 2008) &ndash;
+    	<ul>
+        	<li>Added informative custom errors instead of raising 
+        	    OSError when something goes wrong.
+        	</li>
+
+        	<li>Made the code friendly to multi-threaded applications.
+        	</li>
+
+			<li>Added the constants <tt>O_CREX</tt> and 
+			    <tt>SEMAPHORE_VALUE_MAX</tt>.
+			</li>
+
+			<li>Added code to prohibit negative timeout values.</li>
+		</ul>
+    </li>
+    <li>0.2 (4 Dec 2008) &ndash;
+    	<ul>
+        	<li>Removed the un-Pythonic <tt>try_acquire()</tt> method. The
+        	    same functionality is now available by passing a timeout of 
+        	    <tt>0</tt> to the <tt>.acquire()</tt> method.
+        	</li>
+
+			<li>Renamed the module constant <tt>ACQUIRE_TIMEOUT_SUPPORTED</tt> to
+			    <tt>SEMAPHORE_TIMEOUT_SUPPORTED</tt>.
+			</li>
+
+			<li>Moved the demo code into its own directory and added C
+			    versions of the Python scripts. The parameters are now in a 
+			    text file shared by the Python and C program, so you can
+			    run the C version of Mrs. Premise and have it communicate with
+			    the Python version of Mrs. Conclusion and vice versa.
+			</li>
+		</ul>
+    </li>
+    <li>0.1 (9 Oct 2008) &ndash; Original (alpha) version.</li>
+</ul>
+
+</body>
+</html>
