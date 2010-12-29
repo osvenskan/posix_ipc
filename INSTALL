@@ -1,0 +1,3 @@
+To install, just use the normal setup.py routine:
+
+sudo python setup.py install

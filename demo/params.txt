@@ -1,0 +1,20 @@
+# These parameters control how Mrs. Premise and Mrs. Conclusion behave.
+
+# ITERATIONS is the number of times they'll talk to one another.
+# LIVE_DANGEROUSLY is a Boolean (0 or 1); if set to 1 the programs
+#    won't use the semaphore to coordinate access to the shared 
+#    memory. Corruption will likely result.
+# SEMAPHORE_NAME is the name to be used for the semaphore.
+# SHARED_MEMORY_NAME is the name to be used for the shared memory.
+# PERMISSIONS are in octal (note the leading 0).
+# SHM_SIZE is the size of the shared memory segment in bytes.
+
+ITERATIONS=1000
+LIVE_DANGEROUSLY=0
+SEMAPHORE_NAME=/wuthering_heights
+SHARED_MEMORY_NAME=/four_yorkshiremen
+PERMISSIONS=0600
+SHM_SIZE=4096
+
+
+

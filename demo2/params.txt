@@ -1,0 +1,4 @@
+# These parameters control how Mrs. Premise and Mrs. Conclusion behave.
+
+ITERATIONS=1000
+MESSAGE_QUEUE_NAME=/my_message_queue
