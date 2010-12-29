@@ -8,6 +8,15 @@ if PY_MAJOR_VERSION > 2:
 else:
     NULL_CHAR = '\0'
 
+def raise_error(error, message):
+    # I have to exec() this code because the Python 2 syntax is invalid
+    # under Python 3 and vice-versa.
+    s = "raise "
+    s += "error, message" if (PY_MAJOR_VERSION == 2) else "error(message)" 
+        
+    exec(s)
+
+
 def say(s):
     """Prints a timestamped, self-identified message"""
     who = sys.argv[0]

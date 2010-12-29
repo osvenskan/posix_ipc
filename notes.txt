@@ -1,12 +1,9 @@
 POSIX IPC
 
 -- next done 
-- added Python 2 & 3 to classifiers in setup.py for PyPi. 
-- Fixed FreeBSD support; now works w/v8.0 (and possibly earlier). 
-- Fixed a bug that prevented recognition of message queue support under FreeBSD. 
--  break history into a separate page
 
 -- next todo 
+- why not use "z" as the arg formatter for object names passed by the caller? Would obviate the need for convert_name_param()
 
 - MQ_PRIO_MAX is #defined in limits.h  -- check on FReeBSD
 
