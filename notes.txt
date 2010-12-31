@@ -20,7 +20,6 @@ Put this off until second 3.x release
 - consider this:
 https://wiki.ubuntu.com/PackagingGuide/Python
 
-- add demo of signal & thread
 - can I use select.select() on a message queue handle?
 - unnamed semaphores
 - update PyPi (python setup.py register)
