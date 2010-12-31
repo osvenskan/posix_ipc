@@ -29,7 +29,31 @@ module</a>.</p>
 
 <ul id="history">
 
-    <li><strong><span id="current">Current</span> &ndash; 0.8.1 (15 Mar 2010) &ndash;</strong>
+    <li><strong><span id="current">Current</span> &ndash; 0.9.0 (31 Dec 2010) &ndash;</strong>
+        <p>Added the <tt>demo3</tt> directory with demos of message queue 
+            notification techniques. Also, fixed two bugs related to message 
+            queue notification. Big thanks to
+            Philip D. Bober for debugging and providing a patch to the
+            most difficult part of the code. The bugs were &ndash;
+        </p>
+        
+        <ul>
+            <li>First, the series of calls to set up the Python thread in 
+               <tt>process_notification()</tt> were simply wrong. They worked 
+               some (most?) of the time but would segfault eventually because 
+               I was creating a Python thread state when I should not have.
+            </li>
+            
+            <li>Second, the code in <tt>process_notification()</tt> failed
+                to consider that the user's callback might re-request 
+                notification, thus overwriting pointers that I would later
+                decref. <tt>process_notification()</tt> is now thread-safe.
+            </li>
+        </ul>
+    </li>
+            
+
+    <li>0.8.1 (15 Mar 2010) &ndash;
         <p>Fixed a sloppy declaration that caused a compile error under
             Cygwin 1.7.1. Thanks to Jill McCutcheon for the bug report.
         </p>

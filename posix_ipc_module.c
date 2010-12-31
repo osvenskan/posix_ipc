@@ -1667,9 +1667,9 @@ void process_notification(union sigval notification_data) {
     PyObject *py_args; 
     PyObject *py_result;
     PyGILState_STATE gstate;
-    PyThreadState *main_thread;
-    PyThreadState *callback_thread;
     MessageQueue *self = notification_data.sival_ptr;
+    PyObject *callback_function = NULL;
+    PyObject *callback_param = NULL;
     
     DPRINTF("C thread %ld invoked\n", pthread_self());
     
@@ -1678,22 +1678,25 @@ void process_notification(union sigval notification_data) {
     DPRINTF("Calling PyGILState_Ensure()\n");
     gstate = PyGILState_Ensure();
 
-    // Get the current thread state so that I have an interpreter to 
-    // which to point.
-    DPRINTF("Calling PyThreadState_Get()\n");
-    main_thread = PyThreadState_Get();
-
-    // Create a new Python thread for the callback.
-    DPRINTF("Calling PyThreadState_New()\n");
-    callback_thread = PyThreadState_New(main_thread->interp);
+    /* Notifications are one-offs; the caller must re-register if he wants 
+       more. Therefore I must discard my pointers to the callback function
+       and param after the callback is complete.
     
-    // Make the callback thread current.
-    DPRINTF("Calling PyThreadState_Swap()\n");
-    PyThreadState_Swap(callback_thread);
+       But the caller may want to re-request notification during the callback.
+       If he does so, MessageQueue_request_notification() will be invoked
+       and self->notification_callback and ->notification_callback_param
+       will get overwritten. Therefore I need to make copies of them here
+       under the assumption that my self-> pointers won't survive the 
+       callback and DECREF them after the callback is complete.
+    */
+    callback_function = self->notification_callback;
+    callback_param = self->notification_callback_param;
+    self->notification_callback = NULL;
+    self->notification_callback_param = NULL;
 
     // Perform the callback.
-    py_args = Py_BuildValue("(O)", self->notification_callback_param);
-    py_result = PyObject_CallObject(self->notification_callback, py_args);
+    py_args = Py_BuildValue("(O)", callback_param);
+    py_result = PyObject_CallObject(callback_function, py_args);
     Py_DECREF(py_args);
     
     // If py_result is NULL, the call failed. However, I want to return
@@ -1702,22 +1705,9 @@ void process_notification(union sigval notification_data) {
 
     DPRINTF("Done calling\n");
 
-    // Clean up my internal pointers since notifications are one-offs;
-    // the caller must re-register if he wants more.
-    Py_XDECREF(self->notification_callback);
-    Py_XDECREF(self->notification_callback_param);
-    self->notification_callback = NULL;
-    self->notification_callback_param = NULL;
-    
-    // Now unwind the Python thread/GIL stuff above
-    DPRINTF("Calling PyThreadState_Swap()\n");
-    PyThreadState_Swap(main_thread);
-
-    DPRINTF("Calling PyThreadState_Clear()\n");
-    PyThreadState_Clear(callback_thread);
-
-    DPRINTF("Calling PyThreadState_Delete()\n");
-    PyThreadState_Delete(callback_thread);
+    // Now I can clean these up safely.
+    Py_XDECREF(callback_function);
+    Py_XDECREF(callback_param);
     
     if (!py_result) {
         DPRINTF("Invoking the callback failed\n");
@@ -1729,8 +1719,6 @@ void process_notification(union sigval notification_data) {
     
     Py_XDECREF(py_result);
 
-    // PyGILState_Ensure() acquires the lock, but does PyGILState_Release()
-    // release it? The documentation doesn't say, but it seems like it does.
     DPRINTF("Calling PyGILState_Release()\n");
     PyGILState_Release(gstate);
 
