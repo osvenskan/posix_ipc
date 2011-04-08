@@ -3,11 +3,13 @@ manipulation of POSIX inter-process semaphores, shared memory and message
 queues on platforms supporting the POSIX Realtime Extensions a.k.a. POSIX
 1003.1b-1993. This includes most Unices and Windows + Cygwin 1.7.
 
+posix_ipc is compatible with Python 2 and 3.
+
 The latest version, contact info, sample code, etc. are available here:
 http://semanchuk.com/philip/posix_ipc/
 
-Installation is as simple as `sudo python setup.py`. Usage, a version history,
-warnings, suggestions, etc. are covered in ReadMe.html.
+Installation is as simple as `python setup.py install`. Usage, a version 
+history, warnings, suggestions, etc. are covered in ReadMe.html.
 
 posix_ipc is free software (free as in speech and free as in beer) released
 under a 3-clause BSD license. Complete licensing information is available in 

@@ -1,13 +1,8 @@
 POSIX IPC
 
--- next done 
 
 -- next todo 
 - why not use "z" as the arg formatter for object names passed by the caller? Would obviate the need for convert_name_param()
-
-
-
-Put this off until second 3.x release
 
 - check to see if the fancy code for handling interrupts (Ctrl+C) still works under Python 3.x. Answer -- looks OK from preliminary test
 
@@ -16,17 +11,10 @@ Put this off until second 3.x release
 
 - consider adding to freshmeat
 
-- consider adding "provides" to setup.py (file:///usr/local/doc/Python-Docs-2.5/dist/node10.html)
 - consider this:
 https://wiki.ubuntu.com/PackagingGuide/Python
 
 - can I use select.select() on a message queue handle?
 - unnamed semaphores
 - update PyPi (python setup.py register)
-
-
-
-
-- Does posix_listdir() in posixmodule.c leak a bytes object? It calls PyUnicode_FSConverter() on opath but doesn't call releasebytes(). 
-
 

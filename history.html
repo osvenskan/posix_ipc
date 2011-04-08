@@ -29,7 +29,21 @@ module</a>.</p>
 
 <ul id="history">
 
-    <li><strong><span id="current">Current</span> &ndash; 0.9.0 (31 Dec 2010) &ndash;</strong>
+    <li><strong><span id="current">Current</span> &ndash; 0.9.1 (7 Apr 2011) &ndash;</strong>
+        <ul>
+            <li>Fixed (?) a bug in message queue thread notification that caused
+                <tt>ceval: tstate mix-up</tt> and other fun messages. Thanks to
+                Lev Maximov for the bug report.
+            </li>
+        
+            <li>Added the <tt>demo3</tt> directory with demos of message queue.
+                This was supposed be included in version 0.9.0 but I accidentally
+                left it out. (Also reported by Lev.) 
+            </li>
+        </ul>
+    </li>
+
+    <li>0.9.0 (31 Dec 2010) &ndash;
         <p>Added the <tt>demo3</tt> directory with demos of message queue 
             notification techniques. Also, fixed two bugs related to message 
             queue notification. Big thanks to
