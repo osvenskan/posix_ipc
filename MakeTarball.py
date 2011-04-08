@@ -8,9 +8,7 @@ import hashlib
 
 RSS_TIMESTAMP_FORMAT = "%a, %d %b %Y %H:%M:%S GMT"
 
-f = open("VERSION")
-VERSION = f.read().strip()
-f.close()
+VERSION = open("VERSION").read().strip()
 
 filenames = (
 #    "memory_leak_tests.py",
@@ -53,6 +51,13 @@ filenames = (
     "demo2/premise.py",
     "demo2/utils.py",
     "demo2/params.txt",
+    "demo3/ReadMe.txt", 
+    "demo3/cleanup.py", 
+    "demo3/one_shot_signal.py", 
+    "demo3/one_shot_thread.py", 
+    "demo3/repeating_signal.py", 
+    "demo3/repeating_thread.py", 
+    "demo3/utils.py", 
 )
 
 tarball_name = "posix_ipc-%s.tar.gz" % VERSION
@@ -75,17 +80,13 @@ for name in filenames:
 tarball.close()
 
 # Generate the md5 hash of the tarball
-f = open("./" + tarball_name)
-s = f.read()
-f.close()
+s = open("./" + tarball_name).read()
 
 s = hashlib.md5(s).hexdigest()
 
 print "md5 = " + s
 
-f = open(md5_name, "w")
-f.write(s)
-f.close()
+open(md5_name, "w").write(s)
 
 
 # Print an RSS item suitable for pasting into rss.xml
