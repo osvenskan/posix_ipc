@@ -69,7 +69,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PyVarObject_HEAD_INIT(type, size) PyObject_HEAD_INIT(type) size,
 #endif
 
-
 /* POSIX says that a mode_t "shall be an integer type". To avoid the need 
 for a specific get_mode function for each type, I'll just stuff the mode into 
 a long and mention it in the Xxx_members list for each type.
@@ -104,6 +103,11 @@ typedef struct {
     int receive_permitted;
     PyObject *notification_callback;
     PyObject *notification_callback_param;
+    // In the event that the user requests notifications in a new thread,
+    // I'll need a reference to the interpreter in order to create the 
+    // thread for the callback. See request_notification() and
+    // process_notification() for details.
+    PyInterpreterState *interpreter;
 } MessageQueue;
 #endif
 
@@ -1370,6 +1374,14 @@ MessageQueue_init(MessageQueue *self, PyObject *args, PyObject *keywords) {
         PyErr_SetString(pBaseException, "Unable to initialize object");
         goto error_return;
     }
+
+    // Last but not least, get a reference to the interpreter state. I only
+    // need this if the caller requests queue notifications that occur in 
+    // a new thread, so much of the time this goes unused.
+    // It's my understanding that there's only one interpreter state to go
+    // around, so no matter which thread I get the interpreter state from, 
+    // it will be the same interpreter state.
+    self->interpreter = PyThreadState_Get()->interp;
     
     return 0; 
     
@@ -1661,23 +1673,57 @@ MessageQueue_unlink(MessageQueue *self) {
 }
 
 
+void dprint_current_thread_id(void) {
+    // Debug print only. Note that calling PyThreadState_Get() when there's
+    // no current thread is a fatal error, so calling this can crash your
+    // app.
+    DPRINTF("Current thread has id %ld\n", PyThreadState_Get()->thread_id);
+}
+
+    
 void process_notification(union sigval notification_data) {
     /* Invoked by the system in a new thread as notification of a message 
        arriving in the queue. */
     PyObject *py_args; 
     PyObject *py_result;
-    PyGILState_STATE gstate;
     MessageQueue *self = notification_data.sival_ptr;
     PyObject *callback_function = NULL;
     PyObject *callback_param = NULL;
+    PyThreadState *callback_thread = NULL;
+    PyThreadState *previous_thread = NULL;
     
     DPRINTF("C thread %ld invoked\n", pthread_self());
     
-    // PyGILState_Ensure() implicitly acquires the GIL so I don't need
-    // to call PyEval_AcquireLock().
-    DPRINTF("Calling PyGILState_Ensure()\n");
-    gstate = PyGILState_Ensure();
+    /* There are a number of fancy functions meant to ease the process of 
+    calling into a Python thread from C. For me they resulted in segfaults,
+    "ceval: tstate mix-up" and "ceval: orphan tstate" messages.
+    
+    In particular, I think I was being bitten by this PyGILState_Ensure() bug:
+    http://bugs.python.org/issue1720250
 
+    The solution used here is my own invention created by reading the doc, 
+    the source code & online conversations.
+    
+    Unfortunately, I can't use this solution forever because 
+    PyEval_AcquireLock() and PyEval_AcquireLock() have been deprecated.
+    I haven't been able to get my code to work without them though.
+    ref: http://bugs.python.org/issue10913
+    */
+    
+    // Create a new Python thread for the callback. It's OK to call this when
+    // I don't hold the GIL. 
+    DPRINTF("Creating callback thread\n");
+    callback_thread = PyThreadState_New(self->interpreter);
+    DPRINTF("Callback thread has id %ld\n", callback_thread->thread_id);
+    
+    // I need the GIL to call PyThreadState_Swap()
+    DPRINTF("Acquiring the GIL\n");
+    PyEval_AcquireLock();
+    
+    DPRINTF("Making callback thread current\n");
+    previous_thread = PyThreadState_Swap(callback_thread);    
+    dprint_current_thread_id();
+    
     /* Notifications are one-offs; the caller must re-register if he wants 
        more. Therefore I must discard my pointers to the callback function
        and param after the callback is complete.
@@ -1695,6 +1741,7 @@ void process_notification(union sigval notification_data) {
     self->notification_callback_param = NULL;
 
     // Perform the callback.
+    DPRINTF("Performing the callback...\n");
     py_args = Py_BuildValue("(O)", callback_param);
     py_result = PyObject_CallObject(callback_function, py_args);
     Py_DECREF(py_args);
@@ -1719,8 +1766,17 @@ void process_notification(union sigval notification_data) {
     
     Py_XDECREF(py_result);
 
-    DPRINTF("Calling PyGILState_Release()\n");
-    PyGILState_Release(gstate);
+    // Clean up the thread I created. I can't clean it up while it is the 
+    // current thread, so first I restore the thread I swapped out earlier.
+    DPRINTF("Swapping callback thread out of current\n");
+    PyThreadState_Swap(previous_thread);
+    
+    DPRINTF("cleaning up callback thread\n");
+    PyThreadState_Clear(callback_thread);
+    PyThreadState_Delete(callback_thread);
+    
+    DPRINTF("Releasing GIL\n");    
+    PyEval_ReleaseLock();
 
     DPRINTF("exiting thread\n");
 };
@@ -1799,16 +1855,15 @@ MessageQueue_request_notification(MessageQueue *self, PyObject *args) {
         notification.sigev_notify_function = process_notification;
         notification.sigev_notify_attributes = NULL;
     
-        // Python voodoo here. When notification occurs, it will be in a
-        // (new) C thread. In that thread I'll create a Python thread but
-        // beforehand, threads must be initialized. 
+        // When notification occurs, it will be in a (new) C thread. In that 
+        // thread I'll create a Python thread but beforehand, threads must be
+        // initialized. 
         if (!PyEval_ThreadsInitialized()) {
             DPRINTF("calling PyEval_InitThreads()\n");
             PyEval_InitThreads();
-            // PyEval_InitThreads() acquires the GIL on my behalf but
-            // I don't want it at the moment.
-            PyEval_ReleaseLock();
         }
+
+        dprint_current_thread_id();
     }
     
     if (SIGEV_NONE != notification.sigev_notify) {
@@ -1836,6 +1891,8 @@ MessageQueue_request_notification(MessageQueue *self, PyObject *args) {
         }
     }
     
+    DPRINTF("exiting MessageQueue_request_notification()\n");
+
     Py_RETURN_NONE;
 
     error_return:
