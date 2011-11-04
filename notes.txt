@@ -15,6 +15,5 @@ POSIX IPC
 https://wiki.ubuntu.com/PackagingGuide/Python
 
 - can I use select.select() on a message queue handle?
-- unnamed semaphores
 - update PyPi (python setup.py register)
 

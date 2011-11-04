@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "structmember.h"
 
 #include <time.h>
+#include <sys/time.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <stdio.h>
@@ -297,6 +298,7 @@ int convert_timeout(PyObject *py_timeout, void *converted_timeout) {
     // struct is undefined. Otherwise, the rest of the struct is populated.
     int rc = 0;
     double simple_timeout = 0;
+    struct timeval current_time;
     NoneableTimeout *p_timeout = (NoneableTimeout *)converted_timeout;
 
     // The timeout can be None or any Python numeric type (float, 
@@ -333,7 +335,10 @@ int convert_timeout(PyObject *py_timeout, void *converted_timeout) {
             
             p_timeout->is_zero = (!simple_timeout);
 
-            simple_timeout += time(NULL);
+            gettimeofday(&current_time, NULL);
+
+            simple_timeout += current_time.tv_sec;
+            simple_timeout += (float)current_time.tv_usec / 1e6;
     
             p_timeout->timestamp.tv_sec = (time_t)floor(simple_timeout);
             p_timeout->timestamp.tv_nsec = (long)((simple_timeout - floor(simple_timeout)) * ONE_BILLION);
