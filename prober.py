@@ -116,16 +116,14 @@ def sniff_sem_value_max():
     
     if not does_build_succeed("sniff_sem_value_max.c"):
         # OpenSolaris 2008.05 doesn't #define SEM_VALUE_MAX. (This may
-        # be true elsewhere too.) Ask sysconf() instead if it exists. (It
-        # does not exist on Cygwin.)
+        # be true elsewhere too.) Ask sysconf() instead if it exists.
+        # Note that sys.sysconf_names doesn't exist under Cygwin.
         if hasattr(os, "sysconf_names") and \
            ("SC_SEM_VALUE_MAX" in os.sysconf_names):
             sem_value_max = os.sysconf("SC_SEM_VALUE_MAX")
         else:
-            # I don't know of an OS that would trigger this condition,
-            # but that doesn't mean it won't happen. This value of last
-            # resort should be #defined everywhere. What could possibly
-            # go wrong?
+            # This value of last resort should be #defined everywhere. What 
+            # could possibly go wrong?
             sem_value_max = "_POSIX_SEM_VALUE_MAX"
 
     return sem_value_max
@@ -163,7 +161,9 @@ def sniff_mq_prio_max():
 
     if max_priority is None:
         # Looking for a #define didn't work; ask sysconf() instead.
-        if "SC_MQ_PRIO_MAX" in os.sysconf_names:
+        # Note that sys.sysconf_names doesn't exist under Cygwin.
+        if hasattr(os, "sysconf_names") and \
+           ("SC_MQ_PRIO_MAX" in os.sysconf_names):
             max_priority = os.sysconf("SC_MQ_PRIO_MAX")
         else:
             max_priority = DEFAULT_PRIORITY_MAX
