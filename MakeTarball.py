@@ -62,6 +62,7 @@ filenames = (
 
 tarball_name = "posix_ipc-%s.tar.gz" % VERSION
 md5_name = "posix_ipc-%s.md5.txt" % VERSION
+sha1_name = "posix_ipc-%s.sha1.txt" % VERSION
 
 if os.path.exists(tarball_name):
     os.remove(tarball_name)
@@ -82,11 +83,14 @@ tarball.close()
 # Generate the md5 hash of the tarball
 s = open("./" + tarball_name).read()
 
-s = hashlib.md5(s).hexdigest()
+md5 = hashlib.md5(s).hexdigest()
+sha1 = hashlib.sha1(s).hexdigest()
 
-print "md5 = " + s
+open(md5_name, "wb").write(md5)
+open(sha1_name, "wb").write(sha1)
 
-open(md5_name, "w").write(s)
+print "md5 = " + md5
+print "sha1 = " + sha1
 
 
 # Print an RSS item suitable for pasting into rss.xml
