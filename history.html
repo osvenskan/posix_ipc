@@ -29,7 +29,32 @@ module</a>.</p>
 
 <ul id="history">
 
-    <li><strong><span id="current">Current</span> &ndash; 0.9.1 (7 Apr 2011) &ndash;</strong>
+    <li><strong><span id="current">Current</span> &ndash; 0.9.2 (6 Nov 2011) &ndash;</strong>
+        <ul>
+            <li>Fixed a bug where timeouts in <tt>Semaphore.acquire()</tt>, 
+                <tt>MessageQueue.send()</tt> and <tt>MessageQueue.receive()</tt>
+                were only accurate to about one second due to use of the C call
+                <tt>time()</tt>. Switching to <tt>gettimeofday()</tt> fixes 
+                the problem. Thanks to Douglas Young for the bug report and
+                patch.
+            </li>
+        
+            <li>Fixed a bug in <tt>prober.py</tt> that caused install to fail
+                under Ubuntu 11.10. <tt>prober.py</tt> specified link options 
+                in the wrong order, and so linking one of the test 
+                applications that's built during setup was failing. Thanks
+                to Kevin Miles for the bug report.
+            </li>
+
+            <li>Added a check in <tt>prober.py</tt> to see if 
+                <tt>sysconf_names</tt> exists in the <tt>os</tt> module. It
+                doesn't exist under Cygwin, and this code caused an error 
+                on that platform. Thanks to Rizwan Raza for the bug report.
+            </li>
+        </ul>
+    </li>
+
+    <li>0.9.1 (7 Apr 2011) &ndash;
         <ul>
             <li>Fixed (?) a bug in message queue thread notification that caused
                 <tt>ceval: tstate mix-up</tt> and other fun messages. Thanks to

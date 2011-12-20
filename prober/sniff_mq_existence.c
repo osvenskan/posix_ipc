@@ -1,8 +1,7 @@
 #include <mqueue.h>
-#include <stdlib.h>
 
 int main(void) { 
-    mq_unlink(NULL);
+    mq_unlink("");
     
     return 0;
 }

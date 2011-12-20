@@ -51,8 +51,15 @@ def print_bad_news(value_name, default):
 
 def does_build_succeed(filename, linker_options = ""):
     # Utility function that returns True if the file compiles and links
-    # successfully, False otherwise.    
-    cmd = "cc -Wall -o ./prober/foo %s ./prober/%s" % (linker_options, filename)
+    # successfully, False otherwise.
+    # Two things to note here --
+    #   - If there's a linker option like -lrt, it needs to come *after*
+    #     the specification of the C file or linking will fail on Ubuntu 11.10
+    #     (maybe because of the gcc version?)
+    #   - Some versions of Linux place the sem_xxx() functions in libpthread.
+    #     Rather than testing whether or not it's needed, I just specify it
+    #     everywhere since it's harmless to specify it when it's not needed.
+    cmd = "cc -Wall -o ./prober/foo ./prober/%s %s -lpthread" % (filename, linker_options)
 
     p = subprocess.Popen(cmd, shell=True, stdout=STDOUT, stderr=STDERR)
         
@@ -158,6 +165,12 @@ def sniff_mq_prio_max():
     DEFAULT_PRIORITY_MAX = 32
     
     max_priority = compile_and_run("sniff_mq_prio_max.c")
+    
+    if max_priority:
+        try:
+            max_priority = int(max_priority)
+        except ValueError:
+            max_priority = None
 
     if max_priority is None:
         # Looking for a #define didn't work; ask sysconf() instead.
@@ -265,6 +278,7 @@ def probe():
         # FreeBSD. 
         realtime_lib_is_needed = False
     else:
+        # Some platforms (e.g. Linux & OpenSuse) require linking to librt
         realtime_lib_is_needed = sniff_realtime_lib()
 
     if realtime_lib_is_needed:
