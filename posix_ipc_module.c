@@ -2,7 +2,7 @@
 posix_ipc - A Python module for accessing POSIX 1003.1b-1993 semaphores,
             shared memory and message queues.
 
-Copyright (c) 2008, Philip Semanchuk
+Copyright (c) 2012, Philip Semanchuk
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -359,9 +359,27 @@ generic_str(char *name) {
 
 static void
 mode_to_str(long mode, char *mode_str) {
+    // Given a numeric mode and preallocated string space, populates the
+    // string with the mode formatted as an octal number.
     sprintf(mode_str, "0%o", (int)mode);
 }
 
+
+static int test_semaphore_validity(Semaphore *p) {
+    // Returns 1 (true) if the Semaphore object refers to a valid 
+    // semaphore, 0 (false) otherwise. In the latter case, it sets the
+    // Python exception info and the caller should immediately return NULL.
+    // The false condition should not arise unless the user of the module 
+    // tries to use a Semaphore after it's been closed.
+    int valid = 1;
+    
+    if (!p->pSemaphore) {
+        valid = 0;
+        PyErr_SetString(pExistentialException, "The semaphore has been closed");
+    }
+
+    return valid;
+}
 
 /*   =====  Semaphore implementation functions =====   */
 
@@ -398,10 +416,6 @@ my_sem_unlink(const char *name) {
             break;
 
             case ENOENT:
-                PyErr_SetString(pExistentialException, 
-                                "No semaphore exists with the specified name");
-            break;
-
             case EINVAL:
                 PyErr_SetString(pExistentialException, 
                                 "No semaphore exists with the specified name");
@@ -577,6 +591,9 @@ Semaphore_init(Semaphore *self, PyObject *args, PyObject *keywords) {
 
 static PyObject *
 Semaphore_release(Semaphore *self) {
+    if (!test_semaphore_validity(self))
+        goto error_return;
+    
     if (-1 == sem_post(self->pSemaphore)) {
         switch (errno) {
             case EINVAL:
@@ -604,6 +621,9 @@ Semaphore_acquire(Semaphore *self, PyObject *args, PyObject *keywords) {
     NoneableTimeout timeout;
     int rc = 0;
     
+    if (!test_semaphore_validity(self))
+        goto error_return;
+
     // Initialize this to the default of None.
     timeout.is_none = 1;
 
@@ -712,6 +732,9 @@ static PyObject *
 Semaphore_getvalue(Semaphore *self, void *closure) { 
     int value;
     
+    if (!test_semaphore_validity(self))
+        goto error_return;
+
     if (-1 == sem_getvalue(self->pSemaphore, &value)) {
         switch (errno) {
             case EINVAL:
@@ -737,12 +760,21 @@ Semaphore_getvalue(Semaphore *self, void *closure) {
 
 static PyObject *
 Semaphore_unlink(Semaphore *self) {
+    if (!test_semaphore_validity(self))
+        goto error_return;
+
     return my_sem_unlink(self->name);
+
+    error_return:
+    return NULL;
 }
 
 
 static PyObject *
 Semaphore_close(Semaphore *self) {
+    if (!test_semaphore_validity(self))
+        goto error_return;
+
     if (-1 == sem_close(self->pSemaphore)) {
         switch (errno) {
             case EINVAL:
@@ -2478,7 +2510,7 @@ POSIX_IPC_INIT_FUNCTION_NAME(void) {
 
     PyModule_AddStringConstant(module, "VERSION", POSIX_IPC_VERSION);
     PyModule_AddStringConstant(module, "__version__", POSIX_IPC_VERSION);
-    PyModule_AddStringConstant(module, "__copyright__", "Copyright 2008 Philip Semanchuk");
+    PyModule_AddStringConstant(module, "__copyright__", "Copyright 2012 Philip Semanchuk");
     PyModule_AddStringConstant(module, "__author__", "Philip Semanchuk");
     PyModule_AddStringConstant(module, "__license__", "BSD");
 

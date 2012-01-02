@@ -4,7 +4,7 @@
 
 <head>
 	<meta name="author" content="Philip Semanchuk">
-	<meta name="copyright" content="All contents &copy; 2008 Philip Semanchuk">
+	<meta name="copyright" content="All contents &copy; 2012 Philip Semanchuk">
 	<meta name="keywords" content="python posix ipc semaphore shared memory message queue">
 	
     <title>POSIX IPC for Python</title>
@@ -679,6 +679,38 @@ entities, it might be hard to figure out what you're leaving behind.
 </p>
 
 <p>In short, remember to clean up after yourself.</p>
+
+<h4>Semaphores and References</h4>
+
+<p>I know it's <em>verboten</em> to talk about pointers in Python, but I'm 
+going to do it anyway.
+</p>
+
+<p>Each Semaphore object created by this module contains a C pointer to
+the IPC object created by the system. When you call <tt>sem.close()</tt>,
+the object's internal pointer is set to <tt>NULL</tt>. This leaves the
+object in a not-quite-useless state. You can still call <tt>sem.unlink()</tt>
+or print <tt>sem.name</tt>, but calls to <tt>sem.aquire()</tt> or 
+<tt>sem.release()</tt> will raise an <tt>ExistentialError</tt>.
+</p>
+
+<p>If you know you're not going to use a Semaphore object after calling 
+<tt>sem.close()</tt> or <tt>sem.unlink()</tt>, you could you set your 
+semaphore variable to the return from the function (which is always 
+<tt>None</tt>) like so:
+</p>
+
+<pre>
+    my_sem = my_sem.close()
+</pre>
+
+<p>That will ensure you don't have any nearly useless objects laying around
+that you might use by accident.
+</p>
+
+<p>This doesn't apply to shared memory and message queues because they're
+referenced at the C level by a file descriptor rather than a pointer. 
+</p>
 
 <h4>Permissions</h4>
 
