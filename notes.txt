@@ -1,5 +1,7 @@
 POSIX IPC
 
+- Fix Russel's bug. Best choice is probably to check for a NULL pointer in Semaphore & Msg Queue code (not needed in shared mem?) AND add a line to the doc suggesting that people set their variable = to the return from sem.close() or sem.unlink().
+
 
 -- next todo 
 - why not use "z" as the arg formatter for object names passed by the caller? Would obviate the need for convert_name_param()
