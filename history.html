@@ -29,7 +29,15 @@ module</a>.</p>
 
 <ul id="history">
 
-    <li><strong><span id="current">Current</span> &ndash; 0.9.2 (6 Nov 2011) &ndash;</strong>
+    <li><strong><span id="current">Current</span> &ndash; 0.9.3 (2 Jan 2012) &ndash;</strong>
+        <p>Added a bugfix/feature to raise an error (rather than segault) 
+            when trying to use a closed semaphore.
+            Thanks to Russel for the suggestion and patch.
+        </p>
+    </li>
+
+
+    <li>0.9.2 (6 Nov 2011) &ndash;
         <ul>
             <li>Fixed a bug where timeouts in <tt>Semaphore.acquire()</tt>, 
                 <tt>MessageQueue.send()</tt> and <tt>MessageQueue.receive()</tt>
