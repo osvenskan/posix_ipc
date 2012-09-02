@@ -29,7 +29,19 @@ module</a>.</p>
 
 <ul id="history">
 
-    <li><strong><span id="current">Current</span> &ndash; 0.9.3 (2 Jan 2012) &ndash;</strong>
+    <li><strong><span id="current">Current</span> &ndash; 0.9.4 (2 Sept 2012) &ndash;</strong>
+        <p>Fixed a buglet. When creating shared memory under Linux and 
+        specifying both a size and the read-only flag, creating the memory
+        would succeed but calling <tt>ftruncate()</tt> would fail. 
+        The failure to change the size was correctly reported 
+        but <tt>posix_ipc</tt> failed to clean up the shared memory segment 
+        it had created. That's now fixed. Thanks to Kevin Miles for the bug
+        report.
+        </p>
+    </li>
+
+
+    <li>0.9.3 (2 Jan 2012) &ndash;
         <p>Added a bugfix/feature to raise an error (rather than segault) 
             when trying to use a closed semaphore.
             Thanks to Russel for the suggestion and patch.
@@ -123,7 +135,7 @@ module</a>.</p>
                 because the changes were big (they weren't), but because
                 they and rationale behind them are subtle.
             
-                <p>Fixing these bugs was made easier by this realization &ndash;
+                <p>Fixing these bugs was made easier by this realization: 
                     on all of the systems to which I have access that implement 
                     message queues (FreeBSD, OpenSolaris, Linux, and Windows + 
                     Cygwin), all except Linux implement them as 

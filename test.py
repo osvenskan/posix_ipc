@@ -2,10 +2,12 @@ import posix_ipc
 import pdb
 
 #mq = posix_ipc.MessageQueue("/foo", posix_ipc.O_CREX, 0600, 5, 4096)
-sem = posix_ipc.Semaphore("/fook", posix_ipc.O_CREX, 0600, 1)
+#sem = posix_ipc.Semaphore("/fook", posix_ipc.O_CREX, 0600, 1)
+
+
  
 # shm = posix_ipc.SharedMemory("/foo", posix_ipc.O_CREX, 0600, 4096)
-#shm = posix_ipc.SharedMemory("/foo", mode=0400)
+shm = posix_ipc.SharedMemory("/bar", posix_ipc.O_CREX, size=4096, read_only=True)
 
 # 
 # value = sem.value
@@ -36,10 +38,11 @@ i=42
 #sem = sem
 #shm = shm
 
-# shm.unlink()
+shm.close_fd()
+shm.unlink()
 # 
-sem.close()
-sem.unlink()
+#sem.close()
+#sem.unlink()
  
 # mq.close()
 # mq.unlink()
