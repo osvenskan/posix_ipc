@@ -160,20 +160,20 @@ bytes_to_c_string(PyObject* o, int lock) {
    This code swiped directly from Python 3.1's posixmodule.c by Yours Truly.
    The name there is bytes2str().
 */
-	if (PyBytes_Check(o))
-		return PyBytes_AsString(o);
-	else if (PyByteArray_Check(o)) {
-		if (lock && PyObject_GetBuffer(o, NULL, 0) < 0)
-			/* On a bytearray, this should not fail. */
-			PyErr_BadInternalCall();
-		return PyByteArray_AsString(o);
-	} else {
-		/* The FS converter should have verified that this
-		   is either bytes or bytearray. */
-		Py_FatalError("bad object passed to bytes2str");
-		/* not reached. */
-		return "";
-	}
+    if (PyBytes_Check(o))
+        return PyBytes_AsString(o);
+    else if (PyByteArray_Check(o)) {
+        if (lock && PyObject_GetBuffer(o, NULL, 0) < 0)
+            /* On a bytearray, this should not fail. */
+            PyErr_BadInternalCall();
+        return PyByteArray_AsString(o);
+    } else {
+        /* The FS converter should have verified that this
+           is either bytes or bytearray. */
+        Py_FatalError("bad object passed to bytes2str");
+        /* not reached. */
+        return "";
+    }
 }
 
 static void
@@ -182,9 +182,9 @@ release_bytes(PyObject* o)
    This code swiped directly from Python 3.1's posixmodule.c by Yours Truly.
    */
 {
-	if (PyByteArray_Check(o))
-		o->ob_type->tp_as_buffer->bf_releasebuffer(NULL, 0);
-	Py_DECREF(o);
+    if (PyByteArray_Check(o))
+        o->ob_type->tp_as_buffer->bf_releasebuffer(NULL, 0);
+    Py_DECREF(o);
 }
 #endif
 
@@ -485,13 +485,13 @@ Semaphore_init(Semaphore *self, PyObject *args, PyObject *keywords) {
         
     
     if ( !(flags & O_CREAT) && (flags & O_EXCL) ) {
-		PyErr_SetString(PyExc_ValueError, 
+        PyErr_SetString(PyExc_ValueError, 
                 "O_EXCL must be combined with O_CREAT");
         goto error_return;
     }
 
     if (name.is_none && ((flags & O_EXCL) != O_EXCL)) {
-		PyErr_SetString(PyExc_ValueError, 
+        PyErr_SetString(PyExc_ValueError, 
                 "Name can only be None if O_EXCL is set");
         goto error_return;
     }
@@ -888,13 +888,13 @@ SharedMemory_init(SharedMemory *self, PyObject *args, PyObject *keywords) {
         goto error_return;
 
     if ( !(flags & O_CREAT) && (flags & O_EXCL) ) {
-		PyErr_SetString(PyExc_ValueError, 
+        PyErr_SetString(PyExc_ValueError, 
                 "O_EXCL must be combined with O_CREAT");
         goto error_return;
     }
 
     if (name.is_none && ((flags & O_EXCL) != O_EXCL)) {
-		PyErr_SetString(PyExc_ValueError, 
+        PyErr_SetString(PyExc_ValueError, 
                 "Name can only be None if O_EXCL is set");
         goto error_return;
     }
@@ -984,6 +984,13 @@ SharedMemory_init(SharedMemory *self, PyObject *args, PyObject *keywords) {
         if (size) {
             DPRINTF("calling ftruncate, fd = %d, size = %ld\n", self->fd, size);
             if (-1 == ftruncate(self->fd, (off_t)size)) {
+                // The code below will raise a Python error. Since that error 
+                // is raised during __init__(), it will look to the caller 
+                // as if object creation failed entirely. Here I clean up 
+                // the system object I just created.
+                close(self->fd);
+                shm_unlink(self->name);
+
                 // ftruncate can return a ton of different errors, but most
                 // are not relevant or are extremely unlikely.
                 switch (errno) {
@@ -998,10 +1005,6 @@ SharedMemory_init(SharedMemory *self, PyObject *args, PyObject *keywords) {
                     break;
                     
                     case EROFS:
-                        PyErr_SetString(pPermissionsException,
-                                        "The memory is read-only");
-                    break;
-
                     case EACCES:
                         PyErr_SetString(pPermissionsException,
                                         "The memory is read-only");
@@ -1256,13 +1259,13 @@ MessageQueue_init(MessageQueue *self, PyObject *args, PyObject *keywords) {
         goto error_return;
 
     if ( !(flags & O_CREAT) && (flags & O_EXCL) ) {
-		PyErr_SetString(PyExc_ValueError, 
+        PyErr_SetString(PyExc_ValueError, 
                 "O_EXCL must be combined with O_CREAT");
         goto error_return;
     }
 
     if (name.is_none && ((flags & O_EXCL) != O_EXCL)) {
-		PyErr_SetString(PyExc_ValueError, 
+        PyErr_SetString(PyExc_ValueError, 
                 "Name can only be None if O_EXCL is set");
         goto error_return;
     }
@@ -2388,7 +2391,7 @@ static PyTypeObject MessageQueueType = {
  * Module-level functions & meta stuff
  *
  */
-		
+        
 static PyObject *
 posix_ipc_unlink_semaphore(PyObject *self, PyObject *args) {
     const char *name;
@@ -2448,15 +2451,15 @@ static PyMethodDef module_methods[ ] = {
 
 #if PY_MAJOR_VERSION > 2
 static struct PyModuleDef this_module = {
-	PyModuleDef_HEAD_INIT,  // m_base
-	"posix_ipc",            // m_name
-	"POSIX IPC module",     // m_doc
-	-1,                     // m_size (space allocated for module globals)
-	module_methods,         // m_methods
-	NULL,                   // m_reload
-	NULL,                   // m_traverse
-	NULL,                   // m_clear
-	NULL                    // m_free
+    PyModuleDef_HEAD_INIT,  // m_base
+    "posix_ipc",            // m_name
+    "POSIX IPC module",     // m_doc
+    -1,                     // m_size (space allocated for module globals)
+    module_methods,         // m_methods
+    NULL,                   // m_reload
+    NULL,                   // m_traverse
+    NULL,                   // m_clear
+    NULL                    // m_free
 };
 #endif
 
