@@ -181,8 +181,12 @@ def sniff_mq_prio_max():
     # to define a larger value.
     # ref: http://www.opengroup.org/onlinepubs/009695399/basedefs/limits.h.html
     DEFAULT_PRIORITY_MAX = 32
-    
-    max_priority = compile_and_run("sniff_mq_prio_max.c")
+
+    max_priority = None
+    # OS X up to and including 10.8 doesn't support POSIX messages queues and
+    # doesn't define MQ_PRIO_MAX. Maybe this aggravation will cease in 10.9?
+    if does_build_succeed("sniff_mq_prio_max.c"):
+        max_priority = compile_and_run("sniff_mq_prio_max.c")
     
     if max_priority:
         try:
@@ -199,6 +203,10 @@ def sniff_mq_prio_max():
         else:
             max_priority = DEFAULT_PRIORITY_MAX
             print_bad_news("the value of PRIORITY_MAX", max_priority)
+
+    # Under OS X, os.sysconf("SC_MQ_PRIO_MAX") returns -1.
+    if max_priority < 0:
+        max_priority = DEFAULT_PRIORITY_MAX
 
     # Adjust for the fact that these are 0-based values; i.e. permitted 
     # priorities range from 0 - (MQ_PRIO_MAX - 1). So why not just make
