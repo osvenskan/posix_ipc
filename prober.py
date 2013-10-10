@@ -84,6 +84,24 @@ def compile_and_run(filename, linker_options = ""):
         return s.strip().decode()
         
 
+def get_sysctl_value(name):
+    """Given a sysctl name (e.g. 'kern.mqueue.maxmsg'), returns sysctl's value
+    for that variable or None if the sysctl call fails (unknown name, not 
+    a BSD-ish system, etc.)
+
+    Only makes sense on systems that implement sysctl (BSD derivatives). 
+    """
+    s = None
+    try: 
+        s = subprocess.Popen(["sysctl", "-n", name], 
+                              stdout=subprocess.PIPE).communicate()[0]
+        s = s.strip().decode()
+    except:
+        pass
+    
+    return s
+
+
 def sniff_realtime_lib():
     rc = None
     filename = "sniff_realtime_lib.c"
@@ -195,32 +213,46 @@ def sniff_mq_max_messages():
     # This value is not defined by POSIX.
     
     # On most systems I've tested, msg Qs are implemented via mmap-ed files 
-    # or a similar interface, so the only limits are imposed by the file 
-    # system.
+    # or a similar interface, so the only theoretical limits are imposed by the
+    # file system. In practice, Linux and *BSD impose some fairly tight 
+    # limits. 
 
-    # However, on Linux it is available in a /proc file and defaults to the
-    # wimpy value of 10.
+    # On Linux it's available in a /proc file and often defaults to the wimpy
+    # value of 10.
     
+    # On FreeBSD (and other BSDs, I assume), it's available via sysctl as
+    # kern.mqueue.maxmsg. On my FreeBSD 9.1 test system, it defaults to 100. 
+
     # mqueue.h defines mq_attr.mq_maxmsg as a C long, so that's 
     # a practical limit for this value.
     
     # ref: http://linux.die.net/man/7/mq_overview
     # ref: http://www.freebsd.org/cgi/man.cgi?query=mqueuefs&sektion=5&manpath=FreeBSD+7.0-RELEASE
+    # http://fxr.watson.org/fxr/source/kern/uipc_mqueue.c?v=FREEBSD91#L195
     # ref: http://groups.google.com/group/comp.unix.solaris/browse_thread/thread/aa223fc7c91f8c38
     # ref: http://cygwin.com/cgi-bin/cvsweb.cgi/src/winsup/cygwin/posix_ipc.cc?cvsroot=src
     # ref: http://cygwin.com/cgi-bin/cvsweb.cgi/src/winsup/cygwin/include/mqueue.h?cvsroot=src
-    mq_max_messages = "LONG_MAX"
+    mq_max_messages = None
 
-    # Since Linux is the odd one out here, I'll check to see if we're on
-    # a Linux-y system
+    # Try to get the value from where Linux stores it.
     try:
-        f = open("/proc/sys/fs/mqueue/msg_max")
-        mq_max_messages = "%dL" % int(f.read())
-        f.close()
+        mq_max_messages = int(open("/proc/sys/fs/mqueue/msg_max").read())
     except:
-        # oh well
+        # Oh well.
         pass
-        
+
+    if not mq_max_messages:
+        # Maybe we're on BSD.
+        mq_max_messages = get_sysctl_value('kern.mqueue.maxmsg')
+        if mq_max_messages:
+            mq_max_messages = int(mq_max_messages)
+
+    if not mq_max_messages:
+        # Use an arbitrary default. The max possible is > 2 billion, but the 
+        # values used by Linux and FreeBSD suggest that a smaller default is 
+        # wiser.
+        mq_max_messages = 1024
+
     return mq_max_messages
 
 
@@ -228,12 +260,16 @@ def sniff_mq_max_message_size_default():
     # The max message size is not defined by POSIX.
     
     # On most systems I've tested, msg Qs are implemented via mmap-ed files 
-    # or a similar interface, so the only limits are imposed by the file 
-    # system.
+    # or a similar interface, so the only theoretical limits are imposed by 
+    # the file system. In practice, Linux and *BSD impose some tighter limits. 
 
-    # However, on Linux max message size is available in a /proc file and 
-    # often defaults to the value of 8192.
-    
+    # On Linux, max message size is available in a /proc file and often 
+    # defaults to the value of 8192.
+
+    # On FreeBSD (and other BSDs, I assume), it's available via sysctl as
+    # kern.mqueue.maxmsgsize. On my FreeBSD 9.1 test system, it defaults to 
+    # 16384. 
+
     # mqueue.h defines mq_attr.mq_msgsize as a C long, so that's 
     # a practical limit for this value.
     
@@ -241,20 +277,28 @@ def sniff_mq_max_message_size_default():
     # a buffer the size of the queue's max message every time receive() is 
     # called, so it would be a bad idea to set this default to the max.
     # I set it to 8192 -- not too small, not too big. I only set it smaller
-    # if I'm on a Linux system that tells me I must.
-    mq_max_message_size_default = 8192 
+    # if I'm on a system that tells me I must do so.
+    DEFAULT = 8192 
+    mq_max_message_size_default = 0
 
-    # Since Linux is the odd one out here, I'll check to see if we're on
-    # a Linux-y system
+    # Try to get the value from where Linux stores it.
     try:
-        f = open("/proc/sys/fs/mqueue/msgsize_max")
-        mq_max_message_size_default = max(mq_max_message_size_default, int(f.read()))
-        f.close()
+        mq_max_message_size_default = \
+                            int(open("/proc/sys/fs/mqueue/msgsize_max").read())
     except:
         # oh well
         pass
+
+    if not mq_max_message_size_default:
+        # Maybe we're on BSD.
+        mq_max_message_size_default = get_sysctl_value('kern.mqueue.maxmsgsize')
+        if mq_max_message_size_default:
+            mq_max_message_size_default = int(mq_max_message_size_default)
+
+    if not mq_max_message_size_default:
+        mq_max_message_size_default = DEFAULT
         
-    return "%dL" % mq_max_message_size_default
+    return mq_max_message_size_default
 
 
 
@@ -339,9 +383,7 @@ To recreate this file, just delete it and re-run setup.py.
         lines.append("#endif")
         
         # A trailing '\n' keeps compilers happy...
-        f = open(filename, "w")
-        f.write(msg + '\n'.join(lines) + '\n')
-        f.close()
+        open(filename, "w").write(msg + '\n'.join(lines) + '\n')
         
     return d
 
