@@ -5,15 +5,11 @@ import platform
 # My modules
 import prober
 
-f = open("VERSION")
-VERSION = f.read().strip()
-f.close()
+VERSION = open("VERSION").read().strip()
 
 name = "posix_ipc"
 description = "POSIX IPC primitives (semaphores, shared memory and message queues) for Python"
-f = open("README")
-long_description = f.read().strip()
-f.close()
+long_description = open("README").read().strip()
 author = "Philip Semanchuk",
 author_email = "philip@semanchuk.com",
 maintainer = "Philip Semanchuk",
@@ -21,7 +17,7 @@ url = "http://semanchuk.com/philip/posix_ipc/",
 download_url = "http://semanchuk.com/philip/posix_ipc/posix_ipc-%s.tar.gz" % VERSION,
 source_files = ["posix_ipc_module.c"]
 # http://pypi.python.org/pypi?%3Aaction=list_classifiers
-classifiers = [ "Development Status :: 4 - Beta", 
+classifiers = [ "Development Status :: 5 - Production/Stable", 
                 "Intended Audience :: Developers", 
                 "License :: OSI Approved :: BSD License",
                 "Operating System :: MacOS :: MacOS X",
