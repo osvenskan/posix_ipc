@@ -111,7 +111,8 @@ mapfile.close()
 # unlinking at the module level I'll do it that way.
 posix_ipc.unlink_shared_memory(params["SHARED_MEMORY_NAME"])
 
-semaphore.close()
+semaphore.release()
+
 # I could also unlink the semaphore by calling 
 # posix_ipc.unlink_semaphore() but I'll do it this way instead.
 semaphore.unlink()
