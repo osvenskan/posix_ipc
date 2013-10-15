@@ -29,7 +29,21 @@ module</a>.</p>
 
 <ul id="history">
 
-    <li><strong><span id="current">Current</span> &ndash; 0.9.4 (2 Sept 2012) &ndash;</strong>
+    <li><strong><span id="current">Current</span> &ndash; 0.9.5 (14 Oct 2013) &ndash;</strong>
+        <ul>
+            <li>Added the ability to use Semaphores in context managers.
+        	Thanks to Matt Ruffalo for the suggestion and patch.
+            </li>
+            <li>Fixed a big under FreeBSD 9.x where I used overly ambitious
+            values for some message queue constants at build time. Now,
+            <tt>posix_ipc</tt> asks <tt>sysctl</tt> for the correct values.
+            <i>Köszönöm</i> to Attila Nagy for the bug report.
+            </li>
+        </ul>
+    </li>
+
+
+    <li>0.9.4 (2 Sept 2012) &ndash;
         <p>Fixed a buglet. When creating shared memory under Linux and 
         specifying both a size and the read-only flag, creating the memory
         would succeed but calling <tt>ftruncate()</tt> would fail. 

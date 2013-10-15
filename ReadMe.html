@@ -358,6 +358,22 @@ situations specific to IPC.
     </dd>
 </dl>
 
+<h4>Context Manager Support</h4>
+
+<p>These semaphores provide <tt>__enter__()</tt> and <tt>__exit__()</tt>
+methods so they can be used in context managers. For instance --
+</p>
+
+<pre>
+with posix_ipc.Semaphore(name) as sem:
+    # Do something...
+</pre>
+
+<p>Entering the context acquires the semaphore, exiting the context releases 
+	the semaphore. See <tt>demo4/child.py</tt> for a complete example.
+</p>
+
+
 <h3 id="shared_memory">The SharedMemory Class</h3>
 
 <p>This is a handle to a shared memory segment. POSIX shared memory segments
@@ -600,6 +616,8 @@ a file descriptor that can be mmapped.
                 of <tt>(function, param)</tt>, notification will be sent
                 by invoking <tt><em>function(param)</em></tt> in a new
                 thread. 
+                <strong>My implementation of thread notification is buggy.</strong> 
+                See <a href="#KnownBugs">Known Bugs</a> below.
             </li>
         </ul>
 
@@ -758,15 +776,24 @@ probably cover them.
 
 <p>For Pythonistas &ndash;</p>
 <ul>
-    <li><a href="http://www.youtube.com/watch?v=13JK5kChbRw">A meditation on the inaccuracy 
-        of shared memories</a>
+    <li><a href="http://www.youtube.com/watch?v=13JK5kChbRw">A meditation on the 
+    	inaccuracy of shared memories</a>
     </li>
 </ul>
 
 
 <h3><a name="KnownBugs">Known Bugs</a></h3>
 
-<p>I don't know of any bugs in this code. However, under Python 3 the
+<p>While testing the message queue thread notification feature in version 0.9.5, 
+I saw my old friend, 
+"<tt>Fatal Python error: PyEval_AcquireLock: current thread state is NULL</tt>".
+The Python documentation surrounding thread state and the GIL was as clear as 
+mud to me when I wrote that code, and I'm sad but not surprised that it has
+turned out to be buggy. Use it at your own risk and I'll try to find time to
+rewrite it.
+</p>
+
+<p>I don't know of any other bugs in this code. However, under Python 3 the
 standard library modules accept bytes and bytearray objects for filenames in
 addition to strings. One could argue that this module should behave the 
 same way.
@@ -800,7 +827,8 @@ conformance</em>" and still not support any or all of the IPC functions.
         </p>
         
         <p>If you don't have the <tt>sem</tt> and <tt>mqueuefs</tt> kernel 
-            modules loaded, you'll get a message like this when you 
+            modules loaded, you'll get a message like this (or something
+            similarly discouraging) when you 
             try to create a semaphore or message queue:<br>
             <tt>Bad system call: 12 (core dumped)</tt>
         </p>
@@ -811,13 +839,14 @@ conformance</em>" and still not support any or all of the IPC functions.
             <a href="http://www.freebsd.org/cgi/man.cgi?query=mqueuefs&amp;apropos=0&amp;sektion=5&amp;manpath=FreeBSD+8.0-stable&amp;format=html">mqueuefs</a> has 
             some cool features.
         </p>
-        
+
+        <p>
         Prior to 7.2, FreeBSD POSIX semaphore support was 
         <a href="http://www.freebsd.org/cgi/query-pr.cgi?pr=127545">broken</a>.
-        
+        </p>
     </dd>        
     
-        <dt>OS X 10.6</dt>
+    <dt>OS X (up to and including 10.8)</dt>
     <dd>
         Message queues are not supported by OS X. Also, 
         <tt>sem_getvalue()</tt> and <tt>sem_timedwait()</tt> are not 
