@@ -58,6 +58,9 @@ filenames = (
     "demo3/repeating_signal.py", 
     "demo3/repeating_thread.py", 
     "demo3/utils.py", 
+    "demo4/ReadMe.txt", 
+    "demo4/child.py", 
+    "demo4/parent.py", 
 )
 
 tarball_name = "posix_ipc-%s.tar.gz" % VERSION
