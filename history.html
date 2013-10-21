@@ -29,7 +29,22 @@ module</a>.</p>
 
 <ul id="history">
 
-    <li><strong><span id="current">Current</span> &ndash; 0.9.5 (14 Oct 2013) &ndash;</strong>
+    <li><strong><span id="current">Current</span> &ndash; 0.9.6 (14 Oct 2013) &ndash;</strong>
+        <ul>
+            <li>Fixed two bugs in BSD support that occurred if the mqueuefs 
+            kernel module wasn't loaded at install time. First, the installer 
+            would print a harmless but distracting error message from sysctl.
+            Second, <tt>posix_ipc</tt> would build with an inappropriate 
+            value for <tt>QUEUE_MESSAGES_MAX_DEFAULT</tt>. 
+            Subsequent attempts to create a message queue would fail unless the
+            caller set the <tt>max_messages</tt> param to an appropriate
+            value.
+            </li>
+        </ul>
+    </li>
+
+
+    <li>0.9.5 (14 Oct 2013) &ndash;
         <ul>
             <li>Added the ability to use Semaphores in context managers.
         	Thanks to Matt Ruffalo for the suggestion and patch.
