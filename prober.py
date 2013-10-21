@@ -93,8 +93,15 @@ def get_sysctl_value(name):
     """
     s = None
     try: 
+        # I redirect stderr to /dev/null because if sysctl is availble but 
+        # doesn't know about the particular item I'm querying, it will 
+        # kvetch with a message like 'second level name mqueue in 
+        # kern.mqueue.maxmsg is invalid'. This always happens under OS X 
+        # (which doesn't have any kern.mqueue values) and under FreeBSD when
+        # the mqueuefs kernel module isn't loaded.
         s = subprocess.Popen(["sysctl", "-n", name], 
-                              stdout=subprocess.PIPE).communicate()[0]
+                              stdout=subprocess.PIPE,
+                              stderr=open(os.devnull, 'rw')).communicate()[0]
         s = s.strip().decode()
     except:
         pass
