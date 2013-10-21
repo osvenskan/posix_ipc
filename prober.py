@@ -236,7 +236,7 @@ def sniff_mq_max_messages():
     # value of 10.
     
     # On FreeBSD (and other BSDs, I assume), it's available via sysctl as
-    # kern.mqueue.maxmsg. On my FreeBSD 9.1 test system, it defaults to 100. 
+    # kern.mqueue.maxmsg. On my FreeBSD 9.1 test system, it defaults to 100.
 
     # mqueue.h defines mq_attr.mq_maxmsg as a C long, so that's 
     # a practical limit for this value.
@@ -263,10 +263,26 @@ def sniff_mq_max_messages():
             mq_max_messages = int(mq_max_messages)
 
     if not mq_max_messages:
-        # Use an arbitrary default. The max possible is > 2 billion, but the 
-        # values used by Linux and FreeBSD suggest that a smaller default is 
-        # wiser.
-        mq_max_messages = 1024
+        # We're on a non-Linux, non-BSD system, or OS X, or BSD with 
+        # the mqueuefs kernel module not loaded (which it's not, by default,
+        # under FreeBSD 8.x and 9.x. which are the only systems I've tested). 
+        #
+        # If we're on FreeBSD and mqueuefs isn't loaded when this code runs,
+        # sysctl won't be able to provide mq_max_messages to me. (I assume other
+        # BSDs behave the same.) If I use too large of a default, then every
+        # attempt to create a message queue via posix_ipc will fail with
+        # "ValueError: Invalid parameter(s)"  unless the user explicitly sets
+        # the max_messages param.
+        if platform.system().endswith("BSD"):
+            # 100 is the value I see under FreeBSD 9.2. I hope this works
+            # elsewhere!
+            mq_max_messages = 100
+        else:
+            # We're on a non-Linux, non-BSD system. I take a wild guess at an
+            # appropriate value. The max possible is > 2 billion, but the 
+            # values used by Linux and FreeBSD suggest that a smaller default
+            # is wiser.
+            mq_max_messages = 1024
 
     return mq_max_messages
 
