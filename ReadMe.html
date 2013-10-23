@@ -92,10 +92,10 @@ usually lags behind this module a little.
 </p>
 
 <p>You can <strong>download 
-<a href="posix_ipc-0.9.5.tar.gz">posix_ipc version 0.9.5</a>
+<a href="posix_ipc-0.9.6.tar.gz">posix_ipc version 0.9.6</a>
 </strong>
-<a href="posix_ipc-0.9.5.md5.txt">[MD5 sum]</a>
-<a href="posix_ipc-0.9.5.sha1.txt">[SHA1 sum]</a>
+<a href="posix_ipc-0.9.6.md5.txt">[MD5 sum]</a>
+<a href="posix_ipc-0.9.6.sha1.txt">[SHA1 sum]</a>
 
 which contains the source code, setup.py, installation instructions and
 <a href="#samples">sample code</a>. You can read about
@@ -616,8 +616,6 @@ a file descriptor that can be mmapped.
                 of <tt>(function, param)</tt>, notification will be sent
                 by invoking <tt><em>function(param)</em></tt> in a new
                 thread. 
-                <strong>My implementation of thread notification is buggy.</strong> 
-                See <a href="#KnownBugs">Known Bugs</a> below.
             </li>
         </ul>
 
@@ -784,16 +782,7 @@ probably cover them.
 
 <h3><a name="KnownBugs">Known Bugs</a></h3>
 
-<p>While testing the message queue thread notification feature in version 0.9.5, 
-I saw my old friend, 
-"<tt>Fatal Python error: PyEval_AcquireLock: current thread state is NULL</tt>".
-The Python documentation surrounding thread state and the GIL was as clear as 
-mud to me when I wrote that code, and I'm sad but not surprised that it has
-turned out to be buggy. Use it at your own risk and I'll try to find time to
-rewrite it.
-</p>
-
-<p>I don't know of any other bugs in this code. However, under Python 3 the
+<p>I don't know of any bugs in this code. However, under Python 3 the
 standard library modules accept bytes and bytearray objects for filenames in
 addition to strings. One could argue that this module should behave the 
 same way.

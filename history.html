@@ -29,18 +29,37 @@ module</a>.</p>
 
 <ul id="history">
 
-    <li><strong><span id="current">Current</span> &ndash; 0.9.6 (14 Oct 2013) &ndash;</strong>
+    <li><strong><span id="current">Current</span> &ndash; 0.9.6 (23 Oct 2013) &ndash;</strong>
+
+    	<p>Fixed two BSD-specific bugs introduced in version 0.9.5 
+    		that occurred if the kernel module <tt>mqueuefs</tt> wasn't 
+    		loaded at install time. Specifically -- 
+        </p>
+
         <ul>
-            <li>Fixed two bugs in BSD support that occurred if the mqueuefs 
-            kernel module wasn't loaded at install time. First, the installer 
+            <li>The installer 
             would print a harmless but distracting error message from sysctl.
-            Second, <tt>posix_ipc</tt> would build with an inappropriate 
+            (This also affected OS X which is FreeBSD-ish.)
+            </li>
+            
+            <li><tt>posix_ipc</tt> would build with an inappropriate 
             value for <tt>QUEUE_MESSAGES_MAX_DEFAULT</tt>. 
             Subsequent attempts to create a message queue would fail unless the
             caller set the <tt>max_messages</tt> param to an appropriate
-            value.
+            value. (This didn't affect OS X since OS X doesn't support message
+            queues at all.)
             </li>
         </ul>
+
+        <p>Also, rewrote the message queue thread notification code to address
+        the old bug (<tt>Fatal Python error: PyEval_AcquireLock: current thread state is NULL</tt>)
+        that appeared during release testing for 0.9.5 and which 
+        has plagued me on and off since I wrote this code. The new code uses 
+        <a href="http://docs.python.org/2/c-api/init.html#non-python-created-threads">the
+        algorithm recommended in the Python documentation</a> which may have
+        been flaky when I started using it in Python 2.4. It seems stable now
+        under Python 2.6+/3. 
+        </p>
     </li>
 
 
