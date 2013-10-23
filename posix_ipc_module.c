@@ -1758,7 +1758,7 @@ void dprint_current_thread_id(void) {
     // Debug print only. Note that calling PyThreadState_Get() when there's
     // no current thread is a fatal error, so calling this can crash your
     // app.
-    DPRINTF("Current thread has id %ld\n", PyThreadState_Get()->thread_id);
+    DPRINTF("Current thread has id %lu\n", PyThreadState_Get()->thread_id);
 }
 
     
@@ -1770,40 +1770,11 @@ void process_notification(union sigval notification_data) {
     MessageQueue *self = notification_data.sival_ptr;
     PyObject *callback_function = NULL;
     PyObject *callback_param = NULL;
-    PyThreadState *callback_thread = NULL;
-    PyThreadState *previous_thread = NULL;
+    PyGILState_STATE gstate;
     
-    DPRINTF("C thread %ld invoked\n", pthread_self());
-    
-    /* There are a number of fancy functions meant to ease the process of 
-    calling into a Python thread from C. For me they resulted in segfaults,
-    "ceval: tstate mix-up" and "ceval: orphan tstate" messages.
-    
-    In particular, I think I was being bitten by this PyGILState_Ensure() bug:
-    http://bugs.python.org/issue1720250
+    DPRINTF("C thread %lu invoked, calling PyGILState_Ensure()\n", pthread_self());
 
-    The solution used here is my own invention created by reading the doc, 
-    the source code & online conversations.
-    
-    Unfortunately, I can't use this solution forever because 
-    PyEval_AcquireLock() and PyEval_AcquireLock() have been deprecated.
-    I haven't been able to get my code to work without them though.
-    ref: http://bugs.python.org/issue10913
-    */
-    
-    // Create a new Python thread for the callback. It's OK to call this when
-    // I don't hold the GIL. 
-    DPRINTF("Creating callback thread\n");
-    callback_thread = PyThreadState_New(self->interpreter);
-    DPRINTF("Callback thread has id %ld\n", callback_thread->thread_id);
-    
-    // I need the GIL to call PyThreadState_Swap()
-    DPRINTF("Acquiring the GIL\n");
-    PyEval_AcquireLock();
-    
-    DPRINTF("Making callback thread current\n");
-    previous_thread = PyThreadState_Swap(callback_thread);    
-    dprint_current_thread_id();
+    gstate = PyGILState_Ensure();
     
     /* Notifications are one-offs; the caller must re-register if he wants 
        more. Therefore I must discard my pointers to the callback function
@@ -1846,18 +1817,10 @@ void process_notification(union sigval notification_data) {
     }
     
     Py_XDECREF(py_result);
-
-    // Clean up the thread I created. I can't clean it up while it is the 
-    // current thread, so first I restore the thread I swapped out earlier.
-    DPRINTF("Swapping callback thread out of current\n");
-    PyThreadState_Swap(previous_thread);
     
-    DPRINTF("cleaning up callback thread\n");
-    PyThreadState_Clear(callback_thread);
-    PyThreadState_Delete(callback_thread);
-    
-    DPRINTF("Releasing GIL\n");    
-    PyEval_ReleaseLock();
+	/* Release the thread. No Python API allowed beyond this point. */
+    DPRINTF("Calling PyGILState_Release()\n");    
+	PyGILState_Release(gstate);
 
     DPRINTF("exiting thread\n");
 };
