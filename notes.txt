@@ -2,7 +2,17 @@ POSIX IPC
 
 = Release Instructions =
 
+1) Create the tarball and upload to PyPI. This has to be done all in one step.
+   python setup.py sdist --formats=gztar upload
 
+You can upload to the test PyPI with this command — 
+   python setup.py sdist --formats=gztar upload -r https://testpypi.python.org/pypi
+
+2) Run ./post_dist.py to shuffle files and create the RSS info.
+
+3) update semanchuk.com with new binaries, rss.xml, HTML.
+
+ 
 
 
 -- next todo 
