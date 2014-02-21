@@ -4,7 +4,7 @@
 
 <head>
 	<meta name="author" content="Philip Semanchuk">
-	<meta name="copyright" content="All contents &copy; 2013 Philip Semanchuk">
+	<meta name="copyright" content="All contents &copy; 2014 Philip Semanchuk">
 	<meta name="keywords" content="python posix ipc semaphore shared memory message queue">
 	
     <title>POSIX IPC for Python</title>
@@ -98,12 +98,13 @@ usually lags behind this module a little.
 <a href="posix_ipc-0.9.6.sha1.txt">[SHA1 sum]</a>
 
 which contains the source code, setup.py, installation instructions and
-<a href="#samples">sample code</a>. You can read about
-<a href="history.html">all of the changes in this version</a>.
+<a href="#samples">sample code</a>. The exact same 
+<a href="https://pypi.python.org/pypi/posix_ipc">posix_ipc tarball is also available on PyPI</a>.
 </p>
 
 <p>
 You might want to read
+<a href="history.html">all of the changes in this version</a> and 
 about some <a href="#KnownBugs">known bugs</a>.
 </p>
 
@@ -786,6 +787,11 @@ probably cover them.
 standard library modules accept bytes and bytearray objects for filenames in
 addition to strings. One could argue that this module should behave the 
 same way.
+</p>
+
+<p>Also, this module doesn't support Python 3 memory views, which it
+probably should (for shared memory objects). Support for that might come in
+a later version.
 </p>
 
 
