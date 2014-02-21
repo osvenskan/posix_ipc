@@ -367,7 +367,8 @@ def probe():
 
     if ("SEM_GETVALUE_EXISTS" in d) and ("Darwin" in platform.uname()):
         # sem_getvalue() isn't available on OS X. The function exists but 
-        # always returns ENOSYS ("Function not implemented").
+        # always returns -1 (under OS X 10.9) or ENOSYS ("Function not 
+        # implemented") under some earlier version(s).
         del d["SEM_GETVALUE_EXISTS"]
 
     if sniff_sem_timedwait(linker_options):
