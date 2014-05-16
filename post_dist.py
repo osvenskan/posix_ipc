@@ -12,7 +12,7 @@ VERSION = open("VERSION").read().strip()
 
 # Make a copy of the tarball for posterity
 tarball_name = "posix_ipc-%s.tar.gz" % VERSION
-shutil.copyfile(os.path.join("dist", tarball_name), 
+shutil.copyfile(os.path.join("dist", tarball_name),
                 os.path.join("releases", tarball_name))
 
 tarball_name = "releases/posix_ipc-%s.tar.gz" % VERSION
@@ -48,3 +48,4 @@ print """
 
 """ % (VERSION, VERSION, timestamp, VERSION)
 
+print 'hg tag rel' + VERSION
