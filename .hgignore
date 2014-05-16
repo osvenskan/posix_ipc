@@ -2,3 +2,5 @@ syntax: glob
 *.pyc
 .DS_Store
 releases/*
+probe_results.h
+prober/foo
