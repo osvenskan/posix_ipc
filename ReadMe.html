@@ -191,7 +191,9 @@ semaphores.
 
     <dt>USER_SIGNAL_MIN, USER_SIGNAL_MAX</dt>
     <dd>The constants define a range of signal values reserved for
-        use by user applications (like yours).
+        use by user applications (like yours). They're available only on
+        systems that support the POSIX Realtime Signals Extension. Most
+        systems do; NetBSD versions prior to 6.0 are a notable exception.
     </dd>
 </dl>
 

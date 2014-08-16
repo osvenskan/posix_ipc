@@ -12,9 +12,6 @@ You can upload to the test PyPI with this command —
 
 3) update semanchuk.com with new binaries, rss.xml, HTML.
 
- 
-
-
 -- next todo 
 - why not use "z" as the arg formatter for object names passed by the caller? Would obviate the need for convert_name_param()
 
