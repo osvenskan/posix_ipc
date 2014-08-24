@@ -1,4 +1,6 @@
 # Python imports
+# Don't add any from __future__ imports here. This code should execute
+# against standard Python.
 import unittest
 import datetime
 import random
@@ -7,20 +9,10 @@ import random
 import posix_ipc
 import base as tests_base
 
+# N_RELEASES is the number of times release() is called in test_release()
+N_RELEASES = 1000000 # 1 million
+
 class TestSemaphores(tests_base.Base):
-    def xrange(self, stop):
-        """Return a range or xrange (if available) from 0 to stop.
-
-        This is a hack to deal with Python 2/3 version straddling.
-        """
-        try:
-            f = xrange
-        except NameError:
-            f = range
-
-        return f(stop)
-
-
     def setUp(self):
         self.sem = posix_ipc.Semaphore(None, posix_ipc.O_CREX,
                                        initial_value=1)
@@ -192,11 +184,11 @@ class TestSemaphores(tests_base.Base):
 
     def test_release(self):
         """tests that release works"""
-        # Not only does it work, I can do it as many times as I want! It's
-        # interesting to try to do it the max number of times, but it takes
-        # quite some time so I'll stick to a lower (but still very large)
-        # number of releases.
-        n_releases = min(1000000, posix_ipc.SEMAPHORE_VALUE_MAX - 1)
+        # Not only does it work, I can do it as many times as I want! I had
+        # tried some code that called release() SEMAPHORE_VALUE_MAX times, but
+        # on platforms where that's ~2 billion, the test takes too long to run.
+        # So I'll stick to a lower (but still very large) number of releases.
+        n_releases = min(N_RELEASES, posix_ipc.SEMAPHORE_VALUE_MAX - 1)
         for i in range(n_releases):
             self.sem.release()
 

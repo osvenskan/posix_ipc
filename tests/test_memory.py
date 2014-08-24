@@ -1,15 +1,27 @@
 # Python imports
-from __future__ import division
+# Don't add any from __future__ imports here. This code should execute
+# against standard Python.
 import unittest
 import datetime
 import mmap
+import os
 
 # Project imports
 import posix_ipc
 import base as tests_base
 
 class TestMemory(tests_base.Base):
-    SIZE = 1024
+    # SIZE should be something that's not a power of 2 since that's more
+    # likely to expose odd behavior.
+    SIZE = 3333
+
+    def get_block_size(self):
+        """Return block size as reported by operating system"""
+        # I thought it would be a good idea to pass self.mem.name to
+        # os.statvfs in case that filesystem is different from the
+        # regular one, but I get 'No such file or directory' when I do so.
+        # This happens on OS X and Linux.
+        return os.statvfs('.')[1]
 
     def setUp(self):
         self.mem = posix_ipc.SharedMemory('/foo', posix_ipc.O_CREX,
@@ -37,8 +49,7 @@ class TestMemory(tests_base.Base):
         """tests posix_ipc.O_CREAT to create a new mem segment without O_EXCL"""
         mem = posix_ipc.SharedMemory('/bar', posix_ipc.O_CREAT)
 
-        # I would prefer this syntax, but it doesn't work with Python < 2.7.
-        #self.assertIsNotNone(mem)
+        self.assertIsNotNone(mem)
 
         mem.unlink()
 
@@ -58,9 +69,6 @@ class TestMemory(tests_base.Base):
         self.assertIsNotNone(mem.name)
         self.assertEqual(mem.name[0], '/')
         self.assertGreaterEqual(len(mem.name), 2)
-        # import pdb
-        # pdb.set_trace()
-
         mem.close_fd()
         mem.unlink()
 
@@ -68,14 +76,33 @@ class TestMemory(tests_base.Base):
 
     # Other SharedMemory flags are tested later.
 
-    def test_xxxxx(self):
-        """tests xxxxxx"""
+    def test_mmap_size(self):
+        """tests that the size specified is (somewhat) respected by mmap()"""
+        # In limited testing, Linux respects the exact size specified in the
+        # SharedMemory() ctor when creating the mmapped file.
+        # e.g. when self.SIZE = 3333, the
+        # mmapped file is also 3333 bytes.
+        #
+        # OS X's mmapped files always have sizes that are mod 4096 which is
+        # probably block size.
+        #
+        # I haven't tested other operating systems.
+        block_size = self.get_block_size()
+
+        delta = self.SIZE % block_size
+
+        if delta:
+            crude_size = (self.SIZE - delta) + block_size
+        else:
+            crude_size = self.SIZE
 
         f = mmap.mmap(self.mem.fd, self.SIZE)
 
         s = f.read(self.SIZE)
 
-        self.assertEqual(f.size(), self.SIZE)
+        # I accept both the accurate and crude block size because I don't know
+        # which operating system will return which.
+        self.assertIn(f.size(), (self.SIZE, crude_size))
 
         f.close()
 
