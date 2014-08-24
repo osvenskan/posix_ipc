@@ -1,4 +1,6 @@
 # Python imports
+# Don't add any from __future__ imports here. This code should execute
+# against standard Python.
 import unittest
 
 # Project imports
@@ -34,4 +36,13 @@ class Base(unittest.TestCase):
             if not a >= b:
                 standardMsg = '%s not greater than or equal to %s' % (safe_repr(a), safe_repr(b))
                 self.fail(self._formatMessage(msg, standardMsg))
+
+    if not hasattr(unittest.TestCase, 'assertIn'):
+        def assertIn(self, member, container, msg=None):
+            """Just like self.assertTrue(a in b), but with a nicer default message."""
+            if member not in container:
+                standardMsg = '%s not found in %s' % (safe_repr(member),
+                                                      safe_repr(container))
+                self.fail(self._formatMessage(msg, standardMsg))
+
 
