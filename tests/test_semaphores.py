@@ -21,6 +21,16 @@ class TestSemaphores(tests_base.Base):
         if self.sem:
             self.sem.unlink()
 
+    def _test_assign_to_read_only_property(self, property_name, value):
+        """test that writing to a readonly property raises TypeError"""
+        # Awkward syntax here because I can't use assertRaises in a context
+        # manager in Python < 2.7.
+        def assign(property_name):
+            setattr(self.sem, property_name, value)
+
+        # raises TypeError: readonly attribute
+        self.assertRaises(TypeError, assign)
+
     def test_no_flags(self):
         """tests that opening a semaphore with no flags opens the existing
         semaphore and doesn't create a new semaphore"""
@@ -224,6 +234,25 @@ class TestSemaphores(tests_base.Base):
 
         # Wipe this out so that self.tearDown() doesn't crash.
         self.sem = None
+
+    def test_property_name(self):
+        """exercise Semaphore.name"""
+        self.assertGreaterEqual(len(self.sem.name), 2)
+
+        self.assertEqual(self.sem.name[0], '/')
+
+        self._test_assign_to_read_only_property('name', 'hello world')
+
+    def test_property_value(self):
+        """exercise Semaphore.value if possible"""
+        # test read, although this has been tested very thoroughly above
+        if posix_ipc.SEMAPHORE_VALUE_SUPPORTED:
+            self.assertEqual(self.sem.value, 1)
+
+            self._test_assign_to_read_only_property('value', 42)
+
+
+
 
 if __name__ == '__main__':
     unittest.main()
