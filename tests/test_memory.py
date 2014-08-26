@@ -10,6 +10,8 @@ import os
 import posix_ipc
 import base as tests_base
 
+# FIXME - need a test for O_TRUNC
+
 class TestMemory(tests_base.Base):
     # SIZE should be something that's not a power of 2 since that's more
     # likely to expose odd behavior.
@@ -20,7 +22,7 @@ class TestMemory(tests_base.Base):
         # I thought it would be a good idea to pass self.mem.name to
         # os.statvfs in case that filesystem is different from the
         # regular one, but I get 'No such file or directory' when I do so.
-        # This happens on OS X and Linux.
+        # This happens on OS X and Linux, didn't test elsewhere.
         return os.statvfs('.')[1]
 
     def setUp(self):
@@ -42,25 +44,30 @@ class TestMemory(tests_base.Base):
         # raises TypeError: readonly attribute
         self.assertRaises(TypeError, assign)
 
-    def test_no_flags(self):
+    def test_ctor_no_flags_existing(self):
         """tests that opening a memory segment with no flags opens the existing
         memory and doesn't create a new segment"""
         mem_copy = posix_ipc.SharedMemory('/foo')
         self.assertEqual(self.mem.name, mem_copy.name)
 
-    def test_o_creat_existing(self):
-        """tests posix_ipc.O_CREAT to open an existing segment without
-        O_EXCL"""
-        mem_copy = posix_ipc.SharedMemory('/foo', posix_ipc.O_CREAT)
+    def test_ctor_no_flags_non_existent(self):
+        """test that attempting to open a non-existent memory segment with no
+        flags fails"""
+        self.assertRaises(posix_ipc.ExistentialError, posix_ipc.SharedMemory,
+                          '/fjksfjkhsdakh')
+
+    def test_ctor_o_creat_existing(self):
+        """tests posix_ipc.O_CREAT to open an existing segment without O_EXCL"""
+        mem_copy = posix_ipc.SharedMemory(self.mem.name, posix_ipc.O_CREAT)
 
         self.assertEqual(self.mem.name, mem_copy.name)
 
     def test_o_creat_new(self):
         """tests posix_ipc.O_CREAT to create a new mem segment without O_EXCL"""
-        mem = posix_ipc.SharedMemory('/bar', posix_ipc.O_CREAT)
-
+        mem = posix_ipc.SharedMemory('/lsdhfkjahdskjf', posix_ipc.O_CREAT,
+                                     size=4096)
         self.assertIsNotNone(mem)
-
+        mem.close_fd()
         mem.unlink()
 
     def test_o_excl(self):
@@ -83,8 +90,6 @@ class TestMemory(tests_base.Base):
         mem.unlink()
 
     # # don't bother testing mode, it's ignored by the OS?
-
-    # Other SharedMemory flags are tested later.
 
     def test_mmap_size(self):
         """test that the size specified is (somewhat) respected by mmap()"""
@@ -123,7 +128,7 @@ class TestMemory(tests_base.Base):
 
         f.close()
 
-    def test_read_only_ctor_flag(self):
+    def test_ctor_read_only_flag(self):
         """test that specifying the readonly flag prevents writing"""
         mem = posix_ipc.SharedMemory(self.mem.name, read_only=True)
         f = mmap.mmap(mem.fd, self.mem.size, prot=mmap.PROT_READ)
@@ -138,20 +143,15 @@ class TestMemory(tests_base.Base):
 
         self.assertRaises(OSError, os.fdopen, mem.fd)
 
-    def test_object_method_close_fd(self):
-        """test that SharedMemory.close_fd() closes the file descriptor"""
-        mem = posix_ipc.SharedMemory(self.mem.name)
-
-        mem.close_fd()
-
-        self.assertRaises(OSError, os.fdopen, mem.fd)
-
     def test_unlink(self):
         """test that SharedMemory.unlink() deletes the segment"""
+        name = self.mem.name
         self.mem.close_fd()
         self.mem.unlink()
         self.assertRaises(posix_ipc.ExistentialError, getattr,
                           self.mem, 'size')
+        self.assertRaises(posix_ipc.ExistentialError, posix_ipc.SharedMemory,
+                          name)
         self.mem = None
 
     def test_name_property(self):
@@ -169,7 +169,7 @@ class TestMemory(tests_base.Base):
         self._test_assign_to_read_only_property('fd', 42)
 
     def test_size_property(self):
-        """exercise SharedMemory.fd"""
+        """exercise SharedMemory.size"""
         self.assertIsInstance(self.mem.size, (int, long))
 
         self._test_assign_to_read_only_property('size', 42)
