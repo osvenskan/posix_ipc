@@ -32,6 +32,16 @@ class TestMemory(tests_base.Base):
             self.mem.close_fd()
             self.mem.unlink()
 
+    def _test_assign_to_read_only_property(self, property_name, value):
+        """test that writing to a readonly property raises TypeError"""
+        # Awkward syntax here because I can't use assertRaises in a context
+        # manager in Python < 2.7.
+        def assign(property_name):
+            setattr(self.mem, property_name, value)
+
+        # raises TypeError: readonly attribute
+        self.assertRaises(TypeError, assign)
+
     def test_no_flags(self):
         """tests that opening a memory segment with no flags opens the existing
         memory and doesn't create a new segment"""
@@ -77,7 +87,7 @@ class TestMemory(tests_base.Base):
     # Other SharedMemory flags are tested later.
 
     def test_mmap_size(self):
-        """tests that the size specified is (somewhat) respected by mmap()"""
+        """test that the size specified is (somewhat) respected by mmap()"""
         # In limited testing, Linux respects the exact size specified in the
         # SharedMemory() ctor when creating the mmapped file.
         # e.g. when self.SIZE = 3333, the
@@ -87,14 +97,21 @@ class TestMemory(tests_base.Base):
         # probably block size.
         #
         # I haven't tested other operating systems.
+        #
+        # This code accepts either value as correct.
         block_size = self.get_block_size()
 
         delta = self.SIZE % block_size
 
         if delta:
+            # Round up to nearest block size
             crude_size = (self.SIZE - delta) + block_size
         else:
             crude_size = self.SIZE
+
+        # I accept both the accurate and crude block size because I don't know
+        # which operating system will return which.
+        self.assertIn(self.mem.size, (self.SIZE, crude_size))
 
         f = mmap.mmap(self.mem.fd, self.SIZE)
 
@@ -106,116 +123,57 @@ class TestMemory(tests_base.Base):
 
         f.close()
 
+    def test_read_only_ctor_flag(self):
+        """test that specifying the readonly flag prevents writing"""
+        mem = posix_ipc.SharedMemory(self.mem.name, read_only=True)
+        f = mmap.mmap(mem.fd, self.mem.size, prot=mmap.PROT_READ)
+        self.assertRaises(TypeError, f.write, 'hello world')
+        mem.close_fd()
 
+    def test_object_method_close_fd(self):
+        """test that SharedMemory.close_fd() closes the file descriptor"""
+        mem = posix_ipc.SharedMemory(self.mem.name)
 
+        mem.close_fd()
 
-    # def test_zero_initial_value(self):
-    #     """tests that the initial value is 0 when assigned"""
-    #     if posix_ipc.SEMAPHORE_VALUE_SUPPORTED:
-    #         sem = posix_ipc.Semaphore(None, posix_ipc.O_CREX, initial_value=0)
-    #         self.assertEqual(sem.value, 0)
-    #         sem.unlink()
+        self.assertRaises(OSError, os.fdopen, mem.fd)
 
-    # def test_nonzero_initial_value(self):
-    #     """tests that the initial value is non-zero when assigned"""
-    #     if posix_ipc.SEMAPHORE_VALUE_SUPPORTED:
-    #         sem = posix_ipc.Semaphore(None, posix_ipc.O_CREX, initial_value=42)
-    #         self.assertEqual(sem.value, 42)
-    #         sem.unlink()
+    def test_object_method_close_fd(self):
+        """test that SharedMemory.close_fd() closes the file descriptor"""
+        mem = posix_ipc.SharedMemory(self.mem.name)
 
+        mem.close_fd()
 
-    # # test sacquisition
-    # def test_simple_acquisition(self):
-    #     """tests that acquisition works"""
-    #     # I should be able to acquire this semaphore, but if I can't I don't
-    #     # want to hang the test. Acquiring with timeout=0 will raise a BusyError
-    #     # if the semaphore can't be acquired. That works even when
-    #     # SEMAPHORE_TIMEOUT_SUPPORTED is False.
-    #     self.mem.acquire(0)
+        self.assertRaises(OSError, os.fdopen, mem.fd)
 
-    # # test acquisition failures
-    # # def test_acquisition_no_timeout(self):
-    # # This is hard to test since it should wait infinitely. Probably the way
-    # # to do it is to spawn another process that holds the semaphore for
-    # # maybe 10 seconds and have this process wait on it. That's complicated
-    # # and not a really great test.
+    def test_unlink(self):
+        """test that SharedMemory.unlink() deletes the segment"""
+        self.mem.close_fd()
+        self.mem.unlink()
+        self.assertRaises(posix_ipc.ExistentialError, getattr,
+                          self.mem, 'size')
+        self.mem = None
 
-    # def test_acquisition_zero_timeout(self):
-    #     """tests that acquisition w/timeout=0 implements non-blocking
-    #     behavior"""
-    #     # Should not raise an error
-    #     self.mem.acquire(0)
+    def test_name_property(self):
+        """exercise SharedMemory.name"""
+        self.assertGreaterEqual(len(self.mem.name), 2)
 
-    #     with self.assertRaises(posix_ipc.BusyError):
-    #         self.mem.acquire(0)
+        self.assertEqual(self.mem.name[0], '/')
 
-    # def test_acquisition_nonzero_int_timeout(self):
-    #     """tests that acquisition w/timeout=an int is reasonably accurate"""
-    #     if posix_ipc.SEMAPHORE_TIMEOUT_SUPPORTED:
-    #         # Should not raise an error
-    #         self.mem.acquire(0)
+        self._test_assign_to_read_only_property('name', 'hello world')
 
-    #         # This should raise a busy error
-    #         wait_time = 1
-    #         start = datetime.datetime.now()
-    #         with self.assertRaises(posix_ipc.BusyError):
-    #             self.mem.acquire(wait_time)
-    #         end = datetime.datetime.now()
-    #         actual_delta = end - start
-    #         expected_delta = datetime.timedelta(seconds=wait_time)
+    def test_fd_property(self):
+        """exercise SharedMemory.fd"""
+        self.assertIsInstance(self.mem.fd, (int, long))
 
-    #         delta = actual_delta - expected_delta
+        self._test_assign_to_read_only_property('fd', 42)
 
-    #         self.assertEqual(delta.days, 0)
-    #         self.assertEqual(delta.seconds, 0)
-    #         # I don't want to test microseconds because that granularity
-    #         # isn't under the control of this module.
-    #     # else:
-    #         # Can't test this!
+    def test_size_property(self):
+        """exercise SharedMemory.fd"""
+        self.assertIsInstance(self.mem.size, (int, long))
 
-    # def test_acquisition_nonzero_float_timeout(self):
-    #     """tests that acquisition w/timeout=a float is reasonably accurate"""
-    #     if posix_ipc.SEMAPHORE_TIMEOUT_SUPPORTED:
-    #         # Should not raise an error
-    #         self.mem.acquire(0)
+        self._test_assign_to_read_only_property('size', 42)
 
-    #         # This should raise a busy error
-    #         wait_time = 1.5
-    #         start = datetime.datetime.now()
-    #         with self.assertRaises(posix_ipc.BusyError):
-    #             self.mem.acquire(wait_time)
-    #         end = datetime.datetime.now()
-    #         actual_delta = end - start
-    #         expected_delta = datetime.timedelta(seconds=wait_time)
-
-    #         delta = actual_delta - expected_delta
-
-    #         self.assertEqual(delta.days, 0)
-    #         self.assertEqual(delta.seconds, 0)
-    #         # I don't want to test microseconds because that granularity
-    #         # isn't under the control of this module.
-    #     # else:
-    #         # Can't test this!
-
-    # def test_release(self):
-    #     """tests that release works"""
-    #     # Not only does it work, I can do it as many times as I want!
-    #     for i in range(posix_ipc.SEMAPHORE_VALUE_MAX):
-    #         self.mem.release()
-
-    # def test_context_manager(self):
-    #     """tests that context manager acquire/release works"""
-    #     with self.mem as sem:
-    #         if posix_ipc.SEMAPHORE_VALUE_SUPPORTED:
-    #             self.assertEqual(sem.value, 0)
-    #         with self.assertRaises(posix_ipc.BusyError):
-    #             sem.acquire(0)
-
-    #     if posix_ipc.SEMAPHORE_VALUE_SUPPORTED:
-    #         self.assertEqual(sem.value, 0)
-
-    #     # Should not raise an error.
-    #     sem.acquire(0)
 
 if __name__ == '__main__':
     unittest.main()

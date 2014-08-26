@@ -45,4 +45,11 @@ class Base(unittest.TestCase):
                                                       safe_repr(container))
                 self.fail(self._formatMessage(msg, standardMsg))
 
+    if not hasattr(unittest.TestCase, 'assertIsInstance'):
+        def assertIsInstance(self, obj, cls, msg=None):
+            """Same as self.assertTrue(isinstance(obj, cls)), with a nicer
+            default message."""
+            if not isinstance(obj, cls):
+                standardMsg = '%s is not an instance of %r' % (safe_repr(obj), cls)
+                self.fail(self._formatMessage(msg, standardMsg))
 
