@@ -20,11 +20,6 @@ You can upload to the test PyPI with this command —
 - The standard library's os module accepts bytes & bytearrays for filenames. This code probably should too. You might be able to do it for (almost) free. Read the code for PyUnicode_FSConverter() to see what it does if it is fed a bytes object.
 
 
-- consider adding to freshmeat
-
-- consider this:
-https://wiki.ubuntu.com/PackagingGuide/Python
-
 - can I use select.select() on a message queue handle?
 - update PyPi (python setup.py register)
 
