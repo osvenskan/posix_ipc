@@ -47,9 +47,11 @@ class TestSemaphores(tests_base.Base):
     def test_o_creat_new(self):
         """tests posix_ipc.O_CREAT to create a new semaphore without O_EXCL"""
         # I can't pass None for the name unless I also pass O_EXCL.
-        alphabet = 'abcdefghijklmnopqrstuvwxyz'
-        name = '/' + ''.join(random.sample(alphabet, random.randint(3, 12)))
+        name = tests_base.make_name()
 
+        # Note: this method of finding an unused name is vulnerable to a race
+        # condition. It's good enough for test, but don't copy it for use in
+        # production code!
         name_is_available = False
         while not name_is_available:
             try:
@@ -58,7 +60,7 @@ class TestSemaphores(tests_base.Base):
             except posix_ipc.ExistentialError:
                 name_is_available = True
             else:
-                name = '/' + ''.join(random.sample(alphabet, random.randint(3, 12)))
+                name = tests_base.make_name()
 
         sem = posix_ipc.Semaphore(name, posix_ipc.O_CREAT)
 
