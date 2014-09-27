@@ -2,6 +2,7 @@
 # Don't add any from __future__ imports here. This code should execute
 # against standard Python.
 import unittest
+import random
 
 # Project imports
 import posix_ipc
@@ -19,10 +20,15 @@ def safe_repr(obj, short=False):
     return result[:_MAX_LENGTH] + ' [truncated]...'
 
 
-class Base(unittest.TestCase):
+def make_name():
+    """Generate a random name suitable for an IPC object."""
+    alphabet = 'abcdefghijklmnopqrstuvwxyz'
+    return '/' + ''.join(random.sample(alphabet, random.randint(3, 12)))
 
+
+class Base(unittest.TestCase):
     # Under Python < 2.7, there's some handy unittest methods that aren't
-    # defined, so I define them here.
+    # defined, so I define them here. This code is swiped from Python's source.
     if not hasattr(unittest.TestCase, 'assertIsNotNone'):
         def assertIsNotNone(self, obj, msg=None):
             """Included for symmetry with assertIsNone."""

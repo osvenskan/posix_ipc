@@ -103,7 +103,8 @@ class TestMemory(tests_base.Base):
         #
         # I haven't tested other operating systems.
         #
-        # This code accepts either value as correct.
+        # AFAICT the specification doesn't demand that the size has to match
+        # exactly, so this code accepts either value as correct.
         block_size = self.get_block_size()
 
         delta = self.SIZE % block_size
@@ -114,16 +115,10 @@ class TestMemory(tests_base.Base):
         else:
             crude_size = self.SIZE
 
-        # I accept both the accurate and crude block size because I don't know
-        # which operating system will return which.
         self.assertIn(self.mem.size, (self.SIZE, crude_size))
 
         f = mmap.mmap(self.mem.fd, self.SIZE)
 
-        s = f.read(self.SIZE)
-
-        # I accept both the accurate and crude block size because I don't know
-        # which operating system will return which.
         self.assertIn(f.size(), (self.SIZE, crude_size))
 
         f.close()
