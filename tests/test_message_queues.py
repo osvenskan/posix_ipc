@@ -4,10 +4,13 @@
 import unittest
 import datetime
 import random
+import time
 
 # Project imports
 import posix_ipc
 import base as tests_base
+
+ONE_HALF_SECOND = datetime.timedelta(milliseconds=500)
 
 if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
     class TestMessageQueues(tests_base.Base):
@@ -136,7 +139,7 @@ if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
             self.assertRaises(posix_ipc.PermissionsError, mq.send, 'foo')
             mq.close()
 
-        # test send
+        ###### test send
 
         def test_send(self):
             """Test that simple send works.
@@ -147,22 +150,6 @@ if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
             self.mq.send('foo')
 
         # FIXME how to test that send with timeout=None waits as expected?
-
-        def test_send_timeout_zero_success(self):
-            """Test that send w/a timeout=0 succeeds if queue is not full."""
-            self.mq.send('foo', timeout=0)
-
-        def test_send_timeout_zero_fails(self):
-            """Test that send w/a timeout=0 raises BusyError if queue is
-            full.
-            """
-            n_msgs = self.mq.max_messages
-            while n_msgs:
-                self.mq.send(' ')
-                n_msgs -= 1
-
-            self.assertRaises(posix_ipc.BusyError, self.mq.send, 'foo',
-                              timeout=0)
 
         def test_send_timeout_keyword(self):
             """Test that the timeout keyword of send works"""
@@ -182,6 +169,37 @@ if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
                 n_msgs -= 1
 
             self.assertRaises(posix_ipc.BusyError, self.mq.send, 'foo', 0)
+
+        def test_send_timeout_zero_success(self):
+            """Test that send w/a timeout=0 succeeds if queue is not full."""
+            self.mq.send('foo', timeout=0)
+
+        def test_send_timeout_zero_fails(self):
+            """Test that send w/a timeout=0 raises BusyError if queue is
+            full.
+            """
+            n_msgs = self.mq.max_messages
+            while n_msgs:
+                self.mq.send(' ')
+                n_msgs -= 1
+
+            self.assertRaises(posix_ipc.BusyError, self.mq.send, 'foo',
+                              timeout=0)
+
+        def test_send_nonzero_timeout(self):
+            """Test that a non-zero timeout to send is respected."""
+            n_msgs = self.mq.max_messages
+            while n_msgs:
+                self.mq.send(' ')
+                n_msgs -= 1
+
+            start = time.time()
+            self.assertRaises(posix_ipc.BusyError, self.mq.send, ' ',
+                              timeout=1.0)
+            elapsed = time.time() - start
+            # I don't insist on extreme precision.
+            self.assertTrue(elapsed >= 1.0)
+            self.assertTrue(elapsed < 1.5)
 
         def test_send_priority_default(self):
             """Test that the send priority defaults to 0"""
@@ -218,6 +236,41 @@ if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
             """Test that the priority positional param of send works"""
             self.mq.send('foo', 0, 42)
             self.assertEqual(self.mq.receive(), ('foo', 42))
+
+        ###### test receive()
+
+        def test_receive(self):
+            """Test that simple receive works.
+
+            It's already tested elsewhere implicitly, but I want an explicit
+            test.
+            """
+            self.mq.send('foo', priority=3)
+
+            self.assertEqual(self.mq.receive(), ('foo', 3))
+
+        # FIXME This test fails
+        # def test_receive_timeout_keyword(self):
+        #     """Test that the timeout keyword of receive works."""
+        #     self.assertRaises(posix_ipc.BusyError, self.mq.receive,
+        #                       timeout=0)
+
+        def test_receive_timeout_positional(self):
+            """Test that the timeout positional param of receive works."""
+            self.assertRaises(posix_ipc.BusyError, self.mq.receive, 0)
+
+        def test_receive_nonzero_timeout(self):
+            """Test that a non-zero timeout to receive is respected."""
+            start = time.time()
+            self.assertRaises(posix_ipc.BusyError, self.mq.receive, 1.0)
+            elapsed = time.time() - start
+            # I don't insist on extreme precision.
+            self.assertTrue(elapsed >= 1.0)
+            self.assertTrue(elapsed < 1.5)
+
+        # FIXME how to test that timeout=None waits forever?
+
+        # FIXME under py3, receive returns bytes
 
 
     if __name__ == '__main__':
