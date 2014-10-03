@@ -5,15 +5,53 @@ import unittest
 import datetime
 import random
 import time
+import signal
+import threading
 
 # Project imports
 import posix_ipc
 import base as tests_base
 
-ONE_HALF_SECOND = datetime.timedelta(milliseconds=500)
+if hasattr(posix_ipc, 'USER_SIGNAL_MIN'):
+    SIGNAL_VALUE = posix_ipc.USER_SIGNAL_MIN
+else:
+    SIGNAL_VALUE = signal.SIGHUP
+
+
+signal_handler_value_received = 0
+
+def signal_handler(signal_value, frame):
+    # FIXME docstring
+    global signal_handler_value_received
+    signal_handler_value_received = signal_value
+
+def threaded_notification_handler_one_shot(test_case_instance):
+    # FIXME docstring
+    test_case_instance.threaded_notification_called = True
+    test_case_instance.notification_event.set()
+
+def threaded_notification_handler_rearm(test_case_instance):
+    # FIXME docstring
+    # Rearm.
+    param = (threaded_notification_handler_rearm, test_case_instance)
+    test_case_instance.mq.request_notification(param)
+
+    test_case_instance.threaded_notification_called = True
+    test_case_instance.notification_event.set()
+
 
 if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
     class TestMessageQueues(tests_base.Base):
+        def _test_assign_to_read_only_property(self, property_name, value):
+            """test that writing to a readonly property raises TypeError"""
+            # Awkward syntax here because I can't use assertRaises in a context
+            # manager in Python < 2.7.
+            def assign(property_name):
+                setattr(self.mq, property_name, value)
+
+            # raises TypeError: readonly attribute
+            self.assertRaises(TypeError, assign)
+
         def setUp(self):
             self.mq = posix_ipc.MessageQueue(None, posix_ipc.O_CREX)
 
@@ -271,6 +309,236 @@ if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
         # FIXME how to test that timeout=None waits forever?
 
         # FIXME under py3, receive returns bytes
+
+        ###### test request_notification()
+
+        def test_request_notification_signal(self):
+            """Exercise notification by signal"""
+            global someone_rang_the_doorbell
+
+            self.mq.request_notification(SIGNAL_VALUE)
+
+            signal.signal(SIGNAL_VALUE, signal_handler)
+
+            someone_rang_the_doorbell = False
+
+            self.mq.send('')
+
+            self.assertEqual(signal_handler_value_received, SIGNAL_VALUE)
+
+        def test_request_notification_signal_one_shot(self):
+            """Test that after notification by signal, notification is
+            cancelled"""
+            global signal_handler_value_received
+
+            self.mq.request_notification(SIGNAL_VALUE)
+
+            signal.signal(SIGNAL_VALUE, signal_handler)
+
+            signal_handler_value_received = 0
+
+            self.mq.send('')
+
+            self.assertEqual(signal_handler_value_received, SIGNAL_VALUE)
+
+            # Reset the global flag
+            signal_handler_value_received = 0
+
+            self.mq.send('')
+
+            # Flag should not be set because it's only supposed to fire
+            # notification when the queue changes from empty to non-empty,
+            # and there was already 1 msg in the Q when I called send() above.
+            self.assertEqual(signal_handler_value_received, 0)
+
+            # empty the queue
+            self.mq.receive()
+            self.mq.receive()
+
+            self.assertEqual(signal_handler_value_received, 0)
+
+            self.mq.send('')
+
+            # Flag should still not be set because notification was cancelled
+            # after it fired the first time.
+            self.assertEqual(signal_handler_value_received, 0)
+
+        def test_request_notification_cancel_default(self):
+            """Test that notification can be cancelled with the default param"""
+            global signal_handler_value_received
+
+            self.mq.request_notification(SIGNAL_VALUE)
+
+            signal.signal(SIGNAL_VALUE, signal_handler)
+
+            signal_handler_value_received = 0
+
+            # Cancel notification
+            self.mq.request_notification()
+
+            self.mq.send('')
+
+            self.assertEqual(signal_handler_value_received, 0)
+
+        def test_request_notification_cancel_default(self):
+            """Test that notification can be cancelled with the default param"""
+            global signal_handler_value_received
+
+            self.mq.request_notification(SIGNAL_VALUE)
+
+            signal.signal(SIGNAL_VALUE, signal_handler)
+
+            signal_handler_value_received = 0
+
+            # Cancel notification
+            self.mq.request_notification()
+
+            self.mq.send('')
+
+            self.assertEqual(signal_handler_value_received, 0)
+
+        # FIXME this fails
+        # def test_request_notification_cancel_keyword(self):
+        #     """Test that notification can be cancelled with a keyword param"""
+        #     global signal_handler_value_received
+
+        #     self.mq.request_notification(SIGNAL_VALUE)
+
+        #     signal.signal(SIGNAL_VALUE, signal_handler)
+
+        #     signal_handler_value_received = 0
+
+        #     # Cancel notification
+        #     self.mq.request_notification(notification=None)
+
+        #     self.mq.send('')
+
+        #     self.assertEqual(signal_handler_value_received, 0)
+
+        def test_request_notification_cancel_multiple(self):
+            """Test that notification can be cancelled multiple times"""
+            self.mq.request_notification(SIGNAL_VALUE)
+
+            # Cancel notification lots of times
+            for i in range(1000):
+                self.mq.request_notification()
+
+        def test_request_notification_threaded_one_shot(self):
+            """Test simple threaded notification"""
+
+            self.threaded_notification_called = False
+
+            param = (threaded_notification_handler_one_shot, self)
+            self.mq.request_notification(param)
+
+            self.notification_event = threading.Event()
+
+            self.mq.send('')
+
+            # I have to wait on a shared event to ensure that the notification
+            # handler's thread gets a chance to execute before I make my
+            # assertion.
+            self.notification_event.wait(5)
+
+            self.assertTrue(self.threaded_notification_called)
+
+
+        def test_request_notification_threaded_rearm(self):
+            """Test threaded notification in which the notified thread rearms
+            the notification"""
+
+            self.threaded_notification_called = False
+
+            param = (threaded_notification_handler_rearm, self)
+            self.mq.request_notification(param)
+
+            self.notification_event = threading.Event()
+
+            # Re-arm several times.
+            for i in range(10):
+                self.mq.send('')
+
+                # I have to wait on a shared event to ensure that the notification
+                # handler's thread gets a chance to execute before I make my
+                # assertion.
+                self.notification_event.wait(5)
+
+                self.assertTrue(self.threaded_notification_called)
+
+                self.mq.receive()
+
+                self.notification_event.clear()
+
+    def test_close_and_unlink(self):
+        """tests that mq.close() and mq.unlink() work"""
+        # sem.close() is hard to test since subsequent use of the semaphore
+        # after sem.close() is undefined. All I can think of to do is call it
+        # and note that it does not fail. Also, it allows sem.unlink() to
+        # tell the OS to delete the semaphore entirely, so it makes sense
+        # to test them together,
+        self.mq.unlink()
+        self.mq.close()
+        self.assertRaises(posix_ipc.ExistentialError, posix_ipc.MessageQueue,
+                          self.mq.name)
+
+        # Wipe this out so that self.tearDown() doesn't crash.
+        self.mq = None
+
+    def test_property_name(self):
+        """exercise MessageQueue.name"""
+        self.assertGreaterEqual(len(self.mq.name), 2)
+
+        self.assertEqual(self.mq.name[0], '/')
+
+        self._test_assign_to_read_only_property('name', 'hello world')
+
+    def test_property_mqd(self):
+        """exercise MessageQueue.mqd"""
+        self.assertNotEqual(self.mq.mqd, -1)
+
+        # The mqd is of type mqd_t. I can't find doc that states what this
+        # type is. All I know is that -1 is an error, but I can't tell what
+        # else to expect.
+
+        self._test_assign_to_read_only_property('mqd', 42)
+
+    def test_property_max_messages(self):
+        """exercise MessageQueue.max_messages"""
+        self.assertGreaterEqual(self.mq.max_messages, 0)
+
+        self._test_assign_to_read_only_property('max_messages', 42)
+
+    def test_property_max_message_size(self):
+        """exercise MessageQueue.max_message_size"""
+        self.assertGreaterEqual(self.mq.max_message_size, 0)
+
+        self._test_assign_to_read_only_property('max_message_size', 42)
+
+    def test_property_current_messages(self):
+        """exercise MessageQueue.current_messages"""
+        self.assertEqual(self.mq.current_messages, 0)
+
+        self.mq.send('')
+        self.assertEqual(self.mq.current_messages, 1)
+        self.mq.send('')
+        self.mq.send('')
+        self.mq.send('')
+        self.assertEqual(self.mq.current_messages, 4)
+        self.mq.receive()
+        self.assertEqual(self.mq.current_messages, 3)
+        self.mq.receive()
+        self.assertEqual(self.mq.current_messages, 2)
+        self.mq.receive()
+        self.assertEqual(self.mq.current_messages, 1)
+        self.mq.receive()
+        self.assertEqual(self.mq.current_messages, 0)
+
+        self._test_assign_to_read_only_property('current_messages', 42)
+
+
+    # FIXME need to test block flag
+
+
 
 
     if __name__ == '__main__':

@@ -221,13 +221,12 @@ class TestSemaphores(tests_base.Base):
         sem.acquire(0)
 
     def test_close_and_unlink(self):
-        """tests that sem.close() and sem.unlink() works"""
+        """tests that sem.close() and sem.unlink() work"""
         # sem.close() is hard to test since subsequent use of the semaphore
         # after sem.close() is undefined. All I can think of to do is call it
         # and note that it does not fail. Also, it allows sem.unlink() to
         # tell the OS to delete the semaphore entirely, so it makes sense
-        # to test them together,
-        #self.sem.close()
+        # to test them together.
 
         self.sem.unlink()
         self.sem.close()
