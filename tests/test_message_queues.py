@@ -108,13 +108,6 @@ if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
             mq.close()
             mq.unlink()
 
-        def test_o_excl(self):
-            """tests O_CREAT | O_EXCL prevents opening an existing
-            MessageQueue
-            """
-            self.assertRaises(posix_ipc.ExistentialError, posix_ipc.MessageQueue,
-                              self.mq.name, posix_ipc.O_CREAT | posix_ipc.O_EXCL)
-
         def test_o_crex(self):
             """tests O_CREX prevents opening an existing MessageQueue"""
             self.assertRaises(posix_ipc.ExistentialError, posix_ipc.MessageQueue,
@@ -242,7 +235,7 @@ if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
         def test_send_priority_default(self):
             """Test that the send priority defaults to 0"""
             self.mq.send('foo')
-            self.assertEqual(self.mq.receive(), ('foo', 0))
+            self.assertEqual(self.mq.receive(), ('foo'.encode(), 0))
 
         def test_send_fifo_default(self):
             """Test that the queue order is FIFO by default"""
@@ -251,7 +244,7 @@ if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
                 self.mq.send(c)
 
             for c in alphabet:
-                self.assertEqual(self.mq.receive(), (c, 0))
+                self.assertEqual(self.mq.receive(), (c.encode(), 0))
 
         def test_send_priority(self):
             """Test that the priority param is respected"""
@@ -261,19 +254,19 @@ if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
             self.mq.send('highest', priority=3)
             self.mq.send('middle', priority=2)
 
-            self.assertEqual(self.mq.receive(), ('highest', 3))
-            self.assertEqual(self.mq.receive(), ('middle', 2))
-            self.assertEqual(self.mq.receive(), ('lowest', 1))
+            self.assertEqual(self.mq.receive(), ('highest'.encode(), 3))
+            self.assertEqual(self.mq.receive(), ('middle'.encode(), 2))
+            self.assertEqual(self.mq.receive(), ('lowest'.encode(), 1))
 
         def test_send_priority_keyword(self):
             """Test that the priority keyword of send works"""
             self.mq.send('foo', priority=42)
-            self.assertEqual(self.mq.receive(), ('foo', 42))
+            self.assertEqual(self.mq.receive(), ('foo'.encode(), 42))
 
         def test_send_priority_positional(self):
             """Test that the priority positional param of send works"""
             self.mq.send('foo', 0, 42)
-            self.assertEqual(self.mq.receive(), ('foo', 42))
+            self.assertEqual(self.mq.receive(), ('foo'.encode(), 42))
 
         ###### test receive()
 
@@ -285,7 +278,7 @@ if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
             """
             self.mq.send('foo', priority=3)
 
-            self.assertEqual(self.mq.receive(), ('foo', 3))
+            self.assertEqual(self.mq.receive(), ('foo'.encode(), 3))
 
         # FIXME This test fails
         # def test_receive_timeout_keyword(self):
