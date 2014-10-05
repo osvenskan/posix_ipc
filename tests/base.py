@@ -3,9 +3,12 @@
 # against standard Python.
 import unittest
 import random
+import sys
 
 # Project imports
 import posix_ipc
+
+IS_PY3 = (sys.version_info[0] == 3)
 
 # Swiped from Python 2.7 unittest.util. It's only called when the standard
 # lib version doesn't exist (i.e. in Python <= 2.6).

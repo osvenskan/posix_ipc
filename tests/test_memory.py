@@ -159,13 +159,19 @@ class TestMemory(tests_base.Base):
 
     def test_fd_property(self):
         """exercise SharedMemory.fd"""
-        self.assertIsInstance(self.mem.fd, (int, long))
+        if tests_base.IS_PY3:
+            self.assertIsInstance(self.mem.fd, int)
+        else:
+            self.assertIsInstance(self.mem.fd, (int, long))
 
         self._test_assign_to_read_only_property('fd', 42)
 
     def test_size_property(self):
         """exercise SharedMemory.size"""
-        self.assertIsInstance(self.mem.size, (int, long))
+        if tests_base.IS_PY3:
+            self.assertIsInstance(self.mem.size, int)
+        else:
+            self.assertIsInstance(self.mem.size, (int, long))
 
         self._test_assign_to_read_only_property('size', 42)
 
