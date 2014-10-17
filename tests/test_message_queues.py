@@ -17,7 +17,6 @@ if hasattr(posix_ipc, 'USER_SIGNAL_MIN'):
 else:
     SIGNAL_VALUE = signal.SIGHUP
 
-
 signal_handler_value_received = 0
 
 def signal_handler(signal_value, frame):
@@ -451,9 +450,9 @@ if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
             for i in range(10):
                 self.mq.send('')
 
-                # I have to wait on a shared event to ensure that the notification
-                # handler's thread gets a chance to execute before I make my
-                # assertion.
+                # I have to wait on a shared event to ensure that the
+                # notification handler's thread gets a chance to execute before
+                # I make my assertion.
                 self.notification_event.wait(5)
 
                 self.assertTrue(self.threaded_notification_called)
@@ -462,76 +461,118 @@ if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
 
                 self.notification_event.clear()
 
-    def test_close_and_unlink(self):
-        """tests that mq.close() and mq.unlink() work"""
-        # sem.close() is hard to test since subsequent use of the semaphore
-        # after sem.close() is undefined. All I can think of to do is call it
-        # and note that it does not fail. Also, it allows sem.unlink() to
-        # tell the OS to delete the semaphore entirely, so it makes sense
-        # to test them together,
-        self.mq.unlink()
-        self.mq.close()
-        self.assertRaises(posix_ipc.ExistentialError, posix_ipc.MessageQueue,
-                          self.mq.name)
+        def test_close_and_unlink(self):
+            """tests that mq.close() and mq.unlink() work"""
+            # mq.close() is hard to test since subsequent use of the semaphore
+            # after mq.close() is undefined. All I can think of to do is call it
+            # and note that it does not fail. Also, it allows mq.unlink() to
+            # tell the OS to delete the semaphore entirely, so it makes sense
+            # to test them together,
+            self.mq.unlink()
+            self.mq.close()
+            self.assertRaises(posix_ipc.ExistentialError, posix_ipc.MessageQueue,
+                              self.mq.name)
 
-        # Wipe this out so that self.tearDown() doesn't crash.
-        self.mq = None
+            # Wipe this out so that self.tearDown() doesn't crash.
+            self.mq = None
 
-    def test_property_name(self):
-        """exercise MessageQueue.name"""
-        self.assertGreaterEqual(len(self.mq.name), 2)
+        def test_property_name(self):
+            """exercise MessageQueue.name"""
+            self.assertGreaterEqual(len(self.mq.name), 2)
 
-        self.assertEqual(self.mq.name[0], '/')
+            self.assertEqual(self.mq.name[0], '/')
 
-        self._test_assign_to_read_only_property('name', 'hello world')
+            self._test_assign_to_read_only_property('name', 'hello world')
 
-    def test_property_mqd(self):
-        """exercise MessageQueue.mqd"""
-        self.assertNotEqual(self.mq.mqd, -1)
+        def test_property_mqd(self):
+            """exercise MessageQueue.mqd"""
+            self.assertNotEqual(self.mq.mqd, -1)
 
-        # The mqd is of type mqd_t. I can't find doc that states what this
-        # type is. All I know is that -1 is an error, but I can't tell what
-        # else to expect.
+            # The mqd is of type mqd_t. I can't find doc that states what this
+            # type is. All I know is that -1 is an error so it's probably
+            # int-ish, but I can't tell exactly what to expect.
 
-        self._test_assign_to_read_only_property('mqd', 42)
+            self._test_assign_to_read_only_property('mqd', 42)
 
-    def test_property_max_messages(self):
-        """exercise MessageQueue.max_messages"""
-        self.assertGreaterEqual(self.mq.max_messages, 0)
+        def test_property_max_messages(self):
+            """exercise MessageQueue.max_messages"""
+            self.assertGreaterEqual(self.mq.max_messages, 0)
 
-        self._test_assign_to_read_only_property('max_messages', 42)
+            self._test_assign_to_read_only_property('max_messages', 42)
 
-    def test_property_max_message_size(self):
-        """exercise MessageQueue.max_message_size"""
-        self.assertGreaterEqual(self.mq.max_message_size, 0)
+        def test_property_max_message_size(self):
+            """exercise MessageQueue.max_message_size"""
+            self.assertGreaterEqual(self.mq.max_message_size, 0)
 
-        self._test_assign_to_read_only_property('max_message_size', 42)
+            self._test_assign_to_read_only_property('max_message_size', 42)
 
-    def test_property_current_messages(self):
-        """exercise MessageQueue.current_messages"""
-        self.assertEqual(self.mq.current_messages, 0)
+        def test_property_current_messages(self):
+            """exercise MessageQueue.current_messages"""
+            self.assertEqual(self.mq.current_messages, 0)
 
-        self.mq.send('')
-        self.assertEqual(self.mq.current_messages, 1)
-        self.mq.send('')
-        self.mq.send('')
-        self.mq.send('')
-        self.assertEqual(self.mq.current_messages, 4)
-        self.mq.receive()
-        self.assertEqual(self.mq.current_messages, 3)
-        self.mq.receive()
-        self.assertEqual(self.mq.current_messages, 2)
-        self.mq.receive()
-        self.assertEqual(self.mq.current_messages, 1)
-        self.mq.receive()
-        self.assertEqual(self.mq.current_messages, 0)
+            self.mq.send('')
+            self.assertEqual(self.mq.current_messages, 1)
+            self.mq.send('')
+            self.mq.send('')
+            self.mq.send('')
+            self.assertEqual(self.mq.current_messages, 4)
+            self.mq.receive()
+            self.assertEqual(self.mq.current_messages, 3)
+            self.mq.receive()
+            self.assertEqual(self.mq.current_messages, 2)
+            self.mq.receive()
+            self.assertEqual(self.mq.current_messages, 1)
+            self.mq.receive()
+            self.assertEqual(self.mq.current_messages, 0)
 
-        self._test_assign_to_read_only_property('current_messages', 42)
+            self._test_assign_to_read_only_property('current_messages', 42)
 
+        def test_block_flag_default_value_and_writability(self):
+            """test that the block flag is True by default and can be changed"""
+            mq = posix_ipc.MessageQueue(None, posix_ipc.O_CREX)
 
-    # FIXME need to test block flag
+            self.assertTrue(mq.block)
 
+            # Toggle. I expect no errors. It's good to test this on a queue
+            # that's only used for this particular test. I would rather have
+            # all the other tests execute using the default value of block
+            # on self.mq.
+            mq.block = False
+            mq.block = True
 
+            mq.close()
+            mq.unlink()
+
+        def test_block_flag_false(self):
+            """test blocking behavior when flag is false"""
+            mq = posix_ipc.MessageQueue(None, posix_ipc.O_CREX, max_messages=3)
+
+            mq.block = False
+
+            # Queue is empty, so receive() should immediately raise BusyError
+            start = time.time()
+            self.assertRaises(posix_ipc.BusyError, mq.receive, 10)
+            elapsed = time.time() - start
+
+            # Not only should receive() have raised BusyError, it should have
+            # done so "immediately". I don't insist on extreme precision since
+            # OS-level task switching might mean that elapsed time is not
+            # vanishingly small as one might expect under most circumstances.
+            self.assertTrue(elapsed < 1.0)
+
+            # Now test send() the same way.
+            mq.send(' ')
+            mq.send(' ')
+            mq.send(' ')
+
+            # Queue is now full.
+            start = time.time()
+            self.assertRaises(posix_ipc.BusyError, mq.send, ' ', 10)
+            elapsed = time.time() - start
+            self.assertTrue(elapsed < 1.0)
+
+            mq.close()
+            mq.unlink()
 
 
     if __name__ == '__main__':
