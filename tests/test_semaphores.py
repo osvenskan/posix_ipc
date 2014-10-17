@@ -123,6 +123,7 @@ class TestSemaphores(tests_base.Base):
 
     # test acquisition failures
     # def test_acquisition_no_timeout(self):
+    # FIXME
     # This is hard to test since it should wait infinitely. Probably the way
     # to do it is to spawn another process that holds the semaphore for
     # maybe 10 seconds and have this process wait on it. That's complicated
@@ -251,8 +252,6 @@ class TestSemaphores(tests_base.Base):
             self.assertEqual(self.sem.value, 1)
 
             self._test_assign_to_read_only_property('value', 42)
-
-
 
 
 if __name__ == '__main__':
