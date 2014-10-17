@@ -6,8 +6,12 @@ import datetime
 import mmap
 import os
 
+
 # Project imports
 import posix_ipc
+# Hack -- add tests directory to sys.path so Python 3 can find base.py.
+import sys
+sys.path.insert(0, os.path.join(os.getcwd(), 'tests'))
 import base as tests_base
 
 # FIXME - need a test for O_TRUNC
