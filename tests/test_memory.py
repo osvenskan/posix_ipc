@@ -1,6 +1,7 @@
 # Python imports
 # Don't add any from __future__ imports here. This code should execute
 # against standard Python.
+import platform
 import unittest
 import datetime
 import mmap
@@ -13,8 +14,6 @@ import posix_ipc
 import sys
 sys.path.insert(0, os.path.join(os.getcwd(), 'tests'))
 import base as tests_base
-
-# FIXME - need a test for O_TRUNC
 
 class TestMemory(tests_base.Base):
     # SIZE should be something that's not a power of 2 since that's more
@@ -83,6 +82,16 @@ class TestMemory(tests_base.Base):
         """tests O_CREX prevents opening an existing memory segment"""
         self.assertRaises(posix_ipc.ExistentialError, posix_ipc.SharedMemory,
                           '/foo', posix_ipc.O_CREX)
+
+    if "Darwin" in platform.uname():
+        # O_TRUNC is not supported under OS X
+        pass
+    else:
+        def test_o_trunc(self):
+            """Test that O_TRUNC truncates the memory to 0 bytes"""
+            mem_copy = posix_ipc.SharedMemory(self.mem.name, posix_ipc.O_TRUNC)
+
+            self.assertEqual(mem_copy.size, 0)
 
     def test_randomly_generated_name(self):
         """tests that the randomly-generated name works"""
