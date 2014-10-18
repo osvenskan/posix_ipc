@@ -142,7 +142,7 @@ class TestSemaphores(tests_base.Base):
         # I would prefer this syntax, but it doesn't work with Python < 2.7.
         # with self.assertRaises(posix_ipc.BusyError):
         #     self.sem.acquire(0)
-        self.failUnlessRaises(posix_ipc.BusyError, self.sem.acquire, 0)
+        self.assertRaises(posix_ipc.BusyError, self.sem.acquire, 0)
 
 
     def test_acquisition_nonzero_int_timeout(self):
@@ -157,8 +157,7 @@ class TestSemaphores(tests_base.Base):
             # I would prefer this syntax, but it doesn't work with Python < 2.7.
             # with self.assertRaises(posix_ipc.BusyError):
             #     self.sem.acquire(wait_time)
-            self.failUnlessRaises(posix_ipc.BusyError, self.sem.acquire,
-                                  wait_time)
+            self.assertRaises(posix_ipc.BusyError, self.sem.acquire, wait_time)
             end = datetime.datetime.now()
             actual_delta = end - start
             expected_delta = datetime.timedelta(seconds=wait_time)
@@ -184,8 +183,7 @@ class TestSemaphores(tests_base.Base):
             # I would prefer this syntax, but it doesn't work with Python < 2.7.
             # with self.assertRaises(posix_ipc.BusyError):
             #     self.sem.acquire(wait_time)
-            self.failUnlessRaises(posix_ipc.BusyError, self.sem.acquire,
-                                  wait_time)
+            self.assertRaises(posix_ipc.BusyError, self.sem.acquire, wait_time)
             end = datetime.datetime.now()
             actual_delta = end - start
             expected_delta = datetime.timedelta(seconds=wait_time)
@@ -217,7 +215,7 @@ class TestSemaphores(tests_base.Base):
             # I would prefer this syntax, but it doesn't work with Python < 2.7.
             # with self.assertRaises(posix_ipc.BusyError):
             #     sem.acquire(0)
-            self.failUnlessRaises(posix_ipc.BusyError, sem.acquire, 0)
+            self.assertRaises(posix_ipc.BusyError, sem.acquire, 0)
 
         if posix_ipc.SEMAPHORE_VALUE_SUPPORTED:
             self.assertEqual(sem.value, 1)
