@@ -437,7 +437,8 @@ a file descriptor that can be mmapped.
 
         <p>When opening an existing shared memory segment, one can also specify
             the flag <tt>O_TRUNC</tt>
-            to truncate the shared memory to zero bytes.
+            to truncate the shared memory to zero bytes. OS X does not appear
+            to support <tt>O_TRUNC</tt>.
         </p>
     </dd>
 
