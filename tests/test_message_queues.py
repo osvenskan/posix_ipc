@@ -24,17 +24,17 @@ else:
 signal_handler_value_received = 0
 
 def signal_handler(signal_value, frame):
-    # FIXME docstring
+    """Handle signal sent for msg q notification test."""
     global signal_handler_value_received
     signal_handler_value_received = signal_value
 
 def threaded_notification_handler_one_shot(test_case_instance):
-    # FIXME docstring
+    """Handle msg q notification in a thread without rearming notification."""
     test_case_instance.threaded_notification_called = True
     test_case_instance.notification_event.set()
 
 def threaded_notification_handler_rearm(test_case_instance):
-    # FIXME docstring
+    """Handle msg q notification in a thread and rearm notification."""
     # Rearm.
     param = (threaded_notification_handler_rearm, test_case_instance)
     test_case_instance.mq.request_notification(param)
@@ -283,12 +283,6 @@ if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
 
             self.assertEqual(self.mq.receive(), ('foo'.encode(), 3))
 
-        # FIXME This test fails
-        # def test_receive_timeout_keyword(self):
-        #     """Test that the timeout keyword of receive works."""
-        #     self.assertRaises(posix_ipc.BusyError, self.mq.receive,
-        #                       timeout=0)
-
         def test_receive_timeout_positional(self):
             """Test that the timeout positional param of receive works."""
             self.assertRaises(posix_ipc.BusyError, self.mq.receive, 0)
@@ -303,8 +297,6 @@ if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
             self.assertTrue(elapsed < 1.5)
 
         # FIXME how to test that timeout=None waits forever?
-
-        # FIXME under py3, receive returns bytes
 
         ###### test request_notification()
 
@@ -392,24 +384,6 @@ if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
             self.mq.send('')
 
             self.assertEqual(signal_handler_value_received, 0)
-
-        # FIXME this fails
-        # def test_request_notification_cancel_keyword(self):
-        #     """Test that notification can be cancelled with a keyword param"""
-        #     global signal_handler_value_received
-
-        #     self.mq.request_notification(SIGNAL_VALUE)
-
-        #     signal.signal(SIGNAL_VALUE, signal_handler)
-
-        #     signal_handler_value_received = 0
-
-        #     # Cancel notification
-        #     self.mq.request_notification(notification=None)
-
-        #     self.mq.send('')
-
-        #     self.assertEqual(signal_handler_value_received, 0)
 
         def test_request_notification_cancel_multiple(self):
             """Test that notification can be cancelled multiple times"""

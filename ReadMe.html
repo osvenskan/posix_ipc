@@ -595,7 +595,7 @@ a file descriptor that can be mmapped.
         </p>
     </dd>
 
-    <dt>receive([timeout = None])</dt>
+    <dt>receive([timeout])</dt>
     <dd>
         Receives a message from the queue, returning a tuple of
         <tt>(message, priority)</tt>. Messages are received in the order of
@@ -605,18 +605,18 @@ a file descriptor that can be mmapped.
         Under Python 3, the returned message is a bytes object.
 
         <p>If the queue is empty, the call will not return immediately.
-        The <span class="param">timeout</span> parameter controls the
-        wait just as for the function <tt>send()</tt>.
+        The optional <span class="param">timeout</span> parameter controls the
+        wait just as for the function <tt>send()</tt>. It defaults to None.
         </p>
     </dd>
 
-    <dt>request_notification([notification = None])</dt>
+    <dt>request_notification([notification])</dt>
     <dd>Depending on the parameter, requests or cancels notification from the
         operating system when the queue changes from empty to non-empty.
 
         <ul>
-            <li>When <span class="param">notification</span> is <tt>None</tt>
-                (the default), any existing notification request is
+            <li>When <span class="param">notification</span> is not provided
+            	or <tt>None</tt>, any existing notification request is
                 cancelled.
             </li>
 
@@ -640,8 +640,7 @@ a file descriptor that can be mmapped.
 
         <p>The operating system delivers (at most) one notification
             per request. If you want subsequent notifications, you must
-            request them by calling
-           <tt>request_notification()</tt> again.
+            request them by calling <tt>request_notification()</tt> again.
         </p>
     </dd>
 
