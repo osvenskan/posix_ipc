@@ -65,11 +65,11 @@
     <br><a href="rss.xml">RSS</a>
 </div>
 
-<p>The Python extension module <tt>posix_ipc</tt> gives access
+<p>The Python extension module <tt>posix_ipc</tt> gives Python access
 to POSIX inter-process semaphores, shared memory and message queues on
 systems that support the POSIX Realtime Extensions a.k.a. POSIX 1003.1b-1993.
-That includes most (all?) Linuxes with kernel ≥ 2.6, OpenSolaris ≥ 2008.05
-and FreeBSD ≥ 7.2.
+That includes most (all?) Linuxes with kernel ≥ 2.6, FreeBSD ≥ 7.2, and
+OpenSolaris ≥ 2008.05.
 </p>
 
 <p>OS X and other Unix-y platforms (including Windows +
@@ -78,17 +78,15 @@ and FreeBSD ≥ 7.2.
 the platform notes below</a> for more details.
 </p>
 
-<p>This module is known to work with Python 2.4 &ndash; 3.3 (but <em>not</em>
-3.0). It is released
-under a <a href="http://creativecommons.org/licenses/BSD/">BSD license</a>.
+<p>This module works under Python 2.4 &ndash; 3.4. It is released
+under a BSD license.
 </p>
 
 <p>You might be interested in the very similar module
 <a href="/philip/sysv_ipc/"><tt>sysv_ipc</tt> which
 provides Python access to IPC using System V semaphores, shared memory and
 message queues</a>.
-System V IPC has broader OS support but is a little less easy to use and
-usually lags behind this module a little.
+System V IPC has broader OS support but is not as easy to use.
 </p>
 
 <p>You can <strong>download
@@ -99,7 +97,10 @@ usually lags behind this module a little.
 
 which contains the source code, setup.py, installation instructions and
 <a href="#samples">sample code</a>. The exact same
-<a href="https://pypi.python.org/pypi/posix_ipc">posix_ipc tarball is also available on PyPI</a>.
+<a href="https://pypi.python.org/pypi/posix_ipc">posix_ipc tarball is also
+available on PyPI</a>. You can also find
+<a href='https://bitbucket.org/philip_semanchuk/posix_ipc'>the
+<tt>posix_ipc</tt> source code on BitBucket</a>.
 </p>
 
 <p>
@@ -853,7 +854,7 @@ conformance</em>" and still not support any or all of the IPC functions.
         </p>
     </dd>
 
-    <dt>OS X (up to and including 10.8)</dt>
+    <dt>OS X (up to and including 10.9)</dt>
     <dd>
         Message queues are not supported by OS X. Also,
         <tt>sem_getvalue()</tt> and <tt>sem_timedwait()</tt> are not
