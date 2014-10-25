@@ -45,16 +45,6 @@ def threaded_notification_handler_rearm(test_case_instance):
 
 if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
     class TestMessageQueues(tests_base.Base):
-        def _test_assign_to_read_only_property(self, property_name, value):
-            """test that writing to a readonly property raises TypeError"""
-            # Awkward syntax here because I can't use assertRaises in a context
-            # manager in Python < 2.7.
-            def assign(property_name):
-                setattr(self.mq, property_name, value)
-
-            # raises TypeError: readonly attribute
-            self.assertRaises(TypeError, assign)
-
         def setUp(self):
             self.mq = posix_ipc.MessageQueue(None, posix_ipc.O_CREX)
 
@@ -63,15 +53,11 @@ if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
                 self.mq.close()
                 self.mq.unlink()
 
-        def _test_assign_to_read_only_property(self, property_name, value):
+        def assertWriteToReadOnlyPropertyFails(self, property_name, value):
             """test that writing to a readonly property raises TypeError"""
-            # Awkward syntax here because I can't use assertRaises in a context
-            # manager in Python < 2.7.
-            def assign(property_name):
-                setattr(self.mq, property_name, value)
-
-            # raises TypeError: readonly attribute
-            self.assertRaises(TypeError, assign)
+            tests_base.Base.assertWriteToReadOnlyPropertyFails(self, self.mq,
+                                                               property_name,
+                                                               value)
 
         def test_no_flags(self):
             """tests that opening a queue with no flags opens the existing
@@ -460,7 +446,7 @@ if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
 
             self.assertEqual(self.mq.name[0], '/')
 
-            self._test_assign_to_read_only_property('name', 'hello world')
+            self.assertWriteToReadOnlyPropertyFails('name', 'hello world')
 
         def test_property_mqd(self):
             """exercise MessageQueue.mqd"""
@@ -470,19 +456,19 @@ if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
             # type is. All I know is that -1 is an error so it's probably
             # int-ish, but I can't tell exactly what to expect.
 
-            self._test_assign_to_read_only_property('mqd', 42)
+            self.assertWriteToReadOnlyPropertyFails('mqd', 42)
 
         def test_property_max_messages(self):
             """exercise MessageQueue.max_messages"""
             self.assertGreaterEqual(self.mq.max_messages, 0)
 
-            self._test_assign_to_read_only_property('max_messages', 42)
+            self.assertWriteToReadOnlyPropertyFails('max_messages', 42)
 
         def test_property_max_message_size(self):
             """exercise MessageQueue.max_message_size"""
             self.assertGreaterEqual(self.mq.max_message_size, 0)
 
-            self._test_assign_to_read_only_property('max_message_size', 42)
+            self.assertWriteToReadOnlyPropertyFails('max_message_size', 42)
 
         def test_property_current_messages(self):
             """exercise MessageQueue.current_messages"""
@@ -503,7 +489,7 @@ if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
             self.mq.receive()
             self.assertEqual(self.mq.current_messages, 0)
 
-            self._test_assign_to_read_only_property('current_messages', 42)
+            self.assertWriteToReadOnlyPropertyFails('current_messages', 42)
 
         def test_block_flag_default_value_and_writability(self):
             """test that the block flag is True by default and can be changed"""

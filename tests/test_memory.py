@@ -37,15 +37,10 @@ class TestMemory(tests_base.Base):
             self.mem.close_fd()
             self.mem.unlink()
 
-    def _test_assign_to_read_only_property(self, property_name, value):
+    def assertWriteToReadOnlyPropertyFails(self, property_name, value):
         """test that writing to a readonly property raises TypeError"""
-        # Awkward syntax here because I can't use assertRaises in a context
-        # manager in Python < 2.7.
-        def assign(property_name):
-            setattr(self.mem, property_name, value)
-
-        # raises TypeError: readonly attribute
-        self.assertRaises(TypeError, assign)
+        tests_base.Base.assertWriteToReadOnlyPropertyFails(self, self.mem,
+                                                           property_name, value)
 
     def test_ctor_no_flags_existing(self):
         """tests that opening a memory segment with no flags opens the existing
@@ -168,7 +163,7 @@ class TestMemory(tests_base.Base):
 
         self.assertEqual(self.mem.name[0], '/')
 
-        self._test_assign_to_read_only_property('name', 'hello world')
+        self.assertWriteToReadOnlyPropertyFails('name', 'hello world')
 
     def test_fd_property(self):
         """exercise SharedMemory.fd"""
@@ -177,7 +172,7 @@ class TestMemory(tests_base.Base):
         else:
             self.assertIsInstance(self.mem.fd, (int, long))
 
-        self._test_assign_to_read_only_property('fd', 42)
+        self.assertWriteToReadOnlyPropertyFails('fd', 42)
 
     def test_size_property(self):
         """exercise SharedMemory.size"""
@@ -186,8 +181,7 @@ class TestMemory(tests_base.Base):
         else:
             self.assertIsInstance(self.mem.size, (int, long))
 
-        self._test_assign_to_read_only_property('size', 42)
-
+        self.assertWriteToReadOnlyPropertyFails('size', 42)
 
 if __name__ == '__main__':
     unittest.main()
