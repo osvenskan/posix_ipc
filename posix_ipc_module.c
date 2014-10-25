@@ -2546,7 +2546,7 @@ POSIX_IPC_INIT_FUNCTION_NAME(void) {
 #ifdef SIGRTMAX
 	// SIGRTMIN and SIGRTMAX are only defined on platforms that support
 	// the Realtime Signals Extension (RTS). NetBSD prior to 6.0 is an
-	// example of a pltform that doesn't support RTS.
+	// example of a platform that doesn't support RTS.
     PyModule_AddIntConstant(module, "USER_SIGNAL_MIN", SIGRTMIN);
     PyModule_AddIntConstant(module, "USER_SIGNAL_MAX", SIGRTMAX);
 #endif
