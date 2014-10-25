@@ -25,15 +25,10 @@ class TestSemaphores(tests_base.Base):
         if self.sem:
             self.sem.unlink()
 
-    def _test_assign_to_read_only_property(self, property_name, value):
+    def assertWriteToReadOnlyPropertyFails(self, property_name, value):
         """test that writing to a readonly property raises TypeError"""
-        # Awkward syntax here because I can't use assertRaises in a context
-        # manager in Python < 2.7.
-        def assign(property_name):
-            setattr(self.sem, property_name, value)
-
-        # raises TypeError: readonly attribute
-        self.assertRaises(TypeError, assign)
+        tests_base.Base.assertWriteToReadOnlyPropertyFails(self, self.sem,
+                                                           property_name, value)
 
     def test_no_flags(self):
         """tests that opening a semaphore with no flags opens the existing
@@ -116,7 +111,7 @@ class TestSemaphores(tests_base.Base):
             sem.unlink()
 
 
-    # test sacquisition
+    # test acquisition
     def test_simple_acquisition(self):
         """tests that acquisition works"""
         # I should be able to acquire this semaphore, but if I can't I don't
@@ -143,7 +138,6 @@ class TestSemaphores(tests_base.Base):
         # with self.assertRaises(posix_ipc.BusyError):
         #     self.sem.acquire(0)
         self.assertRaises(posix_ipc.BusyError, self.sem.acquire, 0)
-
 
     def test_acquisition_nonzero_int_timeout(self):
         """tests that acquisition w/timeout=an int is reasonably accurate"""
@@ -245,7 +239,7 @@ class TestSemaphores(tests_base.Base):
 
         self.assertEqual(self.sem.name[0], '/')
 
-        self._test_assign_to_read_only_property('name', 'hello world')
+        self.assertWriteToReadOnlyPropertyFails('name', 'hello world')
 
     def test_property_value(self):
         """exercise Semaphore.value if possible"""
@@ -253,7 +247,7 @@ class TestSemaphores(tests_base.Base):
         if posix_ipc.SEMAPHORE_VALUE_SUPPORTED:
             self.assertEqual(self.sem.value, 1)
 
-            self._test_assign_to_read_only_property('value', 42)
+            self.assertWriteToReadOnlyPropertyFails('value', 42)
 
 
 if __name__ == '__main__':
