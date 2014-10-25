@@ -17,7 +17,13 @@ sys.path.insert(0, os.path.join(os.getcwd(), 'tests'))
 import base as tests_base
 
 if hasattr(posix_ipc, 'USER_SIGNAL_MIN'):
-    SIGNAL_VALUE = posix_ipc.USER_SIGNAL_MIN
+    # Due to Python bug http://bugs.python.org/issue20584, not all valid signal
+    # values can be used. I noticed it on FreeBSD, it might be visible
+    # elsewhere.
+    if posix_ipc.USER_SIGNAL_MIN >= signal.NSIG:
+        SIGNAL_VALUE = signal.SIGHUP
+    else:
+        SIGNAL_VALUE = posix_ipc.USER_SIGNAL_MIN
 else:
     SIGNAL_VALUE = signal.SIGHUP
 
