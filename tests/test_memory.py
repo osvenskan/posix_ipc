@@ -16,6 +16,7 @@ sys.path.insert(0, os.path.join(os.getcwd(), 'tests'))
 import base as tests_base
 
 class TestMemory(tests_base.Base):
+    """Exercise the SharedMemory class"""
     # SIZE should be something that's not a power of 2 since that's more
     # likely to expose odd behavior.
     SIZE = 3333

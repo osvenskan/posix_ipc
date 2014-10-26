@@ -26,7 +26,6 @@ class Base(unittest.TestCase):
     assertRaises() so that it can be used in a context manager. The
     implementation of each is copied directly from Python's source.
     """
-
     def assertWriteToReadOnlyPropertyFails(self, target_object, property_name,
                                            value):
         """test that writing to a readonly property raises an exception"""

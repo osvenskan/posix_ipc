@@ -17,6 +17,7 @@ import base as tests_base
 ONE_MILLION = 1000000
 
 class TestModule(tests_base.Base):
+    """Exercise the posix_ipc module-level functions and constants"""
     def test_constant_values(self):
         """test that constants are what I expect"""
         self.assertEqual(posix_ipc.O_CREAT, os.O_CREAT)
@@ -95,7 +96,6 @@ class TestModule(tests_base.Base):
         self.assertTrue(issubclass(posix_ipc.PermissionsError, posix_ipc.Error))
         self.assertTrue(issubclass(posix_ipc.ExistentialError, posix_ipc.Error))
         self.assertTrue(issubclass(posix_ipc.BusyError, posix_ipc.Error))
-
 
 if __name__ == '__main__':
     unittest.main()
