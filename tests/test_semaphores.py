@@ -17,6 +17,7 @@ import base as tests_base
 N_RELEASES = 1000000 # 1 million
 
 class TestSemaphores(tests_base.Base):
+    """Exercise the Semaphore class"""
     def setUp(self):
         self.sem = posix_ipc.Semaphore(None, posix_ipc.O_CREX,
                                        initial_value=1)
