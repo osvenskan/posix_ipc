@@ -45,3 +45,10 @@ demo3/utils.py
 demo4/ReadMe.txt
 demo4/child.py
 demo4/parent.py
+tests/__init__.py
+tests/base.py
+tests/test_message_queues.py
+tests/test_semaphores.py
+tests/test_memory.py
+tests/test_module.py
+tests/utils_for_py26.py

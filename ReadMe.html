@@ -30,26 +30,14 @@
 
         pre { margin-left: 2em; }
 
-        .dangerdanger {
-            border: 2px dashed red;
-            padding: .5em;
-            margin: 1em;
-            font-weight: bold;
-            clear: both;
+        #download_box {
+        	float: right;
+        	width: 12em;
+        	background-color: #d0d0a9;
+        	border: 1px solid #666;
+        	padding: .33em;
         }
 
-        form {
-            width: 20em;
-            float: right;
-            font-size: 90%;
-            margin-left: 1em;
-            margin-bottom: 1em;
-            float: right;
-        }
-
-        fieldset, legend {
-            background-color: #d0d0a9;
-        }
         /* This style is only present on the local version of the readme.
            In the online version, the RSS feed is displayed. */
         div.rss { display: none; }
@@ -82,11 +70,12 @@ the platform notes below</a> for more details.
 under a BSD license.
 </p>
 
+
 <p>You can <strong>download
-<a href="posix_ipc-0.9.8.tar.gz">posix_ipc version 0.9.8</a>
+<a href="posix_ipc-0.9.9.tar.gz">posix_ipc version 0.9.9</a>
 </strong>
-<a href="posix_ipc-0.9.8.md5.txt">[MD5 sum]</a>
-<a href="posix_ipc-0.9.8.sha1.txt">[SHA1 sum]</a>
+<a href="posix_ipc-0.9.9.md5.txt">[MD5 sum]</a>
+<a href="posix_ipc-0.9.9.sha1.txt">[SHA1 sum]</a>
 
 which contains the source code, setup.py, installation instructions, tests, and
 <a href="#samples">sample code</a>. The exact same
@@ -685,6 +674,14 @@ a file descriptor that can be mmapped.
 
 
 <h3>Usage Tips</h3>
+
+<h4 id="tests">Tests</h4>
+
+<p>This module comes with fairly complete unit tests in the <tt>tests</tt>
+directory. To run them, install <tt>posix_ipc</tt> and then run this command
+from the same directory as <tt>setup.py</tt>:<br>
+<tt>python -m unittest discover</tt>
+</p>
 
 <h4 id="samples">Sample Code</h4>
 
