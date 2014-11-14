@@ -51,6 +51,7 @@ def threaded_notification_handler_rearm(test_case_instance):
 
 if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
     class TestMessageQueues(tests_base.Base):
+        """Exercise the MessageQueue class"""
         def setUp(self):
             self.mq = posix_ipc.MessageQueue(None, posix_ipc.O_CREX)
 
