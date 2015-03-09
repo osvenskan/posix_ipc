@@ -2,6 +2,7 @@
 # Don't add any from __future__ imports here. This code should execute
 # against standard Python.
 import unittest
+from unittest import skipUnless
 import datetime
 import random
 
@@ -12,6 +13,7 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.getcwd(), 'tests'))
 import base as tests_base
+
 
 # N_RELEASES is the number of times release() is called in test_release()
 N_RELEASES = 1000000 # 1 million
@@ -90,26 +92,26 @@ class TestSemaphores(tests_base.Base):
 
     # don't bother testing mode, it's ignored by the OS?
 
+    @skipUnless(posix_ipc.SEMAPHORE_VALUE_SUPPORTED, "Requires Semaphore.value support")
     def test_default_initial_value(self):
         """tests that the initial value is 0 by default"""
-        if posix_ipc.SEMAPHORE_VALUE_SUPPORTED:
-            sem = posix_ipc.Semaphore(None, posix_ipc.O_CREX)
-            self.assertEqual(sem.value, 0)
-            sem.unlink()
+        sem = posix_ipc.Semaphore(None, posix_ipc.O_CREX)
+        self.assertEqual(sem.value, 0)
+        sem.unlink()
 
+    @skipUnless(posix_ipc.SEMAPHORE_VALUE_SUPPORTED, "Requires Semaphore.value support")
     def test_zero_initial_value(self):
         """tests that the initial value is 0 when assigned"""
-        if posix_ipc.SEMAPHORE_VALUE_SUPPORTED:
-            sem = posix_ipc.Semaphore(None, posix_ipc.O_CREX, initial_value=0)
-            self.assertEqual(sem.value, 0)
-            sem.unlink()
+        sem = posix_ipc.Semaphore(None, posix_ipc.O_CREX, initial_value=0)
+        self.assertEqual(sem.value, 0)
+        sem.unlink()
 
+    @skipUnless(posix_ipc.SEMAPHORE_VALUE_SUPPORTED, "Requires Semaphore.value support")
     def test_nonzero_initial_value(self):
         """tests that the initial value is non-zero when assigned"""
-        if posix_ipc.SEMAPHORE_VALUE_SUPPORTED:
-            sem = posix_ipc.Semaphore(None, posix_ipc.O_CREX, initial_value=42)
-            self.assertEqual(sem.value, 42)
-            sem.unlink()
+        sem = posix_ipc.Semaphore(None, posix_ipc.O_CREX, initial_value=42)
+        self.assertEqual(sem.value, 42)
+        sem.unlink()
 
 
     # test acquisition
@@ -134,63 +136,52 @@ class TestSemaphores(tests_base.Base):
         behavior"""
         # Should not raise an error
         self.sem.acquire(0)
+        with self.assertRaises(posix_ipc.BusyError):
+            self.sem.acquire(0)
 
-        # I would prefer this syntax, but it doesn't work with Python < 2.7.
-        # with self.assertRaises(posix_ipc.BusyError):
-        #     self.sem.acquire(0)
-        self.assertRaises(posix_ipc.BusyError, self.sem.acquire, 0)
-
+    @skipUnless(posix_ipc.SEMAPHORE_TIMEOUT_SUPPORTED, "Requires Semaphore timeout support")
     def test_acquisition_nonzero_int_timeout(self):
         """tests that acquisition w/timeout=an int is reasonably accurate"""
-        if posix_ipc.SEMAPHORE_TIMEOUT_SUPPORTED:
-            # Should not raise an error
-            self.sem.acquire(0)
+        # Should not raise an error
+        self.sem.acquire(0)
 
-            # This should raise a busy error
-            wait_time = 1
-            start = datetime.datetime.now()
-            # I would prefer this syntax, but it doesn't work with Python < 2.7.
-            # with self.assertRaises(posix_ipc.BusyError):
-            #     self.sem.acquire(wait_time)
-            self.assertRaises(posix_ipc.BusyError, self.sem.acquire, wait_time)
-            end = datetime.datetime.now()
-            actual_delta = end - start
-            expected_delta = datetime.timedelta(seconds=wait_time)
+        # This should raise a busy error
+        wait_time = 1
+        start = datetime.datetime.now()
+        with self.assertRaises(posix_ipc.BusyError):
+            self.sem.acquire(wait_time)
+        end = datetime.datetime.now()
+        actual_delta = end - start
+        expected_delta = datetime.timedelta(seconds=wait_time)
 
-            delta = actual_delta - expected_delta
+        delta = actual_delta - expected_delta
 
-            self.assertEqual(delta.days, 0)
-            self.assertEqual(delta.seconds, 0)
-            # I don't want to test microseconds because that granularity
-            # isn't under the control of this module.
-        # else:
-            # Can't test this!
+        self.assertEqual(delta.days, 0)
+        self.assertEqual(delta.seconds, 0)
+        # I don't want to test microseconds because that granularity
+        # isn't under the control of this module.
 
+    @skipUnless(posix_ipc.SEMAPHORE_TIMEOUT_SUPPORTED, "Requires Semaphore timeout support")
     def test_acquisition_nonzero_float_timeout(self):
         """tests that acquisition w/timeout=a float is reasonably accurate"""
-        if posix_ipc.SEMAPHORE_TIMEOUT_SUPPORTED:
-            # Should not raise an error
-            self.sem.acquire(0)
+        # Should not raise an error
+        self.sem.acquire(0)
 
-            # This should raise a busy error
-            wait_time = 1.5
-            start = datetime.datetime.now()
-            # I would prefer this syntax, but it doesn't work with Python < 2.7.
-            # with self.assertRaises(posix_ipc.BusyError):
-            #     self.sem.acquire(wait_time)
-            self.assertRaises(posix_ipc.BusyError, self.sem.acquire, wait_time)
-            end = datetime.datetime.now()
-            actual_delta = end - start
-            expected_delta = datetime.timedelta(seconds=wait_time)
+        # This should raise a busy error
+        wait_time = 1.5
+        start = datetime.datetime.now()
+        with self.assertRaises(posix_ipc.BusyError):
+            self.sem.acquire(wait_time)
+        end = datetime.datetime.now()
+        actual_delta = end - start
+        expected_delta = datetime.timedelta(seconds=wait_time)
 
-            delta = actual_delta - expected_delta
+        delta = actual_delta - expected_delta
 
-            self.assertEqual(delta.days, 0)
-            self.assertEqual(delta.seconds, 0)
-            # I don't want to test microseconds because that granularity
-            # isn't under the control of this module.
-        # else:
-            # Can't test this!
+        self.assertEqual(delta.days, 0)
+        self.assertEqual(delta.seconds, 0)
+        # I don't want to test microseconds because that granularity
+        # isn't under the control of this module.
 
     def test_release(self):
         """tests that release works"""
@@ -207,10 +198,8 @@ class TestSemaphores(tests_base.Base):
         with self.sem as sem:
             if posix_ipc.SEMAPHORE_VALUE_SUPPORTED:
                 self.assertEqual(sem.value, 0)
-            # I would prefer this syntax, but it doesn't work with Python < 2.7.
-            # with self.assertRaises(posix_ipc.BusyError):
-            #     sem.acquire(0)
-            self.assertRaises(posix_ipc.BusyError, sem.acquire, 0)
+            with self.assertRaises(posix_ipc.BusyError):
+                sem.acquire(0)
 
         if posix_ipc.SEMAPHORE_VALUE_SUPPORTED:
             self.assertEqual(sem.value, 1)
@@ -225,12 +214,10 @@ class TestSemaphores(tests_base.Base):
         # and note that it does not fail. Also, it allows sem.unlink() to
         # tell the OS to delete the semaphore entirely, so it makes sense
         # to test them together.
-
         self.sem.unlink()
         self.sem.close()
         self.assertRaises(posix_ipc.ExistentialError, posix_ipc.Semaphore,
                           self.sem.name)
-
         # Wipe this out so that self.tearDown() doesn't crash.
         self.sem = None
 
@@ -242,13 +229,13 @@ class TestSemaphores(tests_base.Base):
 
         self.assertWriteToReadOnlyPropertyFails('name', 'hello world')
 
+    @skipUnless(posix_ipc.SEMAPHORE_VALUE_SUPPORTED, "Requires Semaphore.value support")
     def test_property_value(self):
         """exercise Semaphore.value if possible"""
         # test read, although this has been tested very thoroughly above
-        if posix_ipc.SEMAPHORE_VALUE_SUPPORTED:
-            self.assertEqual(self.sem.value, 1)
+        self.assertEqual(self.sem.value, 1)
 
-            self.assertWriteToReadOnlyPropertyFails('value', 42)
+        self.assertWriteToReadOnlyPropertyFails('value', 42)
 
 
 if __name__ == '__main__':
