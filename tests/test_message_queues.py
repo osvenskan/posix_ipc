@@ -2,6 +2,7 @@
 # Don't add any from __future__ imports here. This code should execute
 # against standard Python.
 import unittest
+from unittest import skipUnless
 import datetime
 import random
 import time
@@ -49,7 +50,7 @@ def threaded_notification_handler_rearm(test_case_instance):
     test_case_instance.notification_event.set()
 
 
-if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
+    @skipUnless(posix_ipc.MESSAGE_QUEUES_SUPPORTED, "Requires MessageQueue support")
     class TestMessageQueues(tests_base.Base):
         """Exercise the MessageQueue class"""
         def setUp(self):
@@ -462,7 +463,6 @@ if posix_ipc.MESSAGE_QUEUES_SUPPORTED:
             # The mqd is of type mqd_t. I can't find doc that states what this
             # type is. All I know is that -1 is an error so it's probably
             # int-ish, but I can't tell exactly what to expect.
-
             self.assertWriteToReadOnlyPropertyFails('mqd', 42)
 
         def test_property_max_messages(self):

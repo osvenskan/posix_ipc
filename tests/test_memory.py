@@ -79,15 +79,12 @@ class TestMemory(tests_base.Base):
         self.assertRaises(posix_ipc.ExistentialError, posix_ipc.SharedMemory,
                           '/foo', posix_ipc.O_CREX)
 
-    if "Darwin" in platform.uname():
-        # O_TRUNC is not supported under OS X
-        pass
-    else:
-        def test_o_trunc(self):
-            """Test that O_TRUNC truncates the memory to 0 bytes"""
-            mem_copy = posix_ipc.SharedMemory(self.mem.name, posix_ipc.O_TRUNC)
+    @unittest.skipIf("Darwin" in platform.uname(), "O_TRUNC is not supported under OS X")
+    def test_o_trunc(self):
+        """Test that O_TRUNC truncates the memory to 0 bytes"""
+        mem_copy = posix_ipc.SharedMemory(self.mem.name, posix_ipc.O_TRUNC)
 
-            self.assertEqual(mem_copy.size, 0)
+        self.assertEqual(mem_copy.size, 0)
 
     def test_randomly_generated_name(self):
         """tests that the randomly-generated name works"""
@@ -183,6 +180,7 @@ class TestMemory(tests_base.Base):
             self.assertIsInstance(self.mem.size, (int, long))
 
         self.assertWriteToReadOnlyPropertyFails('size', 42)
+
 
 if __name__ == '__main__':
     unittest.main()
