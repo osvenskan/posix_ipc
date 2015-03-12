@@ -4,7 +4,7 @@
 
 <head>
 	<meta name="author" content="Philip Semanchuk">
-	<meta name="copyright" content="All contents &copy; 2012 Philip Semanchuk">
+	<meta name="copyright" content="All contents &copy; 2015 Philip Semanchuk">
 	<meta name="keywords" content="python posix ipc semaphore shared memory message queue">
 
     <title>The posix_ipc Module for POSIX IPC Under Python -- Version History</title>
@@ -27,7 +27,23 @@
 <a href="http://semanchuk.com/philip/posix_ipc/">posix_ipc
 module</a>.</p>
 
+<p>As of version 1.0.0, I consider this module complete. I will continue to
+suppport it and look for useful features to add, but right now I don't see any.
+</p>
+
 <ul id="history">
+
+    <li><strong><span id="current">Current</span> &ndash; 1.0.0 (11 Mar 2015) &ndash;</strong>
+        <ul>
+        	<li>Added ability to pass names as unicode in Python 2.</li>
+        	<li>Added ability to pass names as bytes in Python 3.</li>
+        	<li>Dropped support for Python &lt; 2.7.</li>
+            <li>Made unit tests nicer by taking advantage of Python 2.7+
+            certainty and removed some code that only supported Python 2.6.
+            </li>
+        </ul>
+	</li>
+
     <li><strong><span id="current">Current</span> &ndash; 0.9.9 (14 Nov 2014) &ndash;</strong>
         <ul>
             <li>Added the ability to build on platforms that don't support the
