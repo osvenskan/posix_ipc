@@ -90,6 +90,39 @@ class TestSemaphores(tests_base.Base):
         self.assertGreaterEqual(len(sem.name), 2)
         sem.unlink()
 
+    def test_name_as_bytes(self):
+        """Test that the name can be bytes.
+
+        In Python 2, bytes == str. This test is really only interesting in Python 3.
+        """
+        if tests_base.IS_PY3:
+            name = bytes(tests_base.make_name(), 'ASCII')
+        else:
+            name = bytes(tests_base.make_name())
+        sem = posix_ipc.Semaphore(name, posix_ipc.O_CREX)
+        # No matter what the name is passed as, posix_ipc.name returns the default string type,
+        # i.e. str in Python 2 and unicode in Python 3.
+        if tests_base.IS_PY3:
+            self.assertEqual(name, bytes(sem.name, 'ASCII'))
+        else:
+            self.assertEqual(name, sem.name)
+        sem.unlink()
+        sem.close()
+
+    def test_name_as_unicode(self):
+        """Test that the name can be unicode.
+
+        In Python 3, str == unicode. This test is really only interesting in Python 2.
+        """
+        if tests_base.IS_PY3:
+            name = tests_base.make_name()
+        else:
+            name = unicode(tests_base.make_name(), 'ASCII')
+        sem = posix_ipc.Semaphore(name, posix_ipc.O_CREX)
+        self.assertEqual(name, sem.name)
+        sem.unlink()
+        sem.close()
+
     # don't bother testing mode, it's ignored by the OS?
 
     @skipUnless(posix_ipc.SEMAPHORE_VALUE_SUPPORTED, "Requires Semaphore.value support")
@@ -236,7 +269,6 @@ class TestSemaphores(tests_base.Base):
         self.assertEqual(self.sem.value, 1)
 
         self.assertWriteToReadOnlyPropertyFails('value', 42)
-
 
 if __name__ == '__main__':
     unittest.main()

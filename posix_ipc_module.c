@@ -251,6 +251,11 @@ convert_name_param(PyObject *py_name_param, void *checked_name) {
     char *p_name_as_c_string = NULL;
 #endif
 
+    DPRINTF("inside convert_name_param\n");
+    DPRINTF("PyBytes_Check() = %d \n", PyBytes_Check(py_name_param));
+    DPRINTF("PyString_Check() = %d \n", PyString_Check(py_name_param));
+    DPRINTF("PyUnicode_Check() = %d \n", PyUnicode_Check(py_name_param));
+
     p_name->is_none = 0;
 
     // The name can be None or a Python string
@@ -260,13 +265,22 @@ convert_name_param(PyObject *py_name_param, void *checked_name) {
         p_name->is_none = 1;
     }
 #if PY_MAJOR_VERSION > 2
-    else if (PyUnicode_Check(py_name_param)) {
-        // The caller passed me a Unicode string; I need a char *. Getting
-        // from one to the other takes a couple steps.
+    else if (PyUnicode_Check(py_name_param) || PyBytes_Check(py_name_param)) {
+        DPRINTF("name is Unicode or bytes\n");
+        // The caller passed me a Unicode string or a byte array; I need a
+        // char *. Getting from one to the other takes a couple steps.
 
-        // PyUnicode_FSConverter() converts the Unicode object into a
-        // bytes or a bytearray object. (Why can't it be one or the other?!?)
-        PyUnicode_FSConverter(py_name_param, &py_name_as_bytes);
+        if (PyUnicode_Check(py_name_param)) {
+            DPRINTF("name is Unicode\n");
+            // PyUnicode_FSConverter() converts the Unicode object into a
+            // bytes or a bytearray object. (Why can't it be one or the other?)
+            PyUnicode_FSConverter(py_name_param, &py_name_as_bytes);
+        }
+        else {
+            DPRINTF("name is bytes\n");
+            // Make a copy of the name param.
+            py_name_as_bytes = PyBytes_FromObject(py_name_param);
+        }
 
         // bytes_to_c_string() returns a pointer to the buffer.
         p_name_as_c_string = bytes_to_c_string(py_name_as_bytes, 0);
@@ -286,7 +300,8 @@ convert_name_param(PyObject *py_name_param, void *checked_name) {
         release_bytes(py_name_as_bytes);
     }
 #else
-    else if (PyString_Check(py_name_param)) {
+    else if (PyString_Check(py_name_param) || PyUnicode_Check(py_name_param)) {
+        DPRINTF("name is string or unicode\n");
         // PyMalloc memory and copy the user-supplied name to it.
         p_name->name = (char *)PyMem_Malloc(PyString_Size(py_name_param) + 1);
         if (p_name->name) {
@@ -825,7 +840,7 @@ Semaphore_enter(Semaphore *self) {
     /* else acquisition failed for some reason so just fall through to
        the return statement below and return NULL. Semaphore_acquire() has
        already called PyErr_SetString() to set the relevant error.
-	*/
+    */
 
     Py_DECREF(args);
 
@@ -1818,9 +1833,9 @@ void process_notification(union sigval notification_data) {
 
     Py_XDECREF(py_result);
 
-	/* Release the thread. No Python API allowed beyond this point. */
+    /* Release the thread. No Python API allowed beyond this point. */
     DPRINTF("Calling PyGILState_Release()\n");
-	PyGILState_Release(gstate);
+    PyGILState_Release(gstate);
 
     DPRINTF("exiting thread\n");
 };
@@ -2544,9 +2559,9 @@ POSIX_IPC_INIT_FUNCTION_NAME(void) {
     PyModule_AddIntConstant(module, "QUEUE_MESSAGE_SIZE_MAX_DEFAULT", QUEUE_MESSAGE_SIZE_MAX_DEFAULT);
     PyModule_AddIntConstant(module, "QUEUE_PRIORITY_MAX", QUEUE_PRIORITY_MAX);
 #ifdef SIGRTMAX
-	// SIGRTMIN and SIGRTMAX are only defined on platforms that support
-	// the Realtime Signals Extension (RTS). NetBSD prior to 6.0 is an
-	// example of a platform that doesn't support RTS.
+    // SIGRTMIN and SIGRTMAX are only defined on platforms that support
+    // the Realtime Signals Extension (RTS). NetBSD prior to 6.0 is an
+    // example of a platform that doesn't support RTS.
     PyModule_AddIntConstant(module, "USER_SIGNAL_MIN", SIGRTMIN);
     PyModule_AddIntConstant(module, "USER_SIGNAL_MAX", SIGRTMAX);
 #endif
