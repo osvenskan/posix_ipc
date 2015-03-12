@@ -4,7 +4,7 @@
 
 <head>
 	<meta name="author" content="Philip Semanchuk">
-	<meta name="copyright" content="All contents &copy; 2014 Philip Semanchuk">
+	<meta name="copyright" content="All contents &copy; 2015 Philip Semanchuk">
 	<meta name="keywords" content="python posix ipc semaphore shared memory message queue">
 
     <title>POSIX IPC for Python</title>
@@ -677,11 +677,12 @@ from the same directory as <tt>setup.py</tt>:<br>
 
 <h4 id="samples">Sample Code</h4>
 
-<p>This module comes with three demonstrations. The first (in the
+<p>This module comes with four demonstrations. The first (in the
 directory <tt>demo</tt>) shows how to use shared memory and semaphores.
 The second (in the directory <tt>demo2</tt>) shows how to use
 message queues. The third (<tt>demo3</tt>) shows how to use message queue
-notifications.
+notifications. The fourth (<tt>demo4</tt>) shows how to use a semaphore in
+a context manager.
 </p>
 
 <h4>Nobody Likes a Mr. Messy</h4>
@@ -839,7 +840,7 @@ conformance</em>" and still not support any or all of the IPC functions.
         </p>
     </dd>
 
-    <dt>OS X (up to and including 10.9)</dt>
+    <dt>OS X (up to and including 10.10)</dt>
     <dd>
         Message queues are not supported by OS X. Also,
         <tt>sem_getvalue()</tt> and <tt>sem_timedwait()</tt> are not
