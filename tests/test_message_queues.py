@@ -121,6 +121,39 @@ def threaded_notification_handler_rearm(test_case_instance):
             mq.close()
             mq.unlink()
 
+        def test_name_as_bytes(self):
+            """Test that the name can be bytes.
+
+            In Python 2, bytes == str. This test is really only interesting in Python 3.
+            """
+            if tests_base.IS_PY3:
+                name = bytes(tests_base.make_name(), 'ASCII')
+            else:
+                name = bytes(tests_base.make_name())
+            mq = posix_ipc.MessageQueue(name, posix_ipc.O_CREX)
+            # No matter what the name is passed as, posix_ipc.name returns the default string type,
+            # i.e. str in Python 2 and unicode in Python 3.
+            if tests_base.IS_PY3:
+                self.assertEqual(name, bytes(mq.name, 'ASCII'))
+            else:
+                self.assertEqual(name, mq.name)
+            mq.unlink()
+            mq.close()
+
+        def test_name_as_unicode(self):
+            """Test that the name can be unicode.
+
+            In Python 3, str == unicode. This test is really only interesting in Python 2.
+            """
+            if tests_base.IS_PY3:
+                name = tests_base.make_name()
+            else:
+                name = unicode(tests_base.make_name(), 'ASCII')
+            mq = posix_ipc.MessageQueue(name, posix_ipc.O_CREX)
+            self.assertEqual(name, mq.name)
+            mq.unlink()
+            mq.close()
+
         # don't bother testing mode, it's ignored by the OS?
 
         def test_max_messages(self):
@@ -544,7 +577,6 @@ def threaded_notification_handler_rearm(test_case_instance):
 
             mq.close()
             mq.unlink()
-
 
     if __name__ == '__main__':
         unittest.main()
