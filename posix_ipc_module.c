@@ -650,6 +650,7 @@ static PyObject *
 Semaphore_acquire(Semaphore *self, PyObject *args, PyObject *keywords) {
     NoneableTimeout timeout;
     int rc = 0;
+    static char *keyword_list[] = {"timeout", NULL};
 
     if (!test_semaphore_validity(self))
         goto error_return;
@@ -659,7 +660,8 @@ Semaphore_acquire(Semaphore *self, PyObject *args, PyObject *keywords) {
 
     // acquire([timeout=None])
 
-    if (!PyArg_ParseTuple(args, "|O&", convert_timeout, &timeout))
+    if (!PyArg_ParseTupleAndKeywords(args, keywords, "|O&", keyword_list,
+                                     convert_timeout, &timeout))
         goto error_return;
 
     Py_BEGIN_ALLOW_THREADS
@@ -2095,7 +2097,7 @@ static PyMethodDef Semaphore_methods[] = {
     },
     {   "acquire",
         (PyCFunction)Semaphore_acquire,
-        METH_VARARGS,
+        METH_VARARGS | METH_KEYWORDS,
         "Acquire (grab) the semaphore, waiting if necessary"
     },
     {   "release",
