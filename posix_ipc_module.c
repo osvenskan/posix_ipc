@@ -2325,7 +2325,7 @@ static PyMethodDef MessageQueue_methods[] = {
     },
     {   "receive",
         (PyCFunction)MessageQueue_receive,
-        METH_VARARGS,
+        METH_VARARGS | METH_KEYWORDS,
         "Receive a message from the queue"
     },
     {   "close",
@@ -2340,7 +2340,7 @@ static PyMethodDef MessageQueue_methods[] = {
     },
     {   "request_notification",
         (PyCFunction)MessageQueue_request_notification,
-        METH_VARARGS,
+        METH_VARARGS | METH_KEYWORDS,
         "Request notification of the queue becoming non-empty"
     },
 
