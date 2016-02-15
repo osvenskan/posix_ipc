@@ -260,7 +260,7 @@ situations specific to IPC.
     </dd>
 
 
-    <dt>acquire([timeout=None])</dt>
+    <dt>acquire([timeout = None])</dt>
     <dd>Waits (conditionally) until the semaphore's value is &gt; 0 and then returns,
         decrementing the semaphore.
 
@@ -575,7 +575,7 @@ a file descriptor that can be mmapped.
         </p>
     </dd>
 
-    <dt>receive([timeout])</dt>
+    <dt>receive([timeout = None])</dt>
     <dd>
         Receives a message from the queue, returning a tuple of
         <tt>(message, priority)</tt>. Messages are received in the order of
@@ -590,7 +590,7 @@ a file descriptor that can be mmapped.
         </p>
     </dd>
 
-    <dt>request_notification([notification])</dt>
+    <dt>request_notification([notification = None])</dt>
     <dd>Depending on the parameter, requests or cancels notification from the
         operating system when the queue changes from empty to non-empty.
 

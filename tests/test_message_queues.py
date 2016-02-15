@@ -49,10 +49,8 @@ def threaded_notification_handler_rearm(test_case_instance):
     test_case_instance.threaded_notification_called = True
     test_case_instance.notification_event.set()
 
-
-@skipUnless(posix_ipc.MESSAGE_QUEUES_SUPPORTED, "Requires MessageQueue support")
-class TestMessageQueues(tests_base.Base):
-    """Exercise the MessageQueue class"""
+class MessageQueueTestBase(tests_base.Base):
+    """base class for MessageQueue test classes"""
     def setUp(self):
         self.mq = posix_ipc.MessageQueue(None, posix_ipc.O_CREX)
 
@@ -63,10 +61,12 @@ class TestMessageQueues(tests_base.Base):
 
     def assertWriteToReadOnlyPropertyFails(self, property_name, value):
         """test that writing to a readonly property raises TypeError"""
-        tests_base.Base.assertWriteToReadOnlyPropertyFails(self, self.mq,
-                                                           property_name,
-                                                           value)
+        tests_base.Base.assertWriteToReadOnlyPropertyFails(self, self.mq, property_name, value)
 
+
+@skipUnless(posix_ipc.MESSAGE_QUEUES_SUPPORTED, "Requires MessageQueue support")
+class TestMessageQueueCreation(MessageQueueTestBase):
+    """Exercise stuff related to creating MessageQueue"""
     def test_no_flags(self):
         """tests that opening a queue with no flags opens the existing
         queue and doesn't create a new queue"""
@@ -200,8 +200,16 @@ class TestMessageQueues(tests_base.Base):
         self.assertRaises(posix_ipc.PermissionsError, mq.send, 'foo')
         mq.close()
 
-    ###### test send
+    def test_kwargs(self):
+        """ensure init accepts keyword args as advertised"""
+        # mode 0x180 = 0600. Octal is difficult to express in Python 2/3 compatible code.
+        mq = posix_ipc.MessageQueue(None, flags=posix_ipc.O_CREX, mode=0x180, max_messages=1,
+                                    max_message_size=256, read=True, write=True)
+        mq.close()
+        mq.remove()
 
+class TestMessageQueueSendReceive(MessageQueueTestBase):
+    """Exercise send() and receive()"""
     def test_send(self):
         """Test that simple send works.
 
@@ -219,8 +227,7 @@ class TestMessageQueues(tests_base.Base):
             self.mq.send(' ')
             n_msgs -= 1
 
-        self.assertRaises(posix_ipc.BusyError, self.mq.send, 'foo',
-                          timeout=0)
+        self.assertRaises(posix_ipc.BusyError, self.mq.send, 'foo', timeout=0)
 
     def test_send_timeout_positional(self):
         """Test that the timeout positional param of send works"""
@@ -298,6 +305,10 @@ class TestMessageQueues(tests_base.Base):
         self.mq.send('foo', 0, 42)
         self.assertEqual(self.mq.receive(), ('foo'.encode(), 42))
 
+    def test_send_kwargs(self):
+        """ensure send() accepts keyword args as advertised"""
+        self.mq.send('foo', timeout=0, priority=0)
+
     ###### test receive()
 
     def test_receive(self):
@@ -325,8 +336,13 @@ class TestMessageQueues(tests_base.Base):
 
     # FIXME how to test that timeout=None waits forever?
 
-    ###### test request_notification()
+    def test_receive_kwargs(self):
+        """ensure receive() accepts keyword args as advertised"""
+        self.mq.receive(timeout=0)
 
+
+class TestMessageQueueNotification(MessageQueueTestBase):
+    """exercise request_notification()"""
     def test_request_notification_signal(self):
         """Exercise notification by signal"""
         global someone_rang_the_doorbell
@@ -439,7 +455,6 @@ class TestMessageQueues(tests_base.Base):
 
         self.assertTrue(self.threaded_notification_called)
 
-
     def test_request_notification_threaded_rearm(self):
         """Test threaded notification in which the notified thread rearms
         the notification"""
@@ -466,6 +481,14 @@ class TestMessageQueues(tests_base.Base):
 
             self.notification_event.clear()
 
+    def test_kwargs(self):
+        """ensure request_notification() accepts keyword args as advertised"""
+        self.mq.request_notification(notification=SIGNAL_VALUE)
+
+
+class TestMessageQueueDestruction(MessageQueueTestBase):
+    """exercise close() and unlink()"""
+
     def test_close_and_unlink(self):
         """tests that mq.close() and mq.unlink() work"""
         # mq.close() is hard to test since subsequent use of the semaphore
@@ -481,6 +504,8 @@ class TestMessageQueues(tests_base.Base):
         # Wipe this out so that self.tearDown() doesn't crash.
         self.mq = None
 
+class TestMessageQueuePropertiesAndAttributes(MessageQueueTestBase):
+    """Exercise props and attrs"""
     def test_property_name(self):
         """exercise MessageQueue.name"""
         self.assertGreaterEqual(len(self.mq.name), 2)

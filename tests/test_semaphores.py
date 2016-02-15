@@ -18,11 +18,10 @@ import base as tests_base
 # N_RELEASES is the number of times release() is called in test_release()
 N_RELEASES = 1000000 # 1 million
 
-class TestSemaphores(tests_base.Base):
-    """Exercise the Semaphore class"""
+class SemaphoreTestBase(tests_base.Base):
+    """base class for Semaphore test classes"""
     def setUp(self):
-        self.sem = posix_ipc.Semaphore(None, posix_ipc.O_CREX,
-                                       initial_value=1)
+        self.sem = posix_ipc.Semaphore(None, posix_ipc.O_CREX, initial_value=1)
 
     def tearDown(self):
         if self.sem:
@@ -30,9 +29,11 @@ class TestSemaphores(tests_base.Base):
 
     def assertWriteToReadOnlyPropertyFails(self, property_name, value):
         """test that writing to a readonly property raises TypeError"""
-        tests_base.Base.assertWriteToReadOnlyPropertyFails(self, self.sem,
-                                                           property_name, value)
+        tests_base.Base.assertWriteToReadOnlyPropertyFails(self, self.sem, property_name, value)
 
+
+class TestSemaphoreCreation(SemaphoreTestBase):
+    """Exercise stuff related to creating Semaphores"""
     def test_no_flags(self):
         """tests that opening a semaphore with no flags opens the existing
         semaphore and doesn't create a new semaphore"""
@@ -146,15 +147,18 @@ class TestSemaphores(tests_base.Base):
         self.assertEqual(sem.value, 42)
         sem.unlink()
 
+    def test_kwargs(self):
+        """ensure init accepts keyword args as advertised"""
+        # mode 0x180 = 0600. Octal is difficult to express in Python 2/3 compatible code.
+        sem = posix_ipc.Semaphore(None, flags=posix_ipc.O_CREX, mode=0x180, initial_value=0)
+        sem.unlink()
 
-    # test acquisition
+
+class TestSemaphoreAquisitionAndRelease(SemaphoreTestBase):
+    """Exercise acquiring & releasing semaphores"""
     def test_simple_acquisition(self):
         """tests that acquisition works"""
-        # I should be able to acquire this semaphore, but if I can't I don't
-        # want to hang the test. Acquiring with timeout=0 will raise a BusyError
-        # if the semaphore can't be acquired. That works even when
-        # SEMAPHORE_TIMEOUT_SUPPORTED is False.
-        self.sem.acquire(0)
+        self.sem.acquire()
 
     # test acquisition failures
     # def test_acquisition_no_timeout(self):
@@ -216,6 +220,10 @@ class TestSemaphores(tests_base.Base):
         # I don't want to test microseconds because that granularity
         # isn't under the control of this module.
 
+    def test_acquire_kwargs(self):
+        """Ensure acquire() takes kwargs as advertised"""
+        self.sem.acquire(timeout=0)
+
     def test_release(self):
         """tests that release works"""
         # Not only does it work, I can do it as many times as I want! I had
@@ -240,6 +248,8 @@ class TestSemaphores(tests_base.Base):
         # Should not raise an error.
         sem.acquire(0)
 
+
+class TestSemaphoreDestruction(SemaphoreTestBase):
     def test_close_and_unlink(self):
         """tests that sem.close() and sem.unlink() work"""
         # sem.close() is hard to test since subsequent use of the semaphore
@@ -254,6 +264,8 @@ class TestSemaphores(tests_base.Base):
         # Wipe this out so that self.tearDown() doesn't crash.
         self.sem = None
 
+
+class TestSemaphorePropertiesAndAttributes(SemaphoreTestBase):
     def test_property_name(self):
         """exercise Semaphore.name"""
         self.assertGreaterEqual(len(self.sem.name), 2)
