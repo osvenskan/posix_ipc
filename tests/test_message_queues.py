@@ -338,6 +338,7 @@ class TestMessageQueueSendReceive(MessageQueueTestBase):
 
     def test_receive_kwargs(self):
         """ensure receive() accepts keyword args as advertised"""
+        self.mq.send('foo')
         self.mq.receive(timeout=0)
 
 
