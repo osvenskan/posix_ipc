@@ -6,3 +6,4 @@ build/*
 probe_results.h
 prober/foo
 notes.txt
+posix_ipc.egg-info/*
