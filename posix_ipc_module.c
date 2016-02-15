@@ -1655,11 +1655,13 @@ MessageQueue_receive(MessageQueue *self, PyObject *args, PyObject *keywords) {
     unsigned int priority = 0;
     ssize_t size = 0;
     PyObject *py_return_tuple = NULL;
+    static char *keyword_list[ ] = {"timeout", NULL};
 
     // Initialize this to the default of None.
     timeout.is_none = 1;
 
-    if (!PyArg_ParseTuple(args, "|O&", convert_timeout, &timeout))
+    if (!PyArg_ParseTupleAndKeywords(args, keywords, "|O&", keyword_list,
+    							     convert_timeout, &timeout))
         goto error_return;
 
     if (!self->receive_permitted) {
@@ -1842,18 +1844,20 @@ void process_notification(union sigval notification_data) {
     DPRINTF("exiting thread\n");
 };
 
-
 static PyObject *
-MessageQueue_request_notification(MessageQueue *self, PyObject *args) {
+MessageQueue_request_notification(MessageQueue *self, PyObject *args,
+							      PyObject *keywords) {
     struct sigevent notification;
     PyObject *py_callback = NULL;
     PyObject *py_callback_param = NULL;
     PyObject *py_notification = Py_None;
     int param_is_ok = 1;
+    static char *keyword_list[ ] = {"notification", NULL};
 
     // request_notification(notification = None)
 
-    if (!PyArg_ParseTuple(args, "|O", &py_notification))
+    if (!PyArg_ParseTupleAndKeywords(args, keywords, "|O", keyword_list,
+    								 &py_notification))
         goto error_return;
 
     // py_notification can be None ==> cancel, an int ==> signal,
