@@ -206,7 +206,7 @@ class TestMessageQueueCreation(MessageQueueTestBase):
         mq = posix_ipc.MessageQueue(None, flags=posix_ipc.O_CREX, mode=0x180, max_messages=1,
                                     max_message_size=256, read=True, write=True)
         mq.close()
-        mq.remove()
+        mq.unlink()
 
 class TestMessageQueueSendReceive(MessageQueueTestBase):
     """Exercise send() and receive()"""
