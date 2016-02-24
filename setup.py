@@ -1,5 +1,11 @@
-# Python modules
-import setuptools
+# Python-ish modules
+# setuptools is apparently distributed with python.org Python now. Does that mean it's
+# standard? Who knows. I need it to build wheels on my machine, otherwise I can get by just
+# fine with distutils.
+try:
+    import setuptools as distutools
+except ImportError:
+    import distutils.core as distutools
 
 # My modules
 import prober
@@ -41,7 +47,7 @@ d = prober.probe()
 if "REALTIME_LIB_IS_NEEDED" in d:
     libraries.append("rt")
 
-ext_modules = [setuptools.Extension("posix_ipc",
+ext_modules = [distutools.Extension("posix_ipc",
                                     source_files,
                                     libraries=libraries,
                                     depends=["posix_ipc_module.c",
@@ -51,7 +57,7 @@ ext_modules = [setuptools.Extension("posix_ipc",
                                     )
               ]
 
-setuptools.setup(name=name,
+distutools.setup(name=name,
                  version=VERSION,
                  description=description,
                  long_description=long_description,
