@@ -412,23 +412,6 @@ class TestMessageQueueNotification(MessageQueueTestBase):
 
         self.assertEqual(signal_handler_value_received, 0)
 
-    def test_request_notification_cancel_default(self):
-        """Test that notification can be cancelled with the default param"""
-        global signal_handler_value_received
-
-        self.mq.request_notification(SIGNAL_VALUE)
-
-        signal.signal(SIGNAL_VALUE, signal_handler)
-
-        signal_handler_value_received = 0
-
-        # Cancel notification
-        self.mq.request_notification()
-
-        self.mq.send('')
-
-        self.assertEqual(signal_handler_value_received, 0)
-
     def test_request_notification_cancel_multiple(self):
         """Test that notification can be cancelled multiple times"""
         self.mq.request_notification(SIGNAL_VALUE)
@@ -481,10 +464,6 @@ class TestMessageQueueNotification(MessageQueueTestBase):
             self.mq.receive()
 
             self.notification_event.clear()
-
-    def test_kwargs(self):
-        """ensure request_notification() accepts keyword args as advertised"""
-        self.mq.request_notification(notification=SIGNAL_VALUE)
 
 
 class TestMessageQueueDestruction(MessageQueueTestBase):
