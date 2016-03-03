@@ -221,10 +221,6 @@ class TestSemaphoreAquisitionAndRelease(SemaphoreTestBase):
         # I don't want to test microseconds because that granularity
         # isn't under the control of this module.
 
-    def test_acquire_kwargs(self):
-        """Ensure acquire() takes kwargs as advertised"""
-        self.sem.acquire(timeout=0)
-
     def test_release(self):
         """tests that release works"""
         # Not only does it work, I can do it as many times as I want! I had
