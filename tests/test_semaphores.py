@@ -4,7 +4,6 @@
 import unittest
 from unittest import skipUnless
 import datetime
-import random
 
 # Project imports
 import posix_ipc
@@ -71,11 +70,13 @@ class TestSemaphoreCreation(SemaphoreTestBase):
 
         sem.unlink()
 
+    @unittest.skipIf(tests_base.HAS_FREEBSD_BUG_206396, tests_base.FREEBSD_BUG_206396_SKIP_MSG)
     def test_o_excl(self):
         """tests O_CREAT | O_EXCL prevents opening an existing semaphore"""
         self.assertRaises(posix_ipc.ExistentialError, posix_ipc.Semaphore,
                           self.sem.name, posix_ipc.O_CREAT | posix_ipc.O_EXCL)
 
+    @unittest.skipIf(tests_base.HAS_FREEBSD_BUG_206396, tests_base.FREEBSD_BUG_206396_SKIP_MSG)
     def test_o_crex(self):
         """tests O_CREX prevents opening an existing semaphore"""
         self.assertRaises(posix_ipc.ExistentialError, posix_ipc.Semaphore,
