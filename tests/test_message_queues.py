@@ -49,6 +49,7 @@ def threaded_notification_handler_rearm(test_case_instance):
     test_case_instance.threaded_notification_called = True
     test_case_instance.notification_event.set()
 
+
 class MessageQueueTestBase(tests_base.Base):
     """base class for MessageQueue test classes"""
     def setUp(self):
@@ -208,6 +209,8 @@ class TestMessageQueueCreation(MessageQueueTestBase):
         mq.close()
         mq.unlink()
 
+
+@skipUnless(posix_ipc.MESSAGE_QUEUES_SUPPORTED, "Requires MessageQueue support")
 class TestMessageQueueSendReceive(MessageQueueTestBase):
     """Exercise send() and receive()"""
     def test_send(self):
@@ -337,6 +340,7 @@ class TestMessageQueueSendReceive(MessageQueueTestBase):
     # FIXME how to test that timeout=None waits forever?
 
 
+@skipUnless(posix_ipc.MESSAGE_QUEUES_SUPPORTED, "Requires MessageQueue support")
 class TestMessageQueueNotification(MessageQueueTestBase):
     """exercise request_notification()"""
     def test_request_notification_signal(self):
@@ -461,6 +465,7 @@ class TestMessageQueueNotification(MessageQueueTestBase):
             self.notification_event.clear()
 
 
+@skipUnless(posix_ipc.MESSAGE_QUEUES_SUPPORTED, "Requires MessageQueue support")
 class TestMessageQueueDestruction(MessageQueueTestBase):
     """exercise close() and unlink()"""
 
@@ -479,6 +484,8 @@ class TestMessageQueueDestruction(MessageQueueTestBase):
         # Wipe this out so that self.tearDown() doesn't crash.
         self.mq = None
 
+
+@skipUnless(posix_ipc.MESSAGE_QUEUES_SUPPORTED, "Requires MessageQueue support")
 class TestMessageQueuePropertiesAndAttributes(MessageQueueTestBase):
     """Exercise props and attrs"""
     def test_property_name(self):
