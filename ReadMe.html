@@ -4,7 +4,7 @@
 
 <head>
 	<meta name="author" content="Philip Semanchuk">
-	<meta name="copyright" content="All contents &copy; 2015 Philip Semanchuk">
+	<meta name="copyright" content="All contents &copy; 2016 Philip Semanchuk">
 	<meta name="keywords" content="python posix ipc semaphore shared memory message queue">
 
     <title>POSIX IPC for Python</title>
@@ -353,8 +353,9 @@ situations specific to IPC.
 
 <h4>Context Manager Support</h4>
 
-<p>These semaphores provide <tt>__enter__()</tt> and <tt>__exit__()</tt>
-methods so they can be used in context managers. For instance --
+<p>These semaphores support the context manager protocol so they can be
+used with Python's <tt>with</tt> statement, just like
+Python's <tt>threading.Semaphore</tt>. For instance --
 </p>
 
 <pre>
