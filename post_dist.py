@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Python imports
 import time
@@ -28,14 +28,14 @@ sha1 = hashlib.sha1(s).hexdigest()
 open(md5_name, "wb").write(md5)
 open(sha1_name, "wb").write(sha1)
 
-print "md5 = " + md5
-print "sha1 = " + sha1
+print("md5 = " + md5)
+print("sha1 = " + sha1)
 
 
 # Print an RSS item suitable for pasting into rss.xml
 timestamp = time.strftime(RSS_TIMESTAMP_FORMAT, time.gmtime())
 
-print """
+print("""
 
         <item>
             <guid isPermaLink="false">%s</guid>
@@ -46,6 +46,6 @@ print """
             </description>
         </item>
 
-""" % (VERSION, VERSION, timestamp, VERSION)
+""" % (VERSION, VERSION, timestamp, VERSION))
 
-print 'hg tag rel' + VERSION
+print('hg tag rel' + VERSION)

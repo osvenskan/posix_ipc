@@ -2,8 +2,6 @@
 # Don't add any from __future__ imports here. This code should execute
 # against standard Python.
 import unittest
-import datetime
-import mmap
 import os
 import resource
 
@@ -12,9 +10,10 @@ import posix_ipc
 # Hack -- add tests directory to sys.path so Python 3 can find base.py.
 import sys
 sys.path.insert(0, os.path.join(os.getcwd(), 'tests'))
-import base as tests_base
+import base as tests_base  # noqa
 
 ONE_MILLION = 1000000
+
 
 class TestModule(tests_base.Base):
     """Exercise the posix_ipc module-level functions and constants"""
@@ -96,6 +95,7 @@ class TestModule(tests_base.Base):
         self.assertTrue(issubclass(posix_ipc.PermissionsError, posix_ipc.Error))
         self.assertTrue(issubclass(posix_ipc.ExistentialError, posix_ipc.Error))
         self.assertTrue(issubclass(posix_ipc.BusyError, posix_ipc.Error))
+
 
 if __name__ == '__main__':
     unittest.main()

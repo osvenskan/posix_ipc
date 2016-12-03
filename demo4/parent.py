@@ -3,7 +3,7 @@ import posix_ipc
 import time
 import os
 
-sem = posix_ipc.Semaphore(None, posix_ipc.O_CREX, initial_value = 1)
+sem = posix_ipc.Semaphore(None, posix_ipc.O_CREX, initial_value=1)
 print("Parent: created semaphore {}.".format(sem.name))
 
 sem.acquire()
@@ -19,8 +19,8 @@ for i in range(3, 0, -1):
 
 sem.release()
 
-# Sleep for a second to give the child a chance to acquire the semaphore. 
-# This technique is a little sloppy because technically the child could still 
+# Sleep for a second to give the child a chance to acquire the semaphore.
+# This technique is a little sloppy because technically the child could still
 # starve, but it's certainly sufficient for this demo.
 time.sleep(1)
 
@@ -33,7 +33,7 @@ print("Parent: destroying the semaphore.")
 sem.release()
 sem.unlink()
 
-msg = """ 
+msg = """
 By the time you're done reading this, the parent will have exited and so the
 operating system will have destroyed the semaphore. You can prove that  the
 semaphore is gone by running this command and observing that it raises

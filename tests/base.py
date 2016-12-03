@@ -20,6 +20,7 @@ def _force_int(a_string):
 
     return an_int
 
+
 # Lots of code here to determine if the FreeBSD version is <= 10.2. Those versions contain a
 # bug that causes a hang or seg fault if I exercise certain portions of the semaphore tests.
 IS_FREEBSD = (platform.system().lower() == 'freebsd')
