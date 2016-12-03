@@ -15,12 +15,13 @@ MAX_LINE_LENGTH = 78
 
 PY_MAJOR_VERSION = sys.version_info[0]
 
+
 def line_wrap_paragraph(s):
     # Format s with terminal-friendly line wraps.
     done = False
     beginning = 0
     end = MAX_LINE_LENGTH - 1
-    lines = [ ]
+    lines = []
     while not done:
         if end >= len(s):
             done = True
@@ -36,9 +37,10 @@ def line_wrap_paragraph(s):
 
 
 def print_bad_news(value_name, default):
-    s = "Setup can't determine %s on your system, so it will default to %s which may not be correct." \
-            % (value_name, default)
-    plea = "Please report this message and your operating system info to the package maintainer listed in the README file."
+    s = "Setup can't determine %s on your system, so it will default to %s which " \
+        "may not be correct." % (value_name, default)
+    plea = "Please report this message and your operating system info to the package " \
+           "maintainer listed in the README file."
 
     lines = line_wrap_paragraph(s) + [''] + line_wrap_paragraph(plea)
 
@@ -46,10 +48,10 @@ def print_bad_news(value_name, default):
 
     s = border + "\n* " + ('\n* '.join(lines)) + '\n' + border
 
-    print (s)
+    print(s)
 
 
-def does_build_succeed(filename, linker_options = ""):
+def does_build_succeed(filename, linker_options=""):
     # Utility function that returns True if the file compiles and links
     # successfully, False otherwise.
     # Two things to note here --
@@ -68,7 +70,7 @@ def does_build_succeed(filename, linker_options = ""):
     return not bool(p.wait())
 
 
-def compile_and_run(filename, linker_options = ""):
+def compile_and_run(filename, linker_options=""):
     # Utility function that returns the stdout output from running the
     # compiled source file; None if the compile fails.
     cmd = "cc -Wall -o ./prober/foo %s ./prober/%s" % (linker_options, filename)
@@ -100,8 +102,8 @@ def get_sysctl_value(name):
         # (which doesn't have any kern.mqueue values) and under FreeBSD when
         # the mqueuefs kernel module isn't loaded.
         s = subprocess.Popen(["sysctl", "-n", name],
-                              stdout=subprocess.PIPE,
-                              stderr=open(os.devnull, 'rw')).communicate()[0]
+                             stdout=subprocess.PIPE,
+                             stderr=open(os.devnull, 'rw')).communicate()[0]
         s = s.strip().decode()
     except:
         pass
@@ -123,7 +125,7 @@ def sniff_realtime_lib():
             # Realtime libs are needed
             rc = True
 
-    if rc == None:
+    if rc is None:
         # Unable to determine whether or not I needed the realtime libs.
         # That's bad! Print a warning, set the return code to False
         # and hope for the best.
@@ -332,10 +334,9 @@ def sniff_mq_max_message_size_default():
     return mq_max_message_size_default
 
 
-
 def probe():
     linker_options = ""
-    d = { }
+    d = {}
 
     f = open("VERSION")
     d["POSIX_IPC_VERSION"] = '"%s"' % f.read().strip()
@@ -390,7 +391,6 @@ def probe():
         # I only need this for Python 2.x
         d["PY_INT_MAX"] = sys.maxint
 
-
     msg = """/*
 This header file was generated when you ran setup. Once created, the setup
 process won't overwrite it, so you can adjust the values by hand and
@@ -421,7 +421,4 @@ To recreate this file, just delete it and re-run setup.py.
 
 
 if __name__ == "__main__":
-    print (probe())
-
-
-
+    print(probe())

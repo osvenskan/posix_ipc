@@ -3,7 +3,6 @@
 # against standard Python.
 import platform
 import unittest
-import datetime
 import mmap
 import os
 
@@ -13,7 +12,8 @@ import posix_ipc
 # Hack -- add tests directory to sys.path so Python 3 can find base.py.
 import sys
 sys.path.insert(0, os.path.join(os.getcwd(), 'tests'))
-import base as tests_base
+import base as tests_base  # noqa
+
 
 class TestMemory(tests_base.Base):
     """Exercise the SharedMemory class"""
@@ -122,7 +122,7 @@ class TestMemory(tests_base.Base):
         if tests_base.IS_PY3:
             name = tests_base.make_name()
         else:
-            name = unicode(tests_base.make_name(), 'ASCII')
+            name = tests_base.make_name().decode('ASCII')
         mem = posix_ipc.SharedMemory(name, posix_ipc.O_CREX, size=4096)
         self.assertEqual(name, mem.name)
         mem.close_fd()
@@ -213,6 +213,7 @@ class TestMemory(tests_base.Base):
             self.assertIsInstance(self.mem.size, (int, long))
 
         self.assertWriteToReadOnlyPropertyFails('size', 42)
+
 
 if __name__ == '__main__':
     unittest.main()

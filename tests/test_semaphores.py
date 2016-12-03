@@ -11,11 +11,12 @@ import posix_ipc
 import sys
 import os
 sys.path.insert(0, os.path.join(os.getcwd(), 'tests'))
-import base as tests_base
+import base as tests_base  # noqa
 
 
 # N_RELEASES is the number of times release() is called in test_release()
-N_RELEASES = 1000000 # 1 million
+N_RELEASES = 1000000  # 1 million
+
 
 class SemaphoreTestBase(tests_base.Base):
     """base class for Semaphore test classes"""
@@ -119,7 +120,7 @@ class TestSemaphoreCreation(SemaphoreTestBase):
         if tests_base.IS_PY3:
             name = tests_base.make_name()
         else:
-            name = unicode(tests_base.make_name(), 'ASCII')
+            name = tests_base.make_name().decode('ASCII')
         sem = posix_ipc.Semaphore(name, posix_ipc.O_CREX)
         self.assertEqual(name, sem.name)
         sem.unlink()
@@ -278,6 +279,7 @@ class TestSemaphorePropertiesAndAttributes(SemaphoreTestBase):
         self.assertEqual(self.sem.value, 1)
 
         self.assertWriteToReadOnlyPropertyFails('value', 42)
+
 
 if __name__ == '__main__':
     unittest.main()
