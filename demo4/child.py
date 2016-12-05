@@ -8,7 +8,7 @@ name = sys.argv[1]
 
 print('Child: waiting to aquire semaphore ' + name)
 
-with posix_ipc.Semaphore(name) as sem: 
+with posix_ipc.Semaphore(name) as sem:
     print('Child: semaphore ' + sem.name + ' aquired; holding for 3 seconds.')
 
     # Flip a coin to determine whether or not to bail out of the context.

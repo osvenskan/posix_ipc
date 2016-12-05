@@ -1,14 +1,6 @@
 # Python modules
-import time
 import sys
-PY_MAJOR_VERSION = sys.version_info[0]
-# hashlib is only available in Python >= 2.5. I still want to support 
-# older Pythons so I import md5 if hashlib is not available. Fortunately
-# md5 can masquerade as hashlib for my purposes.
-try:
-    import hashlib
-except ImportError:
-    import md5 as hashlib
+import hashlib
 
 # 3rd party modules
 import posix_ipc
@@ -16,6 +8,7 @@ import posix_ipc
 # Utils for this demo
 import utils
 
+PY_MAJOR_VERSION = sys.version_info[0]
 
 utils.say("Oooo 'ello, I'm Mrs. Conclusion!")
 
@@ -37,7 +30,7 @@ for i in range(0, params["ITERATIONS"]):
     while s == what_i_sent:
         # Nothing new; give Mrs. Premise another chance to respond.
         mq.send(s)
-        
+
         s, _ = mq.receive()
         s = s.decode()
         utils.say("Received %s" % s)
@@ -48,9 +41,9 @@ for i in range(0, params["ITERATIONS"]):
         try:
             assert(s == hashlib.md5(what_i_sent).hexdigest())
         except AssertionError:
-            utils.raise_error(AssertionError, 
+            utils.raise_error(AssertionError,
                               "Message corruption after %d iterations." % i)
-    #else:
+    # else:
         # When what_i_sent is blank, this is the first message which
         # I always accept without question.
 
@@ -59,7 +52,7 @@ for i in range(0, params["ITERATIONS"]):
     utils.say("Sending %s" % s)
     mq.send(s)
     what_i_sent = s
-    
+
 
 utils.say("")
 utils.say("%d iterations complete" % (i + 1))
