@@ -3,8 +3,6 @@
 # against standard Python.
 import unittest
 from unittest import skipUnless
-import datetime
-import random
 import time
 import signal
 import threading
@@ -15,7 +13,7 @@ import posix_ipc
 import sys
 import os
 sys.path.insert(0, os.path.join(os.getcwd(), 'tests'))
-import base as tests_base
+import base as tests_base  # noqa
 
 if hasattr(posix_ipc, 'USER_SIGNAL_MIN'):
     # Due to Python bug http://bugs.python.org/issue20584, not all valid signal
@@ -30,15 +28,18 @@ else:
 
 signal_handler_value_received = 0
 
+
 def signal_handler(signal_value, frame):
     """Handle signal sent for msg q notification test."""
     global signal_handler_value_received
     signal_handler_value_received = signal_value
 
+
 def threaded_notification_handler_one_shot(test_case_instance):
     """Handle msg q notification in a thread without rearming notification."""
     test_case_instance.threaded_notification_called = True
     test_case_instance.notification_event.set()
+
 
 def threaded_notification_handler_rearm(test_case_instance):
     """Handle msg q notification in a thread and rearm notification."""
@@ -312,7 +313,7 @@ class TestMessageQueueSendReceive(MessageQueueTestBase):
         """ensure send() accepts keyword args as advertised"""
         self.mq.send('foo', timeout=0, priority=0)
 
-    ###### test receive()
+    # ##### test receive()
 
     def test_receive(self):
         """Test that simple receive works.
@@ -584,6 +585,7 @@ class TestMessageQueuePropertiesAndAttributes(MessageQueueTestBase):
 
         mq.close()
         mq.unlink()
+
 
 if __name__ == '__main__':
     unittest.main()

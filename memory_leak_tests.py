@@ -1,5 +1,4 @@
 # Python modules
-import pdb
 import gc
 import os
 import subprocess
@@ -10,7 +9,7 @@ import sys
 # My module
 import posix_ipc
 
-#TEST_COUNT = 10
+# TEST_COUNT = 10
 TEST_COUNT = 1024 * 102
 
 SKIP_SEMAPHORE_TESTS = False
@@ -57,9 +56,11 @@ NAME_LENGTH = 10
 
 PY_MAJOR_VERSION = sys.version_info[0]
 
+
 def say(s):
     """A wrapper for print() that's compatible with Python 2 & 3"""
-    print (s)
+    print(s)
+
 
 def random_string(length):
     return ''.join(random.sample("abcdefghijklmnopqrstuvwxyz", length))
@@ -67,6 +68,7 @@ def random_string(length):
 
 def print_mem_before():
     say("Memory usage before, RSS = %d, VSZ = %d" % get_memory_usage())
+
 
 def print_mem_after():
     gc.collect()
@@ -78,6 +80,7 @@ def print_mem_after():
 
     say("Memory usage after, RSS = %d, VSZ = %d" % get_memory_usage())
 
+
 def get_memory_usage():
     # `ps` has lots of format options that vary from OS to OS, and some of
     # those options have aliases (e.g. vsz, vsize). The ones I use below
@@ -88,7 +91,7 @@ def get_memory_usage():
     # Output looks like this:
     #   RSZ      VSZ
     #   944    75964
-    
+
     if PY_MAJOR_VERSION > 2:
         s = s.decode(sys.getfilesystemencoding())
 
@@ -109,14 +112,12 @@ def get_memory_usage():
     #
     # return rss, vsize
 
+
 # Assert manual control over the garbage collector
 gc.disable()
 
-try:
-    the_range = xrange(TEST_COUNT)
-except:
-    the_range = range(TEST_COUNT)
-    
+the_range = range(TEST_COUNT)
+
 if SKIP_SEMAPHORE_TESTS:
     say("Skipping semaphore tests")
 else:
@@ -131,7 +132,6 @@ else:
 
     print_mem_after()
 
-
     say("Running semaphore create/destroy test 2...")
     print_mem_before()
 
@@ -143,7 +143,6 @@ else:
 
     print_mem_after()
 
-
     say("Running semaphore create/destroy test 3...")
     print_mem_before()
 
@@ -153,7 +152,6 @@ else:
         sem.unlink()
 
     print_mem_after()
-
 
     say("Running semaphore create/destroy test 4...")
     print_mem_before()
@@ -171,7 +169,6 @@ else:
 
     print_mem_after()
 
-
     say("Running semaphore acquire/release test...")
     print_mem_before()
 
@@ -185,7 +182,6 @@ else:
     sem.unlink()
 
     print_mem_after()
-
 
     if posix_ipc.SEMAPHORE_TIMEOUT_SUPPORTED:
         say("Running semaphore acquire timeout test...")
@@ -205,7 +201,6 @@ else:
         print_mem_after()
     else:
         say("Skipping semaphore acquire timeout test (not supported on this platform)")
-
 
     say("Running semaphore name read test...")
     print_mem_before()
@@ -247,7 +242,7 @@ else:
 
     for i in the_range:
         name = "/" + ''.join(random.sample(NAME_CHARACTERS, NAME_LENGTH))
-        mem = posix_ipc.SharedMemory(name, posix_ipc.O_CREX, size = 4096)
+        mem = posix_ipc.SharedMemory(name, posix_ipc.O_CREX, size=4096)
 
         os.close(mem.fd)
 
@@ -255,13 +250,12 @@ else:
 
     print_mem_after()
 
-
     say("Running memory create/destroy test 2...")
     print_mem_before()
 
     for i in the_range:
         name = "/" + ''.join(random.sample(NAME_CHARACTERS, NAME_LENGTH))
-        mem = posix_ipc.SharedMemory(name, posix_ipc.O_CREX, size = 4096)
+        mem = posix_ipc.SharedMemory(name, posix_ipc.O_CREX, size=4096)
 
         os.close(mem.fd)
 
@@ -269,19 +263,17 @@ else:
 
     print_mem_after()
 
-
     say("Running memory create/destroy test 3...")
     print_mem_before()
 
     for i in the_range:
-        mem = posix_ipc.SharedMemory(None, posix_ipc.O_CREX, size = 4096)
+        mem = posix_ipc.SharedMemory(None, posix_ipc.O_CREX, size=4096)
 
         os.close(mem.fd)
 
         mem.unlink()
 
     print_mem_after()
-
 
     say("Running memory name read test...")
     print_mem_before()
@@ -295,8 +287,6 @@ else:
 
     print_mem_after()
 
-
-
     say("Running memory fd read test...")
     print_mem_before()
 
@@ -308,8 +298,6 @@ else:
     mem.unlink()
 
     print_mem_after()
-
-
 
     say("Running memory size read test...")
     print_mem_before()
@@ -326,7 +314,7 @@ else:
     say("Running memory size read test 2...")
     print_mem_before()
 
-    mem = posix_ipc.SharedMemory("/p_ipc_test", posix_ipc.O_CREX, size = 4096)
+    mem = posix_ipc.SharedMemory("/p_ipc_test", posix_ipc.O_CREX, size=4096)
 
     for i in the_range:
         foo = mem.size
@@ -334,8 +322,6 @@ else:
     mem.unlink()
 
     print_mem_after()
-
-
 
 # ============== Message queue tests ==============
 
@@ -354,7 +340,6 @@ else:
 
     print_mem_after()
 
-
     say("Running message queue create/destroy test 2...")
     print_mem_before()
 
@@ -367,7 +352,6 @@ else:
 
     print_mem_after()
 
-
     say("Running message queue create/destroy test 3...")
     print_mem_before()
 
@@ -377,7 +361,6 @@ else:
         mq.unlink()
 
     print_mem_after()
-
 
     say("Running message queue create/destroy test 4...")
     print_mem_before()
@@ -395,7 +378,6 @@ else:
 
     print_mem_after()
 
-
     say("Running message queue send/receive() test with strings...")
     print_mem_before()
 
@@ -409,7 +391,6 @@ else:
     mq.unlink()
 
     print_mem_after()
-
 
     if PY_MAJOR_VERSION > 2:
         say("Running message queue send/receive() test with bytes...")
@@ -426,7 +407,6 @@ else:
 
         print_mem_after()
 
-
     say("Running lame message queue request_notification() test...")
     print_mem_before()
 
@@ -441,7 +421,6 @@ else:
 
     print_mem_after()
 
-
     say("Running  message queue name read test...")
     print_mem_before()
 
@@ -454,8 +433,6 @@ else:
     mq.unlink()
 
     print_mem_after()
-
-
 
     say("Running  message queue mqd read test...")
     print_mem_before()
@@ -470,7 +447,6 @@ else:
 
     print_mem_after()
 
-
     say("Running  message queue block read test...")
     print_mem_before()
 
@@ -483,7 +459,6 @@ else:
     mq.unlink()
 
     print_mem_after()
-
 
     say("Running  message queue block write test...")
     print_mem_before()
@@ -499,7 +474,6 @@ else:
 
     print_mem_after()
 
-
     say("Running  message queue max_messages read test...")
     print_mem_before()
 
@@ -512,7 +486,6 @@ else:
     mq.unlink()
 
     print_mem_after()
-
 
     say("Running  message queue max_message_size read test...")
     print_mem_before()
@@ -527,7 +500,6 @@ else:
 
     print_mem_after()
 
-
     say("Running  message queue current_messages read test...")
     print_mem_before()
 
@@ -540,7 +512,3 @@ else:
     mq.unlink()
 
     print_mem_after()
-
-
-
-

@@ -1,16 +1,8 @@
 # Python modules
-import time
 import mmap
 import os
 import sys
-PY_MAJOR_VERSION = sys.version_info[0]
-# hashlib is only available in Python >= 2.5. I still want to support 
-# older Pythons so I import md5 if hashlib is not available. Fortunately
-# md5 can masquerade as hashlib for my purposes.
-try:
-    import hashlib
-except ImportError:
-    import md5 as hashlib
+import hashlib
 
 # 3rd party modules
 import posix_ipc
@@ -25,7 +17,7 @@ utils.say("Oooo 'ello, I'm Mrs. Conclusion!")
 
 params = utils.read_params()
 
-# Mrs. Premise has already created the semaphore and shared memory. 
+# Mrs. Premise has already created the semaphore and shared memory.
 # I just need to get handles to them.
 memory = posix_ipc.SharedMemory(params["SHARED_MEMORY_NAME"])
 semaphore = posix_ipc.Semaphore(params["SEMAPHORE_NAME"])
@@ -33,7 +25,7 @@ semaphore = posix_ipc.Semaphore(params["SEMAPHORE_NAME"])
 # MMap the shared memory
 mapfile = mmap.mmap(memory.fd, memory.size)
 
-# Once I've mmapped the file descriptor, I can close it without 
+# Once I've mmapped the file descriptor, I can close it without
 # interfering with the mmap. This also demonstrates that os.close() is a
 # perfectly legitimate alternative to the SharedMemory's close_fd() method.
 os.close(memory.fd)
@@ -66,7 +58,7 @@ for i in range(0, params["ITERATIONS"]):
         try:
             assert(s == hashlib.md5(what_i_wrote).hexdigest())
         except AssertionError:
-            utils.raise_error(AssertionError, 
+            utils.raise_error(AssertionError,
                               "Shared memory corruption after %d iterations." % i)
 
     if PY_MAJOR_VERSION > 2:
@@ -74,7 +66,7 @@ for i in range(0, params["ITERATIONS"]):
     what_i_wrote = hashlib.md5(s).hexdigest()
 
     utils.write_to_memory(mapfile, what_i_wrote)
-    
+
     if not params["LIVE_DANGEROUSLY"]:
         utils.say("Releasing the semaphore")
         semaphore.release()

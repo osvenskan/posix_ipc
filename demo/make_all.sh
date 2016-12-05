@@ -8,5 +8,5 @@ LINKER_OPTIONS="-lrt"
 
 gcc -Wall -c -o md5.o md5.c
 gcc -Wall -c -o utils.o utils.c
-gcc -Wall -L. $LINKER_OPTIONS md5.o utils.o -o premise premise.c
-gcc -Wall -L. $LINKER_OPTIONS md5.o utils.o -o conclusion conclusion.c
+gcc -Wall md5.o utils.o -o premise premise.c -L. $LINKER_OPTIONS
+gcc -Wall md5.o utils.o -o conclusion conclusion.c -L. $LINKER_OPTIONS
