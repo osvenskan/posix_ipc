@@ -8,3 +8,6 @@ prober/foo
 notes.txt
 posix_ipc.egg-info/*
 test.c
+demo/*.o
+demo/premise
+demo/conclusion
