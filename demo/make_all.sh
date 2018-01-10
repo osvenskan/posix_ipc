@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-# Linker opts is blank for OS X, FreeBSD and OpenSolaris
+# Linker opts should be blank for OS X, FreeBSD and OpenSolaris
 #LINKER_OPTIONS=""
 
-# Must link with realtime libs for Linux
-LINKER_OPTIONS="-lrt"
+# On Linux, we must link with realtime and thread libraries
+LINKER_OPTIONS="-lrt -lpthread"
 
 gcc -Wall -c -o md5.o md5.c
 gcc -Wall -c -o utils.o utils.c
