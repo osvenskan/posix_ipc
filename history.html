@@ -33,7 +33,20 @@ suppport it and look for useful features to add, but right now I don't see any.
 
 <ul id="history">
 
-    <li><strong><span id="current">Current</span> &ndash; 1.0.0 (11 Mar 2015) &ndash;</strong>
+    <li><strong><span id="current">Current</span> &ndash; 1.0.1 (10 Jan 2018) &ndash;</strong>
+    	<p>A <i>mea culpa</i> release to clean up some accumulated technical debt.</p>
+
+        <ul>
+        	<li>Moved repository to git and GitHub.</li>
+        	<li>Changed link options in the build script for the first demo that caused a build fail on some (all?) Linuxes.</li>
+            <li>Fix a few bugs where functions that were documented to accept keyword arguments only accepted them as positional arguments; added tests to exercise keyword arguments.</li>
+        	<li>Removed dependency on <tt>setuptools</tt> from <tt>setup.py</tt>.</li>
+            <li>Added code to semaphore tests to avoid triggering a bug on older FreeBSDs (and perhaps other BSDs).</li>
+            <li>PEP8 improvements.</li>
+        </ul>
+	</li>
+
+    <li>1.0.0 (11 Mar 2015) &ndash;
         <ul>
         	<li>Added ability to pass names as unicode in Python 2.</li>
         	<li>Added ability to pass names as bytes in Python 3.</li>
