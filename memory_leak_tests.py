@@ -17,7 +17,7 @@ SKIP_SHARED_MEMORY_TESTS = False
 SKIP_MESSAGE_QUEUE_TESTS = False
 
 if not posix_ipc.MESSAGE_QUEUES_SUPPORTED:
-    SKIP_MESSAGE_QUEUE_TESTS = False
+    SKIP_MESSAGE_QUEUE_TESTS = True
 
 # ps output looks like this:
 #   RSZ      VSZ
@@ -127,8 +127,8 @@ else:
     for i in the_range:
         name = "/" + ''.join(random.sample(NAME_CHARACTERS, NAME_LENGTH))
         sem = posix_ipc.Semaphore(name, posix_ipc.O_CREX)
-        sem.close()
         sem.unlink()
+        sem.close()
 
     print_mem_after()
 
@@ -148,8 +148,8 @@ else:
 
     for i in the_range:
         sem = posix_ipc.Semaphore(None, posix_ipc.O_CREX)
-        sem.close()
         sem.unlink()
+        sem.close()
 
     print_mem_after()
 
@@ -178,8 +178,8 @@ else:
         sem.release()
         sem.acquire()
 
-    sem.close()
     sem.unlink()
+    sem.close()
 
     print_mem_after()
 
@@ -195,8 +195,8 @@ else:
             except posix_ipc.BusyError:
                 pass
 
-        sem.close()
         sem.unlink()
+        sem.close()
 
         print_mem_after()
     else:
@@ -210,8 +210,8 @@ else:
     for i in the_range:
         foo = sem.name
 
-    sem.close()
     sem.unlink()
+    sem.close()
 
     print_mem_after()
 
@@ -224,8 +224,8 @@ else:
         for i in the_range:
             foo = sem.value
 
-        sem.close()
         sem.unlink()
+        sem.close()
 
         print_mem_after()
     else:
