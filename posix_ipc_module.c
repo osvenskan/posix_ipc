@@ -2,7 +2,7 @@
 posix_ipc - A Python module for accessing POSIX 1003.1b-1993 semaphores,
             shared memory and message queues.
 
-Copyright (c) 2012, Philip Semanchuk
+Copyright (c) 2018, Philip Semanchuk
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
