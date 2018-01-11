@@ -1,6 +1,6 @@
 # Python-ish modules
 # setuptools is apparently distributed with python.org Python now. Does that mean it's
-# standard? Who knows. I need it to build wheels on my machine, otherwise I can get by just
+# standard? Who knows. I need it to build wheels on my machine, otherwise setup can get by just
 # fine with distutils.
 try:
     import setuptools as distutools
