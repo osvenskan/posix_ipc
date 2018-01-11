@@ -20,13 +20,14 @@ md5_name = "releases/posix_ipc-%s.md5.txt" % VERSION
 sha1_name = "releases/posix_ipc-%s.sha1.txt" % VERSION
 
 # Generate the md5 hash of the tarball
-s = open(tarball_name).read()
+with open(tarball_name, 'rb') as f:
+    s = f.read()
 
 md5 = hashlib.md5(s).hexdigest()
 sha1 = hashlib.sha1(s).hexdigest()
 
-open(md5_name, "wb").write(md5)
-open(sha1_name, "wb").write(sha1)
+open(md5_name, "w").write(md5)
+open(sha1_name, "w").write(sha1)
 
 print("md5 = " + md5)
 print("sha1 = " + sha1)
