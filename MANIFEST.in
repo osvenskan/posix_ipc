@@ -1,0 +1,11 @@
+include INSTALL LICENSE README VERSION
+include ReadMe.html history.html
+include setup.py prober.py
+include posix_ipc_module.c
+recursive-include prober *.c
+recursive-include demo *.h *.c *.py *.sh *.png *.txt
+recursive-include demo2 *.py *.txt *.png
+recursive-include demo3 *.py *.txt
+recursive-include demo4 *.py *.txt
+recursive-include tests *
+global-exclude *.pyc
