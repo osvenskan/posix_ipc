@@ -60,16 +60,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <mqueue.h>
 #endif
 
-// define Py_TYPE for versions before Python 2.6
-#ifndef Py_TYPE
-#define Py_TYPE(ob)             (((PyObject*)(ob))->ob_type)
-#endif
-
-// define PyVarObject_HEAD_INIT for versions before Python 2.6
-#ifndef PyVarObject_HEAD_INIT
-#define PyVarObject_HEAD_INIT(type, size) PyObject_HEAD_INIT(type) size,
-#endif
-
 /* POSIX says that a mode_t "shall be an integer type". To avoid the need
 for a specific get_mode function for each type, I'll just stuff the mode into
 a long and mention it in the Xxx_members list for each type.
