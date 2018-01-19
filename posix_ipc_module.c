@@ -70,21 +70,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define PyVarObject_HEAD_INIT(type, size) PyObject_HEAD_INIT(type) size,
 #endif
 
-/* SEM_FAILED is defined as an int in Apple's headers, and this makes the
-compiler complain when I compare it to a pointer. Python faced the same
-problem (issue 9586) and I copied their solution here.
-ref: http://bugs.python.org/issue9586
-
-Note that in /Developer/SDKs/MacOSX10.4u.sdk/usr/include/sys/semaphore.h,
-SEM_FAILED is #defined as -1 and that's apparently the definition used by
-Python when building. In /usr/include/sys/semaphore.h, it's defined
-as ((sem_t *)-1).
-*/
-#ifdef __APPLE__
-    #undef  SEM_FAILED
-    #define SEM_FAILED ((sem_t *)-1)
-#endif
-
 /* POSIX says that a mode_t "shall be an integer type". To avoid the need
 for a specific get_mode function for each type, I'll just stuff the mode into
 a long and mention it in the Xxx_members list for each type.
