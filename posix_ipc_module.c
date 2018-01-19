@@ -228,7 +228,9 @@ convert_name_param(PyObject *py_name_param, void *checked_name) {
 
     DPRINTF("inside convert_name_param\n");
     DPRINTF("PyBytes_Check() = %d \n", PyBytes_Check(py_name_param));
+#if PY_MAJOR_VERSION < 3
     DPRINTF("PyString_Check() = %d \n", PyString_Check(py_name_param));
+#endif
     DPRINTF("PyUnicode_Check() = %d \n", PyUnicode_Check(py_name_param));
 
     p_name->is_none = 0;
