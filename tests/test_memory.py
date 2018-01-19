@@ -1,6 +1,7 @@
 # Python imports
 # Don't add any from __future__ imports here. This code should execute
 # against standard Python.
+import numbers
 import platform
 import unittest
 import mmap
@@ -198,19 +199,13 @@ class TestMemory(tests_base.Base):
 
     def test_fd_property(self):
         """exercise SharedMemory.fd"""
-        if tests_base.IS_PY3:
-            self.assertIsInstance(self.mem.fd, int)
-        else:
-            self.assertIsInstance(self.mem.fd, (int, long))
+        self.assertIsInstance(self.mem.fd, numbers.Integral)
 
         self.assertWriteToReadOnlyPropertyFails('fd', 42)
 
     def test_size_property(self):
         """exercise SharedMemory.size"""
-        if tests_base.IS_PY3:
-            self.assertIsInstance(self.mem.size, int)
-        else:
-            self.assertIsInstance(self.mem.size, (int, long))
+        self.assertIsInstance(self.mem.size, numbers.Integral)
 
         self.assertWriteToReadOnlyPropertyFails('size', 42)
 
