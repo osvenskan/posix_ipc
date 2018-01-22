@@ -386,7 +386,7 @@ static int test_semaphore_validity(Semaphore *p) {
     // tries to use a Semaphore after it's been closed.
     int valid = 1;
 
-    if (!p->pSemaphore) {
+    if (SEM_FAILED == p->pSemaphore) {
         valid = 0;
         PyErr_SetString(pExistentialException, "The semaphore has been closed");
     }
@@ -484,8 +484,11 @@ Semaphore_init(Semaphore *self, PyObject *args, PyObject *keywords) {
     int flags = 0;
     static char *keyword_list[ ] = {"name", "flags", "mode", "initial_value", NULL};
 
-    // First things first -- initialize the self struct.
-    self->pSemaphore = NULL;
+    // First things first -- initialize the self struct. I use SEM_FAILED to represent
+   	// an uninitialized pointer to a semaphore because at least one platform (OS X) uses
+   	// file handles to represent semaphore handles, and they can be 0. See comments here --
+   	// https://github.com/osvenskan/posix_ipc/issues/2
+    self->pSemaphore = SEM_FAILED;
     self->name = NULL;
     self->mode = 0600;
 
@@ -545,8 +548,6 @@ Semaphore_init(Semaphore *self, PyObject *args, PyObject *keywords) {
     DPRINTF("pSemaphore == %p\n", self->pSemaphore);
 
     if (self->pSemaphore == SEM_FAILED) {
-        self->pSemaphore = NULL;
-
         switch (errno) {
             case EACCES:
                 PyErr_SetString(pPermissionsException,
