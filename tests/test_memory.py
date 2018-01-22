@@ -6,12 +6,11 @@ import platform
 import unittest
 import mmap
 import os
-
+import sys
 
 # Project imports
 import posix_ipc
 # Hack -- add tests directory to sys.path so Python 3 can find base.py.
-import sys
 sys.path.insert(0, os.path.join(os.getcwd(), 'tests'))
 import base as tests_base  # noqa
 
@@ -170,13 +169,47 @@ class TestMemory(tests_base.Base):
         self.assertRaises(TypeError, f.write, 'hello world')
         mem.close_fd()
 
+    @unittest.skipUnless(sys.stdin.fileno() == 0, "Requires stdin to have file number 0")
+    def test_ctor_fd_can_become_zero(self):
+        """test that SharedMemory accepts 0 as valid file descriptor"""
+        # ref: https://github.com/osvenskan/posix_ipc/issues/2
+        # This test relies on OS compliance with the POSIX spec. Specifically, the spec for
+        # shm_open() says --
+        #
+        #     shm_open() shall return a file descriptor for the shared memory
+        #     object that is the lowest numbered file descriptor not currently
+        #     open for that process.
+        #
+        # ref: http://pubs.opengroup.org/onlinepubs/009695399/functions/shm_open.html
+        #
+        # So, on systems compliant with that particular part of the spec, if I open a SharedMemory
+        # segment after closing stdin (which has fd == 0), the SharedMemory segment, should be
+        # assigned fd 0.
+        os.close(0)
+
+        # I have to supply a size here, otherwise the call to close_fd() will fail under OS X.
+        # See here for another report of the same behavior:
+        # https://stackoverflow.com/questions/35371133/close-on-shared-memory-in-osx-causes-invalid-argument-error
+        mem = posix_ipc.SharedMemory(None, posix_ipc.O_CREX, size=4096)
+        mem_fd = mem.fd
+        # Clean up before attempting the assertion in case the assertion fails.
+        mem.close_fd()
+        mem.unlink()
+
+        self.assertEqual(mem_fd, 0)
+
     def test_object_method_close_fd(self):
         """test that SharedMemory.close_fd() closes the file descriptor"""
         mem = posix_ipc.SharedMemory(self.mem.name)
 
         mem.close_fd()
 
-        self.assertRaises(OSError, os.fdopen, mem.fd)
+        self.assertEqual(mem.fd, -1)
+
+        # On at least one platform (my Mac), this raises OSError under Python 2.7 and ValueError
+        # under Python 3.6.
+        with self.assertRaises((OSError, ValueError)):
+            os.fdopen(mem.fd)
 
     def test_unlink(self):
         """test that SharedMemory.unlink() deletes the segment"""

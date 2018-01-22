@@ -107,6 +107,12 @@ typedef struct {
 // increase this gently or change that code to use malloc().
 #define MAX_SAFE_NAME_LENGTH  14
 
+// POSIX_IPC_FD_NO_VALUE is the placeholder value for SharedMemory file descriptors that are
+// uninitialized, closed, or otherwise not useful. It cannot have a value other than -1 because
+// it's used interchangeably with the shm_open() failure return code (which is -1).
+// ref: http://pubs.opengroup.org/onlinepubs/009695399/functions/shm_open.html
+// ref: https://github.com/osvenskan/posix_ipc/issues/2
+#define POSIX_IPC_FD_NO_VALUE   -1
 
 /* Struct to contain a timeout which can be None */
 typedef struct {
@@ -914,7 +920,7 @@ SharedMemory_init(SharedMemory *self, PyObject *args, PyObject *keywords) {
 
     // First things first -- initialize the self struct.
     self->name = NULL;
-    self->fd = 0;
+    self->fd = POSIX_IPC_FD_NO_VALUE;
     self->mode = 0600;
 
     if (!PyArg_ParseTupleAndKeywords(args, keywords, "O&|Iiki", keyword_list,
@@ -970,7 +976,6 @@ SharedMemory_init(SharedMemory *self, PyObject *args, PyObject *keywords) {
     DPRINTF("shm fd = %d\n", self->fd);
 
     if (-1 == self->fd) {
-        self->fd = 0;
         switch (errno) {
             case EACCES:
                 PyErr_Format(pPermissionsException,
@@ -1103,8 +1108,10 @@ SharedMemory_getsize(SharedMemory *self, void *closure) {
 
 PyObject *
 SharedMemory_close_fd(SharedMemory *self) {
-    if (self->fd) {
+    if (POSIX_IPC_FD_NO_VALUE != self->fd) {
+    	DPRINTF("SharedMemory_close_fd, fd=%d\n", self->fd);
         if (-1 == close(self->fd)) {
+	    	DPRINTF("SharedMemory_close_fd, close failed\n");
             switch (errno) {
                 case EBADF:
                     PyErr_SetString(PyExc_ValueError,
@@ -1117,6 +1124,10 @@ SharedMemory_close_fd(SharedMemory *self) {
             }
 
             goto error_return;
+        }
+        else {
+        	// Close was successful so the fd is no longer valid.
+        	self->fd = POSIX_IPC_FD_NO_VALUE;
         }
     }
 
