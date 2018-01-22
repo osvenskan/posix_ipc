@@ -107,12 +107,21 @@ typedef struct {
 // increase this gently or change that code to use malloc().
 #define MAX_SAFE_NAME_LENGTH  14
 
-// POSIX_IPC_FD_NO_VALUE is the placeholder value for SharedMemory file descriptors that are
+// POSIX_IPC_SHM_NO_VALUE is the placeholder value for SharedMemory file descriptors that are
 // uninitialized, closed, or otherwise not useful. It cannot have a value other than -1 because
 // it's used interchangeably with the shm_open() failure return code (which is -1).
 // ref: http://pubs.opengroup.org/onlinepubs/009695399/functions/shm_open.html
 // ref: https://github.com/osvenskan/posix_ipc/issues/2
-#define POSIX_IPC_FD_NO_VALUE   -1
+#define POSIX_IPC_SHM_NO_VALUE         -1
+
+// POSIX_IPC_MQ_NO_VALUE is the same concept as POSIX_IPC_SHM_NO_VALUE, but for message queues.
+// However, while POSIX_IPC_SHM_NO_VALUE is a necessity, this is just defensive programming.
+// In my experience, all systems on which message queues are implemented use pointers (rather than
+// file descriptors) for message queue handles, so both 0 and -1 could serve to represent
+// an uninitialized handle. -1 is a better choice, though, in case some future system uses
+// file handles, and to keep my message queue implementation consistent with my shared mem and
+// semaphore implementations.
+#define POSIX_IPC_MQ_NO_VALUE    (mqd_t)-1
 
 /* Struct to contain a timeout which can be None */
 typedef struct {
@@ -921,7 +930,7 @@ SharedMemory_init(SharedMemory *self, PyObject *args, PyObject *keywords) {
 
     // First things first -- initialize the self struct.
     self->name = NULL;
-    self->fd = POSIX_IPC_FD_NO_VALUE;
+    self->fd = POSIX_IPC_SHM_NO_VALUE;
     self->mode = 0600;
 
     if (!PyArg_ParseTupleAndKeywords(args, keywords, "O&|Iiki", keyword_list,
@@ -1109,7 +1118,7 @@ SharedMemory_getsize(SharedMemory *self, void *closure) {
 
 PyObject *
 SharedMemory_close_fd(SharedMemory *self) {
-    if (POSIX_IPC_FD_NO_VALUE != self->fd) {
+    if (POSIX_IPC_SHM_NO_VALUE != self->fd) {
     	DPRINTF("SharedMemory_close_fd, fd=%d\n", self->fd);
         if (-1 == close(self->fd)) {
 	    	DPRINTF("SharedMemory_close_fd, close failed\n");
@@ -1128,7 +1137,7 @@ SharedMemory_close_fd(SharedMemory *self) {
         }
         else {
         	// Close was successful so the fd is no longer valid.
-        	self->fd = POSIX_IPC_FD_NO_VALUE;
+        	self->fd = POSIX_IPC_SHM_NO_VALUE;
         }
     }
 
@@ -1288,7 +1297,7 @@ MessageQueue_init(MessageQueue *self, PyObject *args, PyObject *keywords) {
                                     "max_message_size", "read", "write", NULL};
 
     // First things first -- initialize the self struct.
-    self->mqd = (mqd_t)0;
+    self->mqd = POSIX_IPC_MQ_NO_VALUE;
     self->name = NULL;
     self->mode = 0600;
     self->notification_callback = NULL;
@@ -1397,7 +1406,6 @@ MessageQueue_init(MessageQueue *self, PyObject *args, PyObject *keywords) {
     DPRINTF("mqd = %ld\n", (long)self->mqd);
 
     if ((mqd_t)-1 == self->mqd) {
-        self->mqd = (mqd_t)0;
         switch (errno) {
             case EINVAL:
                 PyErr_SetString(PyExc_ValueError, "Invalid parameter(s)");
@@ -1970,8 +1978,10 @@ MessageQueue_close(MessageQueue *self) {
         }
         goto error_return;
     }
-    else
-        self->mqd = 0;
+    else {
+    	// Close was successful so the handle is no longer valid.
+        self->mqd = POSIX_IPC_MQ_NO_VALUE;
+    }
 
     Py_RETURN_NONE;
 
