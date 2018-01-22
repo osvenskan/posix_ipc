@@ -494,9 +494,9 @@ Semaphore_init(Semaphore *self, PyObject *args, PyObject *keywords) {
     static char *keyword_list[ ] = {"name", "flags", "mode", "initial_value", NULL};
 
     // First things first -- initialize the self struct. I use SEM_FAILED to represent
-   	// an uninitialized pointer to a semaphore because at least one platform (OS X) uses
-   	// file handles to represent semaphore handles, and they can be 0. See comments here --
-   	// https://github.com/osvenskan/posix_ipc/issues/2
+    // an uninitialized pointer to a semaphore because at least one platform (OS X) uses
+    // file handles to represent semaphore handles, and they can be 0. See comments here --
+    // https://github.com/osvenskan/posix_ipc/issues/2
     self->pSemaphore = SEM_FAILED;
     self->name = NULL;
     self->mode = 0600;
@@ -1119,9 +1119,9 @@ SharedMemory_getsize(SharedMemory *self, void *closure) {
 PyObject *
 SharedMemory_close_fd(SharedMemory *self) {
     if (POSIX_IPC_SHM_NO_VALUE != self->fd) {
-    	DPRINTF("SharedMemory_close_fd, fd=%d\n", self->fd);
+        DPRINTF("SharedMemory_close_fd, fd=%d\n", self->fd);
         if (-1 == close(self->fd)) {
-	    	DPRINTF("SharedMemory_close_fd, close failed\n");
+            DPRINTF("SharedMemory_close_fd, close failed\n");
             switch (errno) {
                 case EBADF:
                     PyErr_SetString(PyExc_ValueError,
@@ -1136,8 +1136,8 @@ SharedMemory_close_fd(SharedMemory *self) {
             goto error_return;
         }
         else {
-        	// Close was successful so the fd is no longer valid.
-        	self->fd = POSIX_IPC_SHM_NO_VALUE;
+            // Close was successful so the fd is no longer valid.
+            self->fd = POSIX_IPC_SHM_NO_VALUE;
         }
     }
 
@@ -1658,7 +1658,7 @@ MessageQueue_receive(MessageQueue *self, PyObject *args, PyObject *keywords) {
     timeout.is_none = 1;
 
     if (!PyArg_ParseTupleAndKeywords(args, keywords, "|O&", keyword_list,
-    							     convert_timeout, &timeout))
+                                     convert_timeout, &timeout))
         goto error_return;
 
     if (!self->receive_permitted) {
@@ -1843,7 +1843,7 @@ void process_notification(union sigval notification_data) {
 
 static PyObject *
 MessageQueue_request_notification(MessageQueue *self, PyObject *args,
-							      PyObject *keywords) {
+                                  PyObject *keywords) {
     struct sigevent notification;
     PyObject *py_callback = NULL;
     PyObject *py_callback_param = NULL;
@@ -1854,7 +1854,7 @@ MessageQueue_request_notification(MessageQueue *self, PyObject *args,
     // request_notification(notification = None)
 
     if (!PyArg_ParseTupleAndKeywords(args, keywords, "|O", keyword_list,
-    								 &py_notification))
+                                     &py_notification))
         goto error_return;
 
     // py_notification can be None ==> cancel, an int ==> signal,
@@ -1979,7 +1979,7 @@ MessageQueue_close(MessageQueue *self) {
         goto error_return;
     }
     else {
-    	// Close was successful so the handle is no longer valid.
+        // Close was successful so the handle is no longer valid.
         self->mqd = POSIX_IPC_MQ_NO_VALUE;
     }
 
