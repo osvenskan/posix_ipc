@@ -402,9 +402,7 @@ a file descriptor that can be mmapped.
             </li>
 
             <li>With <span class="param">flags</span> set to <tt>O_CREAT</tt>,
-                the module opens the segment if it exists (in which case
-                <span class="param">size</span> and <span class="param">mode</span>
-                are ignored) or creates it if it doesn't.
+                the module opens the segment if it exists or creates it if it doesn't.
             </li>
 
             <li>With <span class="param">flags</span> set to <tt>O_CREAT | O_EXCL</tt>
@@ -416,10 +414,27 @@ a file descriptor that can be mmapped.
             </li>
         </ul>
 
+        <p>If you pass a non-zero size, the segment will be (re)sized accordingly, regardless
+        	of whether or not it's a new or existing segment. Prior to version 1.0.4, this documentation incorrectly stated that size was ignored if the segment already existed.
+        </p>
+        <p>
+        	To (re)size the segment, <tt>posix_ipc</tt> calls <tt>ftruncate()</tt>.
+        	The same function is available to Python via
+        	<a href='https://docs.python.org/3/library/os.html#os.ftruncate'><tt>os.ftruncate()</tt></a>.
+        	If you prefer to handle segment (re)sizing yourself, leave the
+        	<tt>SharedMemory</tt> parameter <tt>size</tt> at its default of <tt>0</tt> and
+        	call <tt>os.ftruncate()</tt> when and how you like.
+        </p>
+
+        <p>Note that under macOS (up to and including 10.12 at least), you can
+        	only call <tt>ftruncate()</tt> once on a segment during its lifetime.
+        	This is a limitation of macOS, not <tt>posix_ipc</tt>.
+        </p>
+
         <p>When opening an existing shared memory segment, one can also specify
             the flag <tt>O_TRUNC</tt>
-            to truncate the shared memory to zero bytes. OS X does not appear
-            to support <tt>O_TRUNC</tt>.
+            to truncate the shared memory to zero bytes. macOS does not
+            support <tt>O_TRUNC</tt>.
         </p>
     </dd>
 
@@ -749,20 +764,6 @@ bytes). You can create a queue with a larger value, but be aware that
 every time <tt>receive()</tt> is called.
 </p>
 
-<h4>Resizing Shared Memory Segments</h4>
-
-<p>
-Under OS X/Darwin, <tt>ftruncate()</tt> can be used to set the memory size <em>once</em>
-after the initial call to <tt>shm_open()</tt>. This module does that in the
-<tt>SharedMemory</tt> constructor, so subsequent attempts to resize the shared memory
-will fail.
-</p>
-
-<p>I don't know if this holds true on all platforms. If your platform supports multiple
-calls to <tt>ftruncate()</tt>, you can call that via Python's <tt>os</tt> module,
-passing the file descriptor exposed in the <tt>SharedMemory</tt> object.
-</p>
-
 <h4>Consult Your Local <tt>man</tt> Pages</h4>
 
 <p>The posix_ipc module is just a wrapper around your system's API. If your
@@ -839,17 +840,16 @@ conformance</em>" and still not support any or all of the IPC functions.
         Prior to 7.2, FreeBSD POSIX semaphore support was
         <a href="http://www.freebsd.org/cgi/query-pr.cgi?pr=127545">broken</a>.
         </p>
+
     </dd>
 
-    <dt>OS X (up to and including 10.10)</dt>
+    <dt>macOS/OS X (up to and including 10.12)</dt>
     <dd>
-        Message queues are not supported by OS X. Also,
+    	<p>macOS' implementation of POSIX IPC has some significant holes.
+    		Message queues are not supported at all. Also,
         <tt>sem_getvalue()</tt> and <tt>sem_timedwait()</tt> are not
         supported.
-
-        <p>From what I can tell, OS X does not support <tt>sem_init()</tt> or
-        <tt>sem_destroy()</tt>, so even if this module adds support for unnamed
-        semaphores, they won't be available under OS X.
+    	</p>
     </dd>
 
     <dt>Windows + Cygwin 1.7</dt>
