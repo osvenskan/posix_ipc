@@ -785,7 +785,9 @@ probably cover them.
 
 <h3><a name="KnownBugs">Known Bugs</a></h3>
 
-<p>I don't know of any bugs in this code.</p>
+<p>I don't know of any bugs in this code, but FreeBSD users should check the
+platform notes.
+</p>
 
 <h3>Support for Older Pythons</h3>
 
@@ -839,6 +841,11 @@ conformance</em>" and still not support any or all of the IPC functions.
         <p>
         Prior to 7.2, FreeBSD POSIX semaphore support was
         <a href="http://www.freebsd.org/cgi/query-pr.cgi?pr=127545">broken</a>.
+        </p>
+
+        <p>Under FreeBSD 11.1, I have seen segfaults during the message queue
+        	threaded notification rearm test. I don't know if <tt>posix_ipc</tt>
+        	or FreeBSD (or both!) are culprits.
         </p>
 
     </dd>
