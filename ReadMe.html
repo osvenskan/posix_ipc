@@ -52,7 +52,7 @@ That includes most (all?) Linuxes with kernel ≥ 2.6, FreeBSD ≥ 7.2, and
 OpenSolaris ≥ 2008.05.
 </p>
 
-<p>OS X and other Unix-y platforms (including Windows +
+<p>macOS/OS X and other Unix-y platforms (including Windows +
 <a href="http://www.cygwin.com/">Cygwin 1.7</a>) provide partial
 (or partially broken) support. See <a href="#platforms">
 the platform notes below</a> for more details.
@@ -135,7 +135,7 @@ System V IPC has broader OS support but is not as easy to use.
         timeouts &gt; 0 passed to a semaphore's <tt>acquire()</tt> method are
         treated as infinity.
 
-        <p>As far as I know, this is only False under OS X.</p>
+        <p>As far as I know, this is only False under macOS.</p>
     </dd>
 
     <dt>SEMAPHORE_VALUE_SUPPORTED</dt>
@@ -143,7 +143,7 @@ System V IPC has broader OS support but is not as easy to use.
         accessing the <tt>value</tt> attribute on a <tt>Semaphore</tt> instance
         will raise an AttributeError.
 
-        <p>As far as I know, this is only False under OS X.</p>
+        <p>As far as I know, this is only False under macOS.</p>
     </dd>
 
     <dt>SEMAPHORE_VALUE_MAX</dt>
@@ -296,7 +296,7 @@ situations specific to IPC.
                    condition is satisfied.
                 </p>
 
-                <p>Most platforms provide <tt>sem_timedwait()</tt>. OS X is a
+                <p>Most platforms provide <tt>sem_timedwait()</tt>. macOS is a
                     notable exception. The module's Boolean constant
                     <tt>SEMAPHORE_TIMEOUT_SUPPORTED</tt>
                     is True on platforms that support <tt>sem_timedwait()</tt>.
@@ -346,7 +346,7 @@ situations specific to IPC.
     <dd>The name provided in the constructor.</dd>
 
     <dt>value (read-only)</dt>
-    <dd>The integer value of the semaphore. Not available on OS X.
+    <dd>The integer value of the semaphore. Not available on macOS.
         (See <a href="#platforms">Platforms</a>)
     </dd>
 </dl>
@@ -749,7 +749,7 @@ referenced at the C level by a file descriptor rather than a pointer.
 <h4>Permissions</h4>
 
 <p>It appears that the read and write mode bits on IPC objects are
-ignored by the operating system. For instance, on OS X, OpenSolaris and
+ignored by the operating system. For instance, on macOS, OpenSolaris and
 Linux one can write to semaphores and message queues with a mode of
 <tt>0400</tt>.
 </p>
