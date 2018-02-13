@@ -398,6 +398,9 @@ recompile if you need to.
 
 On your platform, this file may contain only this comment -- that's OK!
 
+To enable lots of debug output, add this line and re-run setup.py:
+#define POSIX_IPC_DEBUG
+
 To recreate this file, just delete it and re-run setup.py.
 */
 
