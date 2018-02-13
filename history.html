@@ -33,7 +33,22 @@ suppport it and look for useful features to add, but right now I don't see any.
 
 <ul id="history">
 
-    <li><strong><span id="current">Current</span> &ndash; 1.0.3 (10 Jan 2018) &ndash;</strong>
+    <li><strong><span id="current">Current</span> &ndash; 1.0.4 (13 Feb 2018) &ndash;</strong>
+        <ul>
+        	<li>Fixed bug where the <tt>SharedMemory</tt> and <tt>Semaphore</tt> classes
+        		<a href='https://github.com/osvenskan/posix_ipc/issues/2'>didn't behave correctly</a> when assigned a file descriptor of 0. Thanks to
+        		Thomas Troeger for the bug report.
+        	</li>
+        	<li>Fixed a small but <a href='https://github.com/osvenskan/posix_ipc/issues/3'>significant documentation bug</a> which stated that the <tt>size</tt> param was ignored when opening
+        		an existing <tt>SharedMemory</tt> segment. Thanks to Thomas Troeger, again.
+        	</li>
+        	<li>Fixed a compilation failure under Python 3 when the internal use <tt>POSIX_IPC_DEBUG</tt>
+        		flag was on. Děkuji to Tomáš Zahradnický for the bug report.
+        	</li>
+        </ul>
+	</li>
+
+    <li>1.0.3 (10 Jan 2018) &ndash;
     	<p>A <i>mea culpa</i> release to clean up some accumulated technical debt.</p>
 
         <ul>
