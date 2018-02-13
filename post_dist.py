@@ -49,4 +49,4 @@ print("""
 
 """ % (VERSION, VERSION, timestamp, VERSION))
 
-print('hg tag rel' + VERSION)
+print('git tag rel' + VERSION)
