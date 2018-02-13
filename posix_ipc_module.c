@@ -1774,7 +1774,7 @@ void dprint_current_thread_id(void) {
     // Debug print only. Note that calling PyThreadState_Get() when there's
     // no current thread is a fatal error, so calling this can crash your
     // app.
-    DPRINTF("Current thread has id %lu\n", PyThreadState_Get()->thread_id);
+    DPRINTF("Current thread has id %lx\n", PyThreadState_Get()->thread_id);
 }
 
 
@@ -1788,7 +1788,7 @@ void process_notification(union sigval notification_data) {
     PyObject *callback_param = NULL;
     PyGILState_STATE gstate;
 
-    DPRINTF("C thread %lu invoked, calling PyGILState_Ensure()\n", pthread_self());
+    DPRINTF("C thread %lx invoked, calling PyGILState_Ensure()\n", (unsigned long)pthread_self());
 
     gstate = PyGILState_Ensure();
 
