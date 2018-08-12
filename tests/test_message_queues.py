@@ -472,10 +472,10 @@ class TestMessageQueueDestruction(MessageQueueTestBase):
 
     def test_close_and_unlink(self):
         """tests that mq.close() and mq.unlink() work"""
-        # mq.close() is hard to test since subsequent use of the semaphore
+        # mq.close() is hard to test since subsequent use of the queue
         # after mq.close() is undefined. All I can think of to do is call it
         # and note that it does not fail. Also, it allows mq.unlink() to
-        # tell the OS to delete the semaphore entirely, so it makes sense
+        # tell the OS to delete the queue entirely, so it makes sense
         # to test them together,
         self.mq.unlink()
         self.mq.close()
@@ -505,6 +505,10 @@ class TestMessageQueuePropertiesAndAttributes(MessageQueueTestBase):
         # type is. All I know is that -1 is an error so it's probably
         # int-ish, but I can't tell exactly what to expect.
         self.assertWriteToReadOnlyPropertyFails('mqd', 42)
+
+    def test_fileno(self):
+        """exercise MessageQueue.fileno()"""
+        self.assertEqual(self.mq.mqd, self.mq.fileno())
 
     def test_property_max_messages(self):
         """exercise MessageQueue.max_messages"""

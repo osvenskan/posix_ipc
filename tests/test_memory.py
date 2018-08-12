@@ -238,6 +238,10 @@ class TestMemory(tests_base.Base):
 
         self.assertWriteToReadOnlyPropertyFails('fd', 42)
 
+    def test_fileno(self):
+        """exercise SharedMemory.fileno"""
+        self.assertEqual(self.mem.fd, self.mem.fileno())
+
     def test_size_property(self):
         """exercise SharedMemory.size"""
         self.assertIsInstance(self.mem.size, numbers.Integral)
