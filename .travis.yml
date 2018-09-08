@@ -10,4 +10,5 @@ python:
   - "3.5"
   - "3.6"
   - "3.7"
+install: python setup.py install
 script: python -m unittest discover
