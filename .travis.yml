@@ -1,7 +1,4 @@
 language: python
-os:
-  - linux
-  - osx
 python:
   - "2.7"
   - "3.3"
@@ -9,6 +6,5 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
-# - "3.7"  # Travis can't do 3.7 yet
 install: python setup.py install
 script: python -m unittest discover
