@@ -1,0 +1,13 @@
+language: python
+# os:
+#   - linux
+#   - osx
+python:
+  - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "3.7"
+script: python -m unittest discover
