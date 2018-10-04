@@ -12,8 +12,8 @@ mq.block = False
 
 def accept(message_queue, mask):
     (msg, prio) = message_queue.receive()
-    print(msg)
-    print(prio)
+    print("Message: ", msg)
+    print("Priority: ", prio)
 
 # The selector can now be created...
 
