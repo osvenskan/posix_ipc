@@ -10,8 +10,9 @@ matrix:
   include:
     - { python: 3.7, dist: xenial, sudo: true }
     - os: osx
-      osx_image: xcode10.2  # Python 3.7.2 running on macOS 10.14.3
+      osx_image: xcode10.2  # Python 2.7 & 3.7
       language: shell       # 'language: python' is an error on Travis CI macOS
+      install: python3 setup.py install
       script: python3 -m unittest discover
 
 install: python setup.py install
