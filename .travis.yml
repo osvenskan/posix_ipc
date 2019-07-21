@@ -12,3 +12,7 @@ matrix:
 
 install: python setup.py install
 script: python -m unittest discover
+
+os:
+  - linux
+  - osx
