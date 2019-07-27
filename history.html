@@ -33,7 +33,23 @@ suppport it and look for useful features to add, but right now I don't see any.
 
 <ul id="history">
 
-    <li><strong><span id="current">Current</span> &ndash; 1.0.4 (13 Feb 2018) &ndash;</strong>
+    <li><strong><span id="current">Current</span> &ndash; 1.0.5 (21 July 2019) &ndash;</strong>
+        <ul>
+        	<li>Added a <tt>fileno</tt> method to <tt>SharedMemory</tt> and
+        		<tt>MessageQueue</tt> objects to support Python's <tt>selectors</tt>
+        		standard library module.
+        	</li>
+        	<li>Added a demo (in the demo5 directory) demonstrating use of <tt>selectors</tt>.
+        		<i>Mange tak</i> to Henrik Enggaard for the <tt>fileno()</tt> suggestion
+        		and for contributing the demo.
+        	</li>
+        	<li>Added automatic Travis testing on GitHub for Python 3.7 thanks to Ben Harper,
+        		and for Python 2.7 under macOS.
+        	</li>
+        </ul>
+	</li>
+
+    <li>1.0.4 (13 Feb 2018) &ndash;
         <ul>
         	<li>Fixed bug where the <tt>SharedMemory</tt> and <tt>Semaphore</tt> classes
         		<a href='https://github.com/osvenskan/posix_ipc/issues/2'>didn't behave correctly</a> when assigned a file descriptor of 0. Thanks to
