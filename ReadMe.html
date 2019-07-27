@@ -4,7 +4,7 @@
 
 <head>
 	<meta name="author" content="Philip Semanchuk">
-	<meta name="copyright" content="All contents &copy; 2018 Philip Semanchuk">
+	<meta name="copyright" content="All contents &copy; 2019 Philip Semanchuk">
 	<meta name="keywords" content="python posix ipc semaphore shared memory message queue">
 
     <title>POSIX IPC for Python</title>
@@ -364,7 +364,9 @@ with posix_ipc.Semaphore(name) as sem:
 </pre>
 
 <p>Entering the context acquires the semaphore, exiting the context releases
-	the semaphore. See <tt>demo4/child.py</tt> for a complete example.
+	the semaphore. See <tt>demo4/child.py</tt> for a complete example. The context
+	manager only manages acquisition and release. If you create a new semaphore
+	as part of executing the <tt>with</tt> statement, you must explicitly unlink it.
 </p>
 
 
