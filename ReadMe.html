@@ -1,6 +1,6 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html>
 
-<html>
+<html lang='en'>
 
 <head>
 	<meta name="author" content="Philip Semanchuk">
@@ -9,7 +9,7 @@
 
     <title>POSIX IPC for Python</title>
 
-    <style type="text/css">
+    <style>
         dt {
             font-family: monospace;
             font-weight: bold;
@@ -45,7 +45,7 @@
     <br><a href="rss.xml">RSS</a>
 </div>
 
-<p>The Python extension module <tt>posix_ipc</tt> gives Python access
+<p>The Python extension module <code>posix_ipc</code> gives Python access
 to POSIX inter-process semaphores, shared memory and message queues on
 systems that support the POSIX Realtime Extensions a.k.a. POSIX 1003.1b-1993.
 That includes most (all?) Linuxes with kernel ≥ 2.6, FreeBSD ≥ 7.2, and
@@ -74,7 +74,7 @@ which contains the source code, setup.py, installation instructions, tests, and
 <a href="https://pypi.python.org/pypi/posix_ipc">posix_ipc tarball is also
 available on PyPI</a>. You can also find
 <a href='https://github.com/osvenskan/posix_ipc/'>the
-<tt>posix_ipc</tt> source code on GitHub</a>.
+<code>posix_ipc</code> source code on GitHub</a>.
 </p>
 
 <p>
@@ -88,13 +88,13 @@ semaphores.
 </p>
 
 <p>You might be interested in the very similar module
-<a href="/philip/sysv_ipc/"><tt>sysv_ipc</tt> which
+<a href="/philip/sysv_ipc/"><code>sysv_ipc</code> which
 provides Python access to IPC using System V semaphores, shared memory and
 message queues</a>.
 System V IPC has broader OS support but is not as easy to use.
 </p>
 
-<h2>Module <tt>posix_ipc</tt> Documentation</h2>
+<h2>Module <code>posix_ipc</code> Documentation</h2>
 
 <p>Jump to <a href="#semaphore">semaphores</a>,
 <a href="#shared_memory">shared memory</a>, or
@@ -117,11 +117,11 @@ System V IPC has broader OS support but is not as easy to use.
 <dl>
     <dt>O_CREX, O_CREAT, O_EXCL and O_TRUNC</dt>
     <dd>These flags are used when creating IPC objects.
-        All except <tt>O_CREX</tt> are bitwise unique and can be
-        ORed together. <tt>O_CREX</tt> is shorthand for
-        <tt>O_CREAT | O_EXCL</tt>.
+        All except <code>O_CREX</code> are bitwise unique and can be
+        ORed together. <code>O_CREX</code> is shorthand for
+        <code>O_CREAT | O_EXCL</code>.
 
-        <p><tt>O_TRUNC</tt> is only useful when
+        <p><code>O_TRUNC</code> is only useful when
         creating SharedMemory objects.</p>
     </dd>
 
@@ -131,16 +131,16 @@ System V IPC has broader OS support but is not as easy to use.
     </dd>
 
     <dt>SEMAPHORE_TIMEOUT_SUPPORTED</dt>
-    <dd>True if the underlying OS supports <tt>sem_timedwait()</tt>. If False, all
-        timeouts &gt; 0 passed to a semaphore's <tt>acquire()</tt> method are
+    <dd>True if the underlying OS supports <code>sem_timedwait()</code>. If False, all
+        timeouts &gt; 0 passed to a semaphore's <code>acquire()</code> method are
         treated as infinity.
 
         <p>As far as I know, this is only False under macOS.</p>
     </dd>
 
     <dt>SEMAPHORE_VALUE_SUPPORTED</dt>
-    <dd>True if the underlying OS supports <tt>sem_getvalue()</tt>. If False,
-        accessing the <tt>value</tt> attribute on a <tt>Semaphore</tt> instance
+    <dd>True if the underlying OS supports <code>sem_getvalue()</code>. If False,
+        accessing the <code>value</code> attribute on a <code>Semaphore</code> instance
         will raise an AttributeError.
 
         <p>As far as I know, this is only False under macOS.</p>
@@ -155,13 +155,13 @@ System V IPC has broader OS support but is not as easy to use.
     </dd>
 
     <dt>QUEUE_MESSAGES_MAX_DEFAULT</dt>
-    <dd>The default value for a message queue's <tt>max_messages</tt>
+    <dd>The default value for a message queue's <code>max_messages</code>
         attribute. This can be quite small under Linux (e.g. 10)
         but is usually LONG_MAX everywhere else.
     </dd>
 
     <dt>QUEUE_MESSAGE_SIZE_MAX_DEFAULT</dt>
-    <dd>The default value for a message queue's <tt>max_message_size</tt>
+    <dd>The default value for a message queue's <code>max_message_size</code>
         attribute. This is 8k (or possibly smaller under Linux).
     </dd>
 
@@ -177,14 +177,14 @@ System V IPC has broader OS support but is not as easy to use.
     </dd>
 
     <dt>VERSION</dt>
-    <dd>The module version string, e.g. <tt>'0.9.8'</tt>. This is also
-    available as <tt>__version__</tt>.
+    <dd>The module version string, e.g. <code>'0.9.8'</code>. This is also
+    available as <code>__version__</code>.
     </dd>
 </dl>
 
 <h3>Module Errors</h3>
 
-<p>In addition to standard Python errors (e.g. <tt>ValueError</tt>),
+<p>In addition to standard Python errors (e.g. <code>ValueError</code>),
 this module raises custom errors. These errors cover
 situations specific to IPC.
 </p>
@@ -196,7 +196,7 @@ situations specific to IPC.
     </dd>
 
     <dt>SignalError</dt>
-    <dd>Raised when a waiting call (e.g. <tt>sem.acquire()</tt>) is
+    <dd>Raised when a waiting call (e.g. <code>sem.acquire()</code>) is
         interrupted by a signal other than KeyboardInterrupt.
     </dd>
 
@@ -226,12 +226,12 @@ situations specific to IPC.
     <dt>Semaphore(name, [flags = 0, [mode = 0600, [initial_value = 0]]])</dt>
     <dd>Creates a new semaphore or opens an existing one.
 
-        <p><span class="param">name</span> must be <tt>None</tt> or
-            a string. If it is <tt>None</tt>, the module chooses a random
+        <p><span class="param">name</span> must be <code>None</code> or
+            a string. If it is <code>None</code>, the module chooses a random
             unused name. If it is a string, it
             should begin with a slash and be valid according
         to pathname rules on your system, e.g.
-        <tt>/wuthering_heights_by_semaphore</tt>
+        <code>/wuthering_heights_by_semaphore</code>
         </p>
 
         <p>The <span class="param">flags</span> specify whether you want to create a
@@ -239,22 +239,22 @@ situations specific to IPC.
         </p>
 
         <ul>
-            <li>With <span class="param">flags</span> set to the default of <tt>0</tt>, the module attempts
+            <li>With <span class="param">flags</span> set to the default of <code>0</code>, the module attempts
                 to open an existing semaphore and raises an error if that semaphore
                 doesn't exist.
             </li>
 
-            <li>With <span class="param">flags</span> set to <tt>O_CREAT</tt>,
+            <li>With <span class="param">flags</span> set to <code>O_CREAT</code>,
                 the module opens the semaphore if it exists (in which case mode and
                 initial value are ignored) or creates it if it doesn't.
             </li>
 
-            <li>With <span class="param">flags</span> set to <tt>O_CREAT | O_EXCL</tt>
-                (or <tt>O_CREX</tt>),
+            <li>With <span class="param">flags</span> set to <code>O_CREAT | O_EXCL</code>
+                (or <code>O_CREX</code>),
                 the module creates a new semaphore identified by
                 <span class="param">name</span>. If a
                 semaphore with that name already exists, the call raises
-                an <tt>ExistentialError</tt>.
+                an <code>ExistentialError</code>.
             </li>
         </ul>
     </dd>
@@ -275,12 +275,12 @@ situations specific to IPC.
             </li>
 
             <li>When <span class="param">timeout</span> is 0, the call
-                immediately raises a <tt>BusyError</tt>
+                immediately raises a <code>BusyError</code>
                 if asked to wait. Since it will return immediately if not
                 asked to wait, this can be thought of as "non-blocking" mode.
 
                 <p>This behavior is unaffected by whether or not the
-                	platform supports <tt>sem_timedwait()</tt>
+                	platform supports <code>sem_timedwait()</code>
                 	(see below).
                 </p>
             </li>
@@ -288,18 +288,18 @@ situations specific to IPC.
             <li>When the <span class="param">timeout</span> is &gt; 0, the call
                 will wait no longer than <span class="param">timeout</span>
                 seconds before either returning (having acquired the semaphore)
-                or raising a <tt>BusyError</tt>.
+                or raising a <code>BusyError</code>.
 
-                <p>On platforms that don't support the <tt>sem_timedwait()</tt> API,
+                <p>On platforms that don't support the <code>sem_timedwait()</code> API,
                    a <span class="param">timeout</span> &gt; 0 is treated as
                    infinite. The call will not return until its wait
                    condition is satisfied.
                 </p>
 
-                <p>Most platforms provide <tt>sem_timedwait()</tt>. macOS is a
+                <p>Most platforms provide <code>sem_timedwait()</code>. macOS is a
                     notable exception. The module's Boolean constant
-                    <tt>SEMAPHORE_TIMEOUT_SUPPORTED</tt>
-                    is True on platforms that support <tt>sem_timedwait()</tt>.
+                    <code>SEMAPHORE_TIMEOUT_SUPPORTED</code>
+                    is True on platforms that support <code>sem_timedwait()</code>.
                 </p>
             </li>
         </ul>
@@ -315,9 +315,9 @@ situations specific to IPC.
         Closes the semaphore, indicating that the current <em>process</em> is
         done with the semaphore. The effect of subsequent use of the semaphore
         by the current process is undefined. Assuming it still exists,
-        (see <tt>unlink()</tt>, below) the semaphore can be re-opened.
+        (see <code>unlink()</code>, below) the semaphore can be re-opened.
 
-        <p>You must call <tt>close()</tt> explicitly; it is
+        <p>You must call <code>close()</code> explicitly; it is
            <strong>not</strong> called automatically
             when a Semaphore object is garbage collected.
         </p>
@@ -331,7 +331,7 @@ situations specific to IPC.
         have closed the semaphore.
 
         <p>Note, however, that once a semaphore has been unlinked,
-            calls to <tt>open()</tt> with the same name should
+            calls to <code>open()</code> with the same name should
             refer to a new semaphore. Sound confusing? It is, and you'd
             probably be wise structure your code so as to avoid
             this situation.
@@ -354,8 +354,8 @@ situations specific to IPC.
 <h4>Context Manager Support</h4>
 
 <p>These semaphores support the context manager protocol so they can be
-used with Python's <tt>with</tt> statement, just like
-Python's <tt>threading.Semaphore</tt>. For instance --
+used with Python's <code>with</code> statement, just like
+Python's <code>threading.Semaphore</code>. For instance --
 </p>
 
 <pre>
@@ -364,9 +364,9 @@ with posix_ipc.Semaphore(name) as sem:
 </pre>
 
 <p>Entering the context acquires the semaphore, exiting the context releases
-	the semaphore. See <tt>demo4/child.py</tt> for a complete example. The context
+	the semaphore. See <code>demo4/child.py</code> for a complete example. The context
 	manager only manages acquisition and release. If you create a new semaphore
-	as part of executing the <tt>with</tt> statement, you must explicitly unlink it.
+	as part of executing the <code>with</code> statement, you must explicitly unlink it.
 </p>
 
 
@@ -383,12 +383,12 @@ a file descriptor that can be mmapped.
     <dt>SharedMemory(name, [flags = 0, [mode = 0600, [size = 0, [read_only = false]]]])</dt>
     <dd>Creates a new shared memory segment or opens an existing one.
 
-        <p><span class="param">name</span> must be <tt>None</tt> or
-            a string. If it is <tt>None</tt>, the module chooses a random
+        <p><span class="param">name</span> must be <code>None</code> or
+            a string. If it is <code>None</code>, the module chooses a random
             unused name. If it is a string, it
             should begin with a slash and be valid according
         to pathname rules on your system, e.g.
-        <tt>/four_yorkshiremen_sharing_memories</tt>
+        <code>/four_yorkshiremen_sharing_memories</code>
         </p>
 
         <p>On some systems you need to have write access to the path.</p>
@@ -398,21 +398,21 @@ a file descriptor that can be mmapped.
         </p>
 
         <ul>
-            <li>With <span class="param">flags</span> set to the default of <tt>0</tt>, the module attempts
+            <li>With <span class="param">flags</span> set to the default of <code>0</code>, the module attempts
                 to open an existing segment and raises an error if that segment
                 doesn't exist.
             </li>
 
-            <li>With <span class="param">flags</span> set to <tt>O_CREAT</tt>,
+            <li>With <span class="param">flags</span> set to <code>O_CREAT</code>,
                 the module opens the segment if it exists or creates it if it doesn't.
             </li>
 
-            <li>With <span class="param">flags</span> set to <tt>O_CREAT | O_EXCL</tt>
-                (or <tt>O_CREX</tt>),
+            <li>With <span class="param">flags</span> set to <code>O_CREAT | O_EXCL</code>
+                (or <code>O_CREX</code>),
                 the module creates a new shared memory segment identified by
                 <span class="param">name</span>. If a
                 segment with that name already exists, the call raises
-                an <tt>ExistentialError</tt>.
+                an <code>ExistentialError</code>.
             </li>
         </ul>
 
@@ -420,23 +420,23 @@ a file descriptor that can be mmapped.
         	of whether or not it's a new or existing segment. Prior to version 1.0.4, this documentation incorrectly stated that size was ignored if the segment already existed.
         </p>
         <p>
-        	To (re)size the segment, <tt>posix_ipc</tt> calls <tt>ftruncate()</tt>.
+        	To (re)size the segment, <code>posix_ipc</code> calls <code>ftruncate()</code>.
         	The same function is available to Python via
-        	<a href='https://docs.python.org/3/library/os.html#os.ftruncate'><tt>os.ftruncate()</tt></a>.
+        	<a href='https://docs.python.org/3/library/os.html#os.ftruncate'><code>os.ftruncate()</code></a>.
         	If you prefer to handle segment (re)sizing yourself, leave the
-        	<tt>SharedMemory</tt> parameter <tt>size</tt> at its default of <tt>0</tt> and
-        	call <tt>os.ftruncate()</tt> when and how you like.
+        	<code>SharedMemory</code> parameter <code>size</code> at its default of <code>0</code> and
+        	call <code>os.ftruncate()</code> when and how you like.
         </p>
 
         <p>Note that under macOS (up to and including 10.12 at least), you can
-        	only call <tt>ftruncate()</tt> once on a segment during its lifetime.
-        	This is a limitation of macOS, not <tt>posix_ipc</tt>.
+        	only call <code>ftruncate()</code> once on a segment during its lifetime.
+        	This is a limitation of macOS, not <code>posix_ipc</code>.
         </p>
 
         <p>When opening an existing shared memory segment, one can also specify
-            the flag <tt>O_TRUNC</tt>
+            the flag <code>O_TRUNC</code>
             to truncate the shared memory to zero bytes. macOS does not
-            support <tt>O_TRUNC</tt>.
+            support <code>O_TRUNC</code>.
         </p>
     </dd>
 
@@ -444,16 +444,16 @@ a file descriptor that can be mmapped.
     <dt>close_fd()</dt>
     <dd>
         Closes the file descriptor associated with this SharedMemory
-        object. Calling <tt>close_fd()</tt> is the same as calling
-        <tt><a href="https://docs.python.org/2/library/os.html#os.close">os.close()</a></tt>
-        on a SharedMemory object's <tt>fd</tt> attribute.
+        object. Calling <code>close_fd()</code> is the same as calling
+        <code><a href="https://docs.python.org/2/library/os.html#os.close">os.close()</a></code>
+        on a SharedMemory object's <code>fd</code> attribute.
 
-        <p>You must call <tt>close_fd()</tt> or <tt>os.close()</tt>
+        <p>You must call <code>close_fd()</code> or <code>os.close()</code>
             explicitly; the file descriptor is <strong>not</strong> closed
             automatically when a SharedMemory object is garbage collected.
         </p>
 
-        <p>Closing the file descriptor has no effect on any <tt>mmap</tt>
+        <p>Closing the file descriptor has no effect on any <code>mmap</code>
             objects that were created from it. See the demo for an
             example.
         </p>
@@ -466,7 +466,7 @@ a file descriptor that can be mmapped.
 
         <p>
         <a href="http://www.opengroup.org/onlinepubs/009695399/functions/shm_unlink.html">The
-        POSIX specification for <tt>shm_unlink()</tt></a> says, "Even if the object
+        POSIX specification for <code>shm_unlink()</code></a> says, "Even if the object
         continues to exist after the last shm_unlink(), reuse of the name shall subsequently
         cause shm_open() to behave as if no shared memory object of this name exists
         (that is, shm_open() will fail if O_CREAT is not set, or will create a new shared
@@ -500,12 +500,12 @@ a file descriptor that can be mmapped.
     <dt>MessageQueue(name, [flags = 0, [mode = 0600, [max_messages = QUEUE_MESSAGES_MAX_DEFAULT, [max_message_size = QUEUE_MESSAGE_SIZE_MAX_DEFAULT, [read = True, [write = True]]]]]])</dt>
     <dd>Creates a new message queue or opens an existing one.
 
-        <p><span class="param">name</span> must be <tt>None</tt> or
-            a string. If it is <tt>None</tt>, the module chooses a random
+        <p><span class="param">name</span> must be <code>None</code> or
+            a string. If it is <code>None</code>, the module chooses a random
             unused name. If it is a string, it
             should begin with a slash and be valid according
         to pathname rules on your system, e.g.
-        <tt>/my_message_queue</tt>
+        <code>/my_message_queue</code>
         </p>
 
         <p>On some systems you need to have write access to the path.</p>
@@ -516,29 +516,29 @@ a file descriptor that can be mmapped.
 
         <ul>
             <li>With <span class="param">flags</span> set to the default of
-                <tt>0</tt>, the module attempts
+                <code>0</code>, the module attempts
                 to open an existing queue and raises an error if that queue
                 doesn't exist.
             </li>
 
-            <li>With <span class="param">flags</span> set to <tt>O_CREAT</tt>,
+            <li>With <span class="param">flags</span> set to <code>O_CREAT</code>,
                 the module opens the queue if it exists (in which case
                 <span class="param">size</span> and <span class="param">mode</span>
                 are ignored) or creates it if it doesn't.
             </li>
 
-            <li>With <span class="param">flags</span> set to <tt>O_CREAT | O_EXCL</tt>
-                (or <tt>O_CREX</tt>),
+            <li>With <span class="param">flags</span> set to <code>O_CREAT | O_EXCL</code>
+                (or <code>O_CREX</code>),
                 the module creates a new message queue identified by
                 <span class="param">name</span>. If a
                 queue with that name already exists, the call raises
-                an <tt>ExistentialError</tt>.
+                an <code>ExistentialError</code>.
             </li>
         </ul>
 
         <p><span class="param">Max_messages</span> defines how many messages
             can be in the queue at one time. When the queue is full,
-            calls to <tt>.send()</tt> will wait.
+            calls to <code>.send()</code> will wait.
         </p>
 
         <p><span class="param">Max_message_size</span> defines the maximum
@@ -548,7 +548,7 @@ a file descriptor that can be mmapped.
         <p><span class="param">Read</span> and
             <span class="param">write</span>
             default to True. If <span class="param">read/write </span>
-            is False, calling <tt>.receive()/.send()</tt> on this object
+            is False, calling <code>.receive()/.send()</code> on this object
             is not permitted.
             This doesn't affect other handles to the same queue.
         </p>
@@ -559,13 +559,13 @@ a file descriptor that can be mmapped.
         Sends a message via the queue.
 
         <p>The <span class="param">message</span> string can contain embedded
-            NULLs (ASCII <tt>0x00</tt>). Under Python 3, the message can
+            NULLs (ASCII <code>0x00</code>). Under Python 3, the message can
             also be a bytes object.
         </p>
 
         <p>The <span class="param">timeout</span> (which can be a float)
             specifies how many seconds this call should wait if the
-            queue is full. Timeouts are irrelevant when the <tt>block</tt>
+            queue is full. Timeouts are irrelevant when the <code>block</code>
             flag is False.
         </p>
 
@@ -576,14 +576,14 @@ a file descriptor that can be mmapped.
             </li>
 
             <li>When <span class="param">timeout</span> is 0, the call
-                immediately raises a <tt>BusyError</tt>
+                immediately raises a <code>BusyError</code>
                 if asked to wait.
             </li>
 
             <li>When the <span class="param">timeout</span> is &gt; 0, the call
                 will wait no longer than <span class="param">timeout</span>
                 seconds before either returning (having sent the message)
-                or raising a <tt>BusyError</tt>.
+                or raising a <code>BusyError</code>.
             </li>
         </ul>
 
@@ -596,7 +596,7 @@ a file descriptor that can be mmapped.
     <dt>receive([timeout = None])</dt>
     <dd>
         Receives a message from the queue, returning a tuple of
-        <tt>(message, priority)</tt>. Messages are received in the order of
+        <code>(message, priority)</code>. Messages are received in the order of
         highest priority to lowest, and in FIFO order for messages of
         equal priority.
 
@@ -604,7 +604,7 @@ a file descriptor that can be mmapped.
 
         <p>If the queue is empty, the call will not return immediately.
         The optional <span class="param">timeout</span> parameter controls the
-        wait just as for the function <tt>send()</tt>. It defaults to None.
+        wait just as for the function <code>send()</code>. It defaults to None.
         </p>
     </dd>
 
@@ -614,31 +614,31 @@ a file descriptor that can be mmapped.
 
         <ul>
             <li>When <span class="param">notification</span> is not provided
-            	or <tt>None</tt>, any existing notification request is
+            	or <code>None</code>, any existing notification request is
                 cancelled.
             </li>
 
             <li>When <span class="param">notification</span> is an
                 integer, notification will be sent as a signal of this
                 value that can be caught using a signal handler installed
-                with <tt>signal.signal()</tt>.
+                with <code>signal.signal()</code>.
             </li>
 
             <li>When <span class="param">notification</span> is a tuple
-                of <tt>(function, param)</tt>, notification will be sent
-                by invoking <tt><em>function(param)</em></tt> in a new
+                of <code>(function, param)</code>, notification will be sent
+                by invoking <code><em>function(param)</em></code> in a new
                 thread.
             </li>
         </ul>
 
         <p>Message queues accept only one notification request at a time.
             If another process has already requested notifications from
-            this queue, this call will fail with a <tt>BusyError</tt>.
+            this queue, this call will fail with a <code>BusyError</code>.
         </p>
 
         <p>The operating system delivers (at most) one notification
             per request. If you want subsequent notifications, you must
-            request them by calling <tt>request_notification()</tt> again.
+            request them by calling <code>request_notification()</code> again.
         </p>
     </dd>
 
@@ -646,7 +646,7 @@ a file descriptor that can be mmapped.
     <dd>
         Closes this reference to the queue.
 
-        <p>You must call <tt>close()</tt> explicitly; it is
+        <p>You must call <code>close()</code> explicitly; it is
            <strong>not</strong> called automatically
             when a MessageQueue object is garbage collected.
         </p>
@@ -668,10 +668,10 @@ a file descriptor that can be mmapped.
     <dt>mqd (read-only)</dt>
     <dd>The message queue descriptor that represents the queue.</dd>
     <dt>block</dt>
-    <dd>When True (the default), calls to <tt>.send()</tt> and
-        <tt>.receive()</tt> may wait (block) if they cannot immediately
-        satisfy the send/receive request. When <tt>block</tt> is False,
-        the module will raise <tt>BusyError</tt>
+    <dd>When True (the default), calls to <code>.send()</code> and
+        <code>.receive()</code> may wait (block) if they cannot immediately
+        satisfy the send/receive request. When <code>block</code> is False,
+        the module will raise <code>BusyError</code>
         instead of waiting.
     </dd>
     <dt>max_messages (read-only)</dt>
@@ -687,19 +687,19 @@ a file descriptor that can be mmapped.
 
 <h4 id="tests">Tests</h4>
 
-<p>This module comes with fairly complete unit tests in the <tt>tests</tt>
-directory. To run them, install <tt>posix_ipc</tt> and then run this command
-from the same directory as <tt>setup.py</tt>:<br>
-<tt>python -m unittest discover</tt>
+<p>This module comes with fairly complete unit tests in the <code>tests</code>
+directory. To run them, install <code>posix_ipc</code> and then run this command
+from the same directory as <code>setup.py</code>:<br>
+<code>python -m unittest discover</code>
 </p>
 
 <h4 id="samples">Sample Code</h4>
 
 <p>This module comes with four demonstrations. The first (in the
-directory <tt>demo</tt>) shows how to use shared memory and semaphores.
-The second (in the directory <tt>demo2</tt>) shows how to use
-message queues. The third (<tt>demo3</tt>) shows how to use message queue
-notifications. The fourth (<tt>demo4</tt>) shows how to use a semaphore in
+directory <code>demo</code>) shows how to use shared memory and semaphores.
+The second (in the directory <code>demo2</code>) shows how to use
+message queues. The third (<code>demo3</code>) shows how to use message queue
+notifications. The fourth (<code>demo4</code>) shows how to use a semaphore in
 a context manager.
 </p>
 
@@ -723,17 +723,17 @@ going to do it anyway.
 </p>
 
 <p>Each Semaphore object created by this module contains a C pointer to
-the IPC object created by the system. When you call <tt>sem.close()</tt>,
-the object's internal pointer is set to <tt>NULL</tt>. This leaves the
-object in a not-quite-useless state. You can still call <tt>sem.unlink()</tt>
-or print <tt>sem.name</tt>, but calls to <tt>sem.aquire()</tt> or
-<tt>sem.release()</tt> will raise an <tt>ExistentialError</tt>.
+the IPC object created by the system. When you call <code>sem.close()</code>,
+the object's internal pointer is set to <code>NULL</code>. This leaves the
+object in a not-quite-useless state. You can still call <code>sem.unlink()</code>
+or print <code>sem.name</code>, but calls to <code>sem.aquire()</code> or
+<code>sem.release()</code> will raise an <code>ExistentialError</code>.
 </p>
 
 <p>If you know you're not going to use a Semaphore object after calling
-<tt>sem.close()</tt> or <tt>sem.unlink()</tt>, you could you set your
+<code>sem.close()</code> or <code>sem.unlink()</code>, you could you set your
 semaphore variable to the return from the function (which is always
-<tt>None</tt>) like so:
+<code>None</code>) like so:
 </p>
 
 <pre>
@@ -753,26 +753,26 @@ referenced at the C level by a file descriptor rather than a pointer.
 <p>It appears that the read and write mode bits on IPC objects are
 ignored by the operating system. For instance, on macOS, OpenSolaris and
 Linux one can write to semaphores and message queues with a mode of
-<tt>0400</tt>.
+<code>0400</code>.
 </p>
 
 
 <h4>Message Queues</h4>
 
 <p>When creating a new message queue, you specify a maximum message size
-which defaults to <tt>QUEUE_MESSAGE_SIZE_MAX_DEFAULT</tt> (currently 8192
+which defaults to <code>QUEUE_MESSAGE_SIZE_MAX_DEFAULT</code> (currently 8192
 bytes). You can create a queue with a larger value, but be aware that
-<tt>posix_ipc</tt> allocates a buffer the size of the maximum message size
-every time <tt>receive()</tt> is called.
+<code>posix_ipc</code> allocates a buffer the size of the maximum message size
+every time <code>receive()</code> is called.
 </p>
 
-<h4>Consult Your Local <tt>man</tt> Pages</h4>
+<h4>Consult Your Local <code>man</code> Pages</h4>
 
 <p>The posix_ipc module is just a wrapper around your system's API. If your
-system's implementation has quirks, the <tt>man</tt> pages for
-<tt>sem_open, sem_post,
+system's implementation has quirks, the <code>man</code> pages for
+<code>sem_open, sem_post,
 sem_wait, sem_close, sem_unlink, shm_open, shm_unlink, mq_open, mq_send
-mq_receive, mq_getattr, mq_close, mq_unlink</tt> and <tt>mq_notify</tt> will
+mq_receive, mq_getattr, mq_close, mq_unlink</code> and <code>mq_notify</code> will
 probably cover them.
 </p>
 
@@ -785,7 +785,7 @@ probably cover them.
     </li>
 </ul>
 
-<h3><a name="KnownBugs">Known Bugs</a></h3>
+<h3><a id="KnownBugs">Known Bugs</a></h3>
 
 <p>I don't know of any bugs in this code, but FreeBSD users should check the
 platform notes.
@@ -819,22 +819,22 @@ conformance</em>" and still not support any or all of the IPC functions.
     <dt>FreeBSD ≥ 7.2</dt>
     <dd>All features supported.
 
-        <p>Under 7.2, <tt>posix_ipc</tt>'s demos fail unless they're run as
+        <p>Under 7.2, <code>posix_ipc</code>'s demos fail unless they're run as
             root. It's a simple permissions problem. Prefix the IPC object
-            names with <tt>/tmp</tt> in <tt>params.txt</tt> and the problem
+            names with <code>/tmp</code> in <code>params.txt</code> and the problem
             goes away. I didn't see this behavior under FreeBSD 8.0, so it
             must have been fixed at some point.
         </p>
 
-        <p>If you don't have the <tt>sem</tt> and <tt>mqueuefs</tt> kernel
+        <p>If you don't have the <code>sem</code> and <code>mqueuefs</code> kernel
             modules loaded, you'll get a message like this (or something
             similarly discouraging) when you
             try to create a semaphore or message queue:<br>
-            <tt>Bad system call: 12 (core dumped)</tt>
+            <code>Bad system call: 12 (core dumped)</code>
         </p>
 
-        <p>Type <tt>kldstat</tt> to list loaded modules, and
-            <tt>kldload sem</tt> or <tt>kldload mqueuefs</tt> if you need
+        <p>Type <code>kldstat</code> to list loaded modules, and
+            <code>kldload sem</code> or <code>kldload mqueuefs</code> if you need
             to load either of these. BTW,
             <a href="http://www.freebsd.org/cgi/man.cgi?query=mqueuefs&amp;apropos=0&amp;sektion=5&amp;manpath=FreeBSD+8.0-stable&amp;format=html">mqueuefs</a> has
             some cool features.
@@ -846,7 +846,7 @@ conformance</em>" and still not support any or all of the IPC functions.
         </p>
 
         <p>Under FreeBSD 11.1, I have seen segfaults during the message queue
-        	threaded notification rearm test. I don't know if <tt>posix_ipc</tt>
+        	threaded notification rearm test. I don't know if <code>posix_ipc</code>
         	or FreeBSD (or both!) are culprits.
         </p>
 
@@ -856,7 +856,7 @@ conformance</em>" and still not support any or all of the IPC functions.
     <dd>
     	<p>macOS' implementation of POSIX IPC has some significant holes.
     		Message queues are not supported at all. Also,
-        <tt>sem_getvalue()</tt> and <tt>sem_timedwait()</tt> are not
+        <code>sem_getvalue()</code> and <code>sem_timedwait()</code> are not
         supported.
     	</p>
     </dd>
@@ -868,7 +868,7 @@ conformance</em>" and still not support any or all of the IPC functions.
 
         <p>Versions of Cygwin prior to 1.7 didn't support POSIX IPC.
             Under Cygwin 1.7 beta 62 (released in early October 2009),
-            <tt>posix_ipc</tt> compiles and runs both demos.
+            <code>posix_ipc</code> compiles and runs both demos.
         </p>
     </dd>
 </dl>

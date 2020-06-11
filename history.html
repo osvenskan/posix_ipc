@@ -1,6 +1,6 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html>
 
-<html>
+<html lang='en'>
 
 <head>
 	<meta name="author" content="Philip Semanchuk">
@@ -9,7 +9,7 @@
 
     <title>The posix_ipc Module for POSIX IPC Under Python -- Version History</title>
 
-    <style type="text/css">
+    <style>
         li {
             margin-top: .67em;
             margin-bottom: .67em;
@@ -35,12 +35,12 @@ suppport it and look for useful features to add, but right now I don't see any.
 
     <li><strong><span id="current">Current</span> &ndash; 1.0.5 (21 July 2019) &ndash;</strong>
         <ul>
-        	<li>Added a <tt>fileno</tt> method to <tt>SharedMemory</tt> and
-        		<tt>MessageQueue</tt> objects to support Python's <tt>selectors</tt>
+        	<li>Added a <code>fileno</code> method to <code>SharedMemory</code> and
+        		<code>MessageQueue</code> objects to support Python's <code>selectors</code>
         		standard library module.
         	</li>
-        	<li>Added a demo (in the demo5 directory) demonstrating use of <tt>selectors</tt>.
-        		<i>Mange tak</i> to Henrik Enggaard for the <tt>fileno()</tt> suggestion
+        	<li>Added a demo (in the demo5 directory) demonstrating use of <code>selectors</code>.
+        		<i>Mange tak</i> to Henrik Enggaard for the <code>fileno()</code> suggestion
         		and for contributing the demo.
         	</li>
         	<li>Added automatic Travis testing on GitHub for Python 3.7 thanks to Ben Harper,
@@ -51,14 +51,14 @@ suppport it and look for useful features to add, but right now I don't see any.
 
     <li>1.0.4 (13 Feb 2018) &ndash;
         <ul>
-        	<li>Fixed bug where the <tt>SharedMemory</tt> and <tt>Semaphore</tt> classes
+        	<li>Fixed bug where the <code>SharedMemory</code> and <code>Semaphore</code> classes
         		<a href='https://github.com/osvenskan/posix_ipc/issues/2'>didn't behave correctly</a> when assigned a file descriptor of 0. Thanks to
         		Thomas Troeger for the bug report.
         	</li>
-        	<li>Fixed a small but <a href='https://github.com/osvenskan/posix_ipc/issues/3'>significant documentation bug</a> which stated that the <tt>size</tt> param was ignored when opening
-        		an existing <tt>SharedMemory</tt> segment. Thanks to Thomas Troeger, again.
+        	<li>Fixed a small but <a href='https://github.com/osvenskan/posix_ipc/issues/3'>significant documentation bug</a> which stated that the <code>size</code> param was ignored when opening
+        		an existing <code>SharedMemory</code> segment. Thanks to Thomas Troeger, again.
         	</li>
-        	<li>Fixed a compilation failure under Python 3 when the internal use <tt>POSIX_IPC_DEBUG</tt>
+        	<li>Fixed a compilation failure under Python 3 when the internal use <code>POSIX_IPC_DEBUG</code>
         		flag was on. Děkuji to Tomáš Zahradnický for the bug report.
         	</li>
         </ul>
@@ -71,7 +71,7 @@ suppport it and look for useful features to add, but right now I don't see any.
         	<li>Moved repository to git and GitHub.</li>
         	<li>Changed link options in the build script for the first demo that caused a build fail on some (all?) Linuxes.</li>
             <li>Fix a few bugs where functions that were documented to accept keyword arguments only accepted them as positional arguments; added tests to exercise keyword arguments.</li>
-        	<li>Removed dependency on <tt>setuptools</tt> from <tt>setup.py</tt>.</li>
+        	<li>Removed dependency on <code>setuptools</code> from <code>setup.py</code>.</li>
             <li>Added code to semaphore tests to avoid triggering a bug on older FreeBSDs (and perhaps other BSDs).</li>
             <li>PEP8 improvements.</li>
         </ul>
@@ -127,7 +127,7 @@ suppport it and look for useful features to add, but right now I don't see any.
     <li>0.9.6 (23 Oct 2013) &ndash;
 
     	<p>Fixed two BSD-specific bugs introduced in version 0.9.5
-    		that occurred if the kernel module <tt>mqueuefs</tt> wasn't
+    		that occurred if the kernel module <code>mqueuefs</code> wasn't
     		loaded at install time. Specifically --
         </p>
 
@@ -137,17 +137,17 @@ suppport it and look for useful features to add, but right now I don't see any.
             (This also affected OS X which is FreeBSD-ish.)
             </li>
 
-            <li><tt>posix_ipc</tt> would build with an inappropriate
-            value for <tt>QUEUE_MESSAGES_MAX_DEFAULT</tt>.
+            <li><code>posix_ipc</code> would build with an inappropriate
+            value for <code>QUEUE_MESSAGES_MAX_DEFAULT</code>.
             Subsequent attempts to create a message queue would fail unless the
-            caller set the <tt>max_messages</tt> param to an appropriate
+            caller set the <code>max_messages</code> param to an appropriate
             value. (This didn't affect OS X since OS X doesn't support message
             queues at all.)
             </li>
         </ul>
 
         <p>Also, rewrote the message queue thread notification code to address
-        the old bug (<tt>Fatal Python error: PyEval_AcquireLock: current thread state is NULL</tt>)
+        the old bug (<code>Fatal Python error: PyEval_AcquireLock: current thread state is NULL</code>)
         that appeared during release testing for 0.9.5 and which
         has plagued me on and off since I wrote this code. The new code uses
         <a href="http://docs.python.org/2/c-api/init.html#non-python-created-threads">the
@@ -165,7 +165,7 @@ suppport it and look for useful features to add, but right now I don't see any.
             </li>
             <li>Fixed a big under FreeBSD 9.x where I used overly ambitious
             values for some message queue constants at build time. Now,
-            <tt>posix_ipc</tt> asks <tt>sysctl</tt> for the correct values.
+            <code>posix_ipc</code> asks <code>sysctl</code> for the correct values.
             <i>Köszönöm</i> to Attila Nagy for the bug report.
             </li>
         </ul>
@@ -175,9 +175,9 @@ suppport it and look for useful features to add, but right now I don't see any.
     <li>0.9.4 (2 Sept 2012) &ndash;
         <p>Fixed a buglet. When creating shared memory under Linux and
         specifying both a size and the read-only flag, creating the memory
-        would succeed but calling <tt>ftruncate()</tt> would fail.
+        would succeed but calling <code>ftruncate()</code> would fail.
         The failure to change the size was correctly reported
-        but <tt>posix_ipc</tt> failed to clean up the shared memory segment
+        but <code>posix_ipc</code> failed to clean up the shared memory segment
         it had created. That's now fixed. Thanks to Kevin Miles for the bug
         report.
         </p>
@@ -194,23 +194,23 @@ suppport it and look for useful features to add, but right now I don't see any.
 
     <li>0.9.2 (6 Nov 2011) &ndash;
         <ul>
-            <li>Fixed a bug where timeouts in <tt>Semaphore.acquire()</tt>,
-                <tt>MessageQueue.send()</tt> and <tt>MessageQueue.receive()</tt>
+            <li>Fixed a bug where timeouts in <code>Semaphore.acquire()</code>,
+                <code>MessageQueue.send()</code> and <code>MessageQueue.receive()</code>
                 were only accurate to about one second due to use of the C call
-                <tt>time()</tt>. Switching to <tt>gettimeofday()</tt> fixes
+                <code>time()</code>. Switching to <code>gettimeofday()</code> fixes
                 the problem. Thanks to Douglas Young for the bug report and
                 patch.
             </li>
 
-            <li>Fixed a bug in <tt>prober.py</tt> that caused install to fail
-                under Ubuntu 11.10. <tt>prober.py</tt> specified link options
+            <li>Fixed a bug in <code>prober.py</code> that caused install to fail
+                under Ubuntu 11.10. <code>prober.py</code> specified link options
                 in the wrong order, and so linking one of the test
                 applications that's built during setup was failing. Thanks
                 to Kevin Miles for the bug report.
             </li>
 
-            <li>Added a check in <tt>prober.py</tt> to see if
-                <tt>sysconf_names</tt> exists in the <tt>os</tt> module. It
+            <li>Added a check in <code>prober.py</code> to see if
+                <code>sysconf_names</code> exists in the <code>os</code> module. It
                 doesn't exist under Cygwin, and this code caused an error
                 on that platform. Thanks to Rizwan Raza for the bug report.
             </li>
@@ -220,11 +220,11 @@ suppport it and look for useful features to add, but right now I don't see any.
     <li>0.9.1 (7 Apr 2011) &ndash;
         <ul>
             <li>Fixed (?) a bug in message queue thread notification that caused
-                <tt>ceval: tstate mix-up</tt> and other fun messages. Thanks to
+                <code>ceval: tstate mix-up</code> and other fun messages. Thanks to
                 Lev Maximov for the bug report.
             </li>
 
-            <li>Added the <tt>demo3</tt> directory with demos of message queue.
+            <li>Added the <code>demo3</code> directory with demos of message queue.
                 This was supposed be included in version 0.9.0 but I accidentally
                 left it out. (Also reported by Lev.)
             </li>
@@ -232,7 +232,7 @@ suppport it and look for useful features to add, but right now I don't see any.
     </li>
 
     <li>0.9.0 (31 Dec 2010) &ndash;
-        <p>Added the <tt>demo3</tt> directory with demos of message queue
+        <p>Added the <code>demo3</code> directory with demos of message queue
             notification techniques. Also, fixed two bugs related to message
             queue notification. Big thanks to
             Philip D. Bober for debugging and providing a patch to the
@@ -241,15 +241,15 @@ suppport it and look for useful features to add, but right now I don't see any.
 
         <ul>
             <li>First, the series of calls to set up the Python thread in
-               <tt>process_notification()</tt> were simply wrong. They worked
+               <code>process_notification()</code> were simply wrong. They worked
                some (most?) of the time but would segfault eventually because
                I was creating a Python thread state when I should not have.
             </li>
 
-            <li>Second, the code in <tt>process_notification()</tt> failed
+            <li>Second, the code in <code>process_notification()</code> failed
                 to consider that the user's callback might re-request
                 notification, thus overwriting pointers that I would later
-                decref. <tt>process_notification()</tt> is now thread-safe.
+                decref. <code>process_notification()</code> is now thread-safe.
             </li>
         </ul>
     </li>
@@ -285,60 +285,60 @@ suppport it and look for useful features to add, but right now I don't see any.
                     memory-mapped files or something similar. On these
                     non-Linux systems, the
                     maximum queue message count and size are pretty darn big
-                    (<tt>LONG_MAX</tt>). Therefore, only on Linux is anyone likely to
+                    (<code>LONG_MAX</code>). Therefore, only on Linux is anyone likely to
                     encounter limits to message queue size and content.
                 </p>
 
                 <p>The first bug I fixed was related to four message queue
-                    constants mentioned in <tt>posix_ipc</tt> documentation:
-                    <tt>QUEUE_MESSAGES_MAX</tt>,
-                    <tt>QUEUE_MESSAGES_MAX_DEFAULT</tt>,
-                    <tt>QUEUE_MESSAGE_SIZE_MAX</tt> and
-                    <tt>QUEUE_MESSAGE_SIZE_MAX_DEFAULT</tt>. All four were defined
-                     in the <tt>C</tt>
-                    code, but the two <tt>XXX_DEFAULT</tt> constants weren't exposed on
+                    constants mentioned in <code>posix_ipc</code> documentation:
+                    <code>QUEUE_MESSAGES_MAX</code>,
+                    <code>QUEUE_MESSAGES_MAX_DEFAULT</code>,
+                    <code>QUEUE_MESSAGE_SIZE_MAX</code> and
+                    <code>QUEUE_MESSAGE_SIZE_MAX_DEFAULT</code>. All four were defined
+                     in the <code>C</code>
+                    code, but the two <code>XXX_DEFAULT</code> constants weren't exposed on
                     the Python side.
                 </p>
 
-                <p>The second bug was that under Linux, <tt>QUEUE_MESSAGES_MAX</tt> and
-                    <tt>QUEUE_MESSAGE_SIZE_MAX</tt> were permanently fixed to their
-                    values at <tt>posix_ipc</tt>'s compile/install time even if the
+                <p>The second bug was that under Linux, <code>QUEUE_MESSAGES_MAX</code> and
+                    <code>QUEUE_MESSAGE_SIZE_MAX</code> were permanently fixed to their
+                    values at <code>posix_ipc</code>'s compile/install time even if the
                     relevant system values changed later. Thanks to Kyle Tippetts
                     for bringing this to my attention.
                 </p>
 
-                <p><tt>QUEUE_MESSAGES_MAX_DEFAULT</tt> was arbitrarily limited to
+                <p><code>QUEUE_MESSAGES_MAX_DEFAULT</code> was arbitrarily limited to
                     (at most) 1024. This wasn't a bug, just a bad choice.
                 </p>
 
                 <p>I made a few changes in order to fix these problems &ndash;</p>
 
                 <ol>
-                    <li>The constants <tt>QUEUE_MESSAGES_MAX</tt> and
-                        <tt>QUEUE_MESSAGE_SIZE_MAX</tt>
+                    <li>The constants <code>QUEUE_MESSAGES_MAX</code> and
+                        <code>QUEUE_MESSAGE_SIZE_MAX</code>
                         <strong>have been deleted</strong> since they were only sure to
                         be accurate on systems where they were irrelevant. Furthermore,
                         Linux (the only place where they matter) exposes these values
                         through the file system (in
-                        <tt>/proc/sys/fs/mqueue/msg_max</tt> and
-                        <tt>/proc/sys/fs/mqueue/msgsize_max</tt> respectively) so Python
+                        <code>/proc/sys/fs/mqueue/msg_max</code> and
+                        <code>/proc/sys/fs/mqueue/msgsize_max</code> respectively) so Python
                         apps that need them can read them without any help
-                        from <tt>posix_ipc</tt>.
+                        from <code>posix_ipc</code>.
                     </li>
 
-                    <li><tt>QUEUE_MESSAGES_MAX_DEFAULT</tt> and
-                        <tt>QUEUE_MESSAGE_SIZE_MAX_DEFAULT</tt> are now exposed to
+                    <li><code>QUEUE_MESSAGES_MAX_DEFAULT</code> and
+                        <code>QUEUE_MESSAGE_SIZE_MAX_DEFAULT</code> are now exposed to
                         Python as they should have been all along.
-                        <tt>QUEUE_MESSAGES_MAX_DEFAULT</tt> is now set to
-                        <tt>LONG_MAX</tt> on all platforms except Linux, where
-                        it's set at compile time from <tt>/proc/sys/fs/mqueue/msg_max</tt>.
+                        <code>QUEUE_MESSAGES_MAX_DEFAULT</code> is now set to
+                        <code>LONG_MAX</code> on all platforms except Linux, where
+                        it's set at compile time from <code>/proc/sys/fs/mqueue/msg_max</code>.
                     </li>
-                    <li><tt>QUEUE_MESSAGE_SIZE_MAX_DEFAULT</tt> remains at the fairly
+                    <li><code>QUEUE_MESSAGE_SIZE_MAX_DEFAULT</code> remains at the fairly
                         arbitrary value of 8k. It's not a good idea to make it too big
                         since a buffer of this size is allocated every time
-                        <tt>MessageQueue.receive()</tt> is called. Under Linux, I
-                        check the contents of <tt>/proc/sys/fs/mqueue/msgsize_max</tt>
-                        and make <tt>QUEUE_MESSAGE_SIZE_MAX_DEFAULT</tt> smaller if
+                        <code>MessageQueue.receive()</code> is called. Under Linux, I
+                        check the contents of <code>/proc/sys/fs/mqueue/msgsize_max</code>
+                        and make <code>QUEUE_MESSAGE_SIZE_MAX_DEFAULT</code> smaller if
                         necessary.
                     </li>
                 </ol>
@@ -353,14 +353,14 @@ suppport it and look for useful features to add, but right now I don't see any.
     <li>0.6.3 (15 Feb 2009) &ndash;
     	<ul>
             <li>Fixed a bug where creating an IPC object with invalid
-                parameters would correctly raise a <tt>ValueError</tt>, but
+                parameters would correctly raise a <code>ValueError</code>, but
                 with a message that may or may not have correctly identified
                 the cause. (My code was making an educated guess that was
                 sometimes wrong.)
 
                 <p>As of this version, if initialization of an IPC object
-                    fails with the error code <tt>EINVAL</tt>,
-                    <tt>posix_ipc</tt> raises a <tt>ValueError</tt>
+                    fails with the error code <code>EINVAL</code>,
+                    <code>posix_ipc</code> raises a <code>ValueError</code>
                     with the vague-but-correct message "Invalid parameter(s)".
                 </p>
             </li>
@@ -369,7 +369,7 @@ suppport it and look for useful features to add, but right now I don't see any.
     </li>
 
     <li>0.6.2 (30 Dec 2009) &ndash;
-        <p>Fixed a bug where a <tt>MessageQueue</tt>'s <tt>mode</tt>
+        <p>Fixed a bug where a <code>MessageQueue</code>'s <code>mode</code>
             attribute returned garbage. <i>Grazie</i> to Stefano Debenedetti for
             the bug report.
         </p>
@@ -377,22 +377,22 @@ suppport it and look for useful features to add, but right now I don't see any.
 
     <li>0.6.1 (29 Nov 2009) &ndash;
         <p>There were no functional changes to the module in this version, but
-        I added the convenience function <tt>close_fd()</tt> and fixed
+        I added the convenience function <code>close_fd()</code> and fixed
         some docmentation and demo bugs/sloppiness.
         </p>
     	<ul>
-            <li>Added the convenience function <tt>SharedMemory.close_fd()</tt>.
+            <li>Added the convenience function <code>SharedMemory.close_fd()</code>.
                 Thanks to Kyle Tippetts for pointing out the usefulness
                 of this.
             </li>
-            <li>Added the module attributes <tt>__version__</tt>,
-                <tt>__copyright__</tt>, <tt>__author__</tt> and
-                <tt>__license__</tt>.
+            <li>Added the module attributes <code>__version__</code>,
+                <code>__copyright__</code>, <code>__author__</code> and
+                <code>__license__</code>.
             </li>
-    	    <li>Fixed the license info embedded in <tt>posix_ipc_module.c</tt>
+    	    <li>Fixed the license info embedded in <code>posix_ipc_module.c</code>
     	        which was still referring to GPL.
-            <li>Replaced <tt>file()</tt> in <tt>setup.py</tt> with
-                <tt>open()</tt>/<tt>close()</tt>.</li>
+            <li>Replaced <code>file()</code> in <code>setup.py</code> with
+                <code>open()</code>/<code>close()</code>.</li>
 
             <li>Demo changes &ndash;
                 <ul>
@@ -423,12 +423,12 @@ suppport it and look for useful features to add, but right now I don't see any.
 
     <li>0.5.5 (17 Sept 2009) &ndash;
     	<ul>
-    	    <li>Set <tt>MQ_MAX_MESSAGES</tt> and <tt>MQ_MAX_MESSAGE_SIZE</tt> to
-    	        <tt>LONG_MAX</tt> under cygwin.
+    	    <li>Set <code>MQ_MAX_MESSAGES</code> and <code>MQ_MAX_MESSAGE_SIZE</code> to
+    	        <code>LONG_MAX</code> under cygwin.
     	        (<i>Danke</i> to René Liebscher.)
     	    </li>
-    	    <li>Surrounded the <tt>#define PAGE_SIZE</tt> in probe_results.h with
-    	        <tt>#ifndef/#endif</tt> because it is already defined on some systems.
+    	    <li>Surrounded the <code>#define PAGE_SIZE</code> in probe_results.h with
+    	        <code>#ifndef/#endif</code> because it is already defined on some systems.
     	        (<i>Danke</i> to René Liebscher, again.)
     	    </li>
             <li>Minor documentation changes.</li>
@@ -442,7 +442,7 @@ suppport it and look for useful features to add, but right now I don't see any.
     	        <a href="http://groups.google.com/group/comp.lang.python/browse_thread/thread/ada39e984dfc3da6/fd6becbdce91a6be?#fd6becbdce91a6be">Python
     	        would generate an uncatchable
     	        KeyboardInterrupt when Ctrl-C was hit during a wait</a>
-    	        (e.g. <tt>sem.acquire()</tt>).
+    	        (e.g. <code>sem.acquire()</code>).
 
     	        <p>Thanks to Maciek W. for reporting the problem and to
     	            Piet van Oostrum and Greg for help with a solution.
@@ -461,9 +461,9 @@ suppport it and look for useful features to add, but right now I don't see any.
 
     <li>0.5.2 (12 Feb 2009) &ndash;
     	<ul>
-    	    <li>Fixed a memory leak in <tt>MessageQueue.receive()</tt>.</li>
-    	    <li>Fixed a bug where the name of the <tt>MessageQueue</tt>
-    	        <tt>current_messages</tt> attribute didn't match the name
+    	    <li>Fixed a memory leak in <code>MessageQueue.receive()</code>.</li>
+    	    <li>Fixed a bug where the name of the <code>MessageQueue</code>
+    	        <code>current_messages</code> attribute didn't match the name
     	        given in the documentation.
     	    </li>
     	    <li>Added the VERSION attribute to the module.</li>
@@ -485,8 +485,8 @@ suppport it and look for useful features to add, but right now I don't see any.
     <li>0.5 (8 Feb 2009) &ndash;
     	<ul>
     	    <li>Added the message queue notification feature.</li>
-    	    <li>Added a <tt>mode</tt> attribute to each type.</li>
-    	    <li>Added <tt>str()</tt> and <tt>repr()</tt> support to
+    	    <li>Added a <code>mode</code> attribute to each type.</li>
+    	    <li>Added <code>str()</code> and <code>repr()</code> support to
     	        each object.
     	    </li>
     	    <li>Added a demo for message queues.</li>
@@ -523,17 +523,17 @@ suppport it and look for useful features to add, but right now I don't see any.
     	        module weren't visible.
     	    </li>
     	    <li>Fixed a compile complaint about the redefinition of
-    	        <tt>SEM_VALUE_MAX</tt> on Linux (Ubuntu) that I introduced
+    	        <code>SEM_VALUE_MAX</code> on Linux (Ubuntu) that I introduced
     	        in the previous version.
     	    </li>
     	    <li>Fixed a bug in the demo program premise.c where I wasn't
     	        closing the file descriptor associated with the shared
     	        memory.
     	    </li>
-    	    <li>Added the <tt>PAGE_SIZE</tt> attribute. This was already
+    	    <li>Added the <code>PAGE_SIZE</code> attribute. This was already
     	        available in the mmap module that you need to use shared
     	        memory anyway, but adding it makes the interface more
-    	        consistent with the <tt>sysv_ipc</tt> module.
+    	        consistent with the <code>sysv_ipc</code> module.
     	    </li>
     	</ul>
     </li>
@@ -547,8 +547,8 @@ suppport it and look for useful features to add, but right now I don't see any.
         	<li>Made the code friendly to multi-threaded applications.
         	</li>
 
-			<li>Added the constants <tt>O_CREX</tt> and
-			    <tt>SEMAPHORE_VALUE_MAX</tt>.
+			<li>Added the constants <code>O_CREX</code> and
+			    <code>SEMAPHORE_VALUE_MAX</code>.
 			</li>
 
 			<li>Added code to prohibit negative timeout values.</li>
@@ -556,13 +556,13 @@ suppport it and look for useful features to add, but right now I don't see any.
     </li>
     <li>0.2 (4 Dec 2008) &ndash;
     	<ul>
-        	<li>Removed the un-Pythonic <tt>try_acquire()</tt> method. The
+        	<li>Removed the un-Pythonic <code>try_acquire()</code> method. The
         	    same functionality is now available by passing a timeout of
-        	    <tt>0</tt> to the <tt>.acquire()</tt> method.
+        	    <code>0</code> to the <code>.acquire()</code> method.
         	</li>
 
-			<li>Renamed the module constant <tt>ACQUIRE_TIMEOUT_SUPPORTED</tt> to
-			    <tt>SEMAPHORE_TIMEOUT_SUPPORTED</tt>.
+			<li>Renamed the module constant <code>ACQUIRE_TIMEOUT_SUPPORTED</code> to
+			    <code>SEMAPHORE_TIMEOUT_SUPPORTED</code>.
 			</li>
 
 			<li>Moved the demo code into its own directory and added C
