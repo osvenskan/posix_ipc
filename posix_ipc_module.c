@@ -1929,11 +1929,15 @@ MessageQueue_request_notification(MessageQueue *self, PyObject *args,
 
         // When notification occurs, it will be in a (new) C thread. In that
         // thread I'll create a Python thread but beforehand, threads must be
-        // initialized.
+        // initialized. This is only necessary for Python 2.x and ≤ 3.6.
+        // In Python 3.7, initializing threads (and the GIL) became the job of
+        // Py_Initialize(), so it doesn't need to be done explicitly here.
+#if PY_MAJOR_VERSION < 3 || PY_MINOR_VERSION < 7
         if (!PyEval_ThreadsInitialized()) {
             DPRINTF("calling PyEval_InitThreads()\n");
             PyEval_InitThreads();
         }
+#endif
 
         dprint_current_thread_id();
     }

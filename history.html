@@ -33,7 +33,8 @@ suppport it and look for useful features to add, but right now I don't see any.
 
 <ul id="history">
 
-    <li><strong><span id="current">Current</span> &ndash; 1.0.5 (21 July 2019) &ndash;</strong>
+    <li><strong><span id="current">Current</span> &ndash; 1.0.5 (10 October 2020) &ndash;</strong>
+    	<p><strong>This is the last version that will support Python 2.7.</strong></p>
         <ul>
         	<li>Added a <code>fileno</code> method to <code>SharedMemory</code> and
         		<code>MessageQueue</code> objects to support Python's <code>selectors</code>
@@ -45,6 +46,9 @@ suppport it and look for useful features to add, but right now I don't see any.
         	</li>
         	<li>Added automatic Travis testing on GitHub for Python 3.7 thanks to Ben Harper,
         		and for Python 2.7 under macOS.
+        	</li>
+        	<li>Fixed a <a href='https://github.com/osvenskan/posix_ipc/issues/22'>deprecation warning
+        	under Python 3.9</a>. <i>Merci</i> to sbraz for the bug report.
         	</li>
         </ul>
 	</li>
