@@ -1,15 +1,15 @@
 Demonstration of using message queues together with the `selectors` module in Python
 ===
 
-The [`selectors` module](https://docs.python.org/3.7/library/selectors.html)
+The [`selectors` module](https://docs.python.org/3/library/selectors.html)
 provides high-level I/O multiplexing akin to an event library -- in brief,
 various event sources, such as file handlers, sockets, message queues, can be
 registered with an event selector, which then returns if any event is
 triggered.
 
-`selectors` has been part of the Python standard library since Python&nbsp;3.4.
+`selectors` has been part of the Python standard library since Python 3.4.
 The low-level functionality is OS specific and more information is available in
-[the Python documentation for `selectors`](https://docs.python.org/3.7/library/selectors.html).
+[the Python documentation for `selectors`](https://docs.python.org/3/library/selectors.html).
 
 The example consists of two Python files: `listener.py` and `tranmitter.py`.
 
