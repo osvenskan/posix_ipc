@@ -1117,6 +1117,16 @@ SharedMemory_getsize(SharedMemory *self, void *closure) {
 
 
 PyObject *
+SharedMemory_fileno(SharedMemory *self) {
+#if PY_MAJOR_VERSION > 2
+    return PyLong_FromLong((long)self->fd);
+#else
+    return PyInt_FromLong((long)self->fd);
+#endif
+}
+
+
+PyObject *
 SharedMemory_close_fd(SharedMemory *self) {
     if (POSIX_IPC_SHM_NO_VALUE != self->fd) {
         DPRINTF("SharedMemory_close_fd, fd=%d\n", self->fd);
@@ -1919,11 +1929,15 @@ MessageQueue_request_notification(MessageQueue *self, PyObject *args,
 
         // When notification occurs, it will be in a (new) C thread. In that
         // thread I'll create a Python thread but beforehand, threads must be
-        // initialized.
+        // initialized. This is only necessary for Python 2.x and ≤ 3.6.
+        // In Python 3.7, initializing threads (and the GIL) became the job of
+        // Py_Initialize(), so it doesn't need to be done explicitly here.
+#if PY_MAJOR_VERSION < 3 || PY_MINOR_VERSION < 7
         if (!PyEval_ThreadsInitialized()) {
             DPRINTF("calling PyEval_InitThreads()\n");
             PyEval_InitThreads();
         }
+#endif
 
         dprint_current_thread_id();
     }
@@ -2002,6 +2016,12 @@ MessageQueue_get_mqd(MessageQueue *self) {
     else
         return PyInt_FromLong((long)self->mqd);
 #endif
+}
+
+
+PyObject *
+MessageQueue_fileno(MessageQueue *self) {
+	return MessageQueue_get_mqd(self);
 }
 
 
@@ -2212,6 +2232,11 @@ static PyMethodDef SharedMemory_methods[] = {
         METH_NOARGS,
         "Closes the file descriptor associated with the shared memory."
     },
+    {   "fileno",
+        (PyCFunction)SharedMemory_fileno,
+        METH_NOARGS,
+        "Returns the shared memory's file descriptor (same as the fd property)."
+    },
     {   "unlink",
         (PyCFunction)SharedMemory_unlink,
         METH_NOARGS,
@@ -2341,6 +2366,11 @@ static PyMethodDef MessageQueue_methods[] = {
         (PyCFunction)MessageQueue_request_notification,
         METH_VARARGS | METH_KEYWORDS,
         "Request notification of the queue becoming non-empty"
+    },
+    {   "fileno",
+        (PyCFunction)MessageQueue_fileno,
+        METH_NOARGS,
+        "Returns the queue's descriptor (same as the mqd property)."
     },
 
     {NULL, NULL, 0, NULL} /* Sentinel */
