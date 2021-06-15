@@ -14,7 +14,7 @@ VERSION = open("VERSION").read().strip()
 
 name = "posix_ipc"
 description = "POSIX IPC primitives (semaphores, shared memory and message queues) for Python"
-long_description = open("README").read().strip()
+long_description = open("README.md").read().strip()
 author = "Philip Semanchuk"
 author_email = "philip@semanchuk.com"
 maintainer = "Philip Semanchuk"
