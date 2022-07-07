@@ -10,16 +10,18 @@ except ImportError:
 # My modules
 import prober
 
-VERSION = open("VERSION").read().strip()
+with open("VERSION") as f:
+    VERSION = f.read().strip()
 
 name = "posix_ipc"
 description = "POSIX IPC primitives (semaphores, shared memory and message queues) for Python"
-long_description = open("README").read().strip()
+with open("README.md") as f:
+    long_description = f.read().strip()
 author = "Philip Semanchuk"
 author_email = "philip@semanchuk.com"
 maintainer = "Philip Semanchuk"
 url = "http://semanchuk.com/philip/posix_ipc/"
-download_url = "http://semanchuk.com/philip/posix_ipc/posix_ipc-%s.tar.gz" % VERSION
+download_url = f"http://semanchuk.com/philip/posix_ipc/posix_ipc-{VERSION}.tar.gz"
 source_files = ["posix_ipc_module.c"]
 # http://pypi.python.org/pypi?%3Aaction=list_classifiers
 classifiers = ["Development Status :: 5 - Production/Stable",
@@ -32,7 +34,6 @@ classifiers = ["Development Status :: 5 - Production/Stable",
                "Operating System :: POSIX",
                "Operating System :: Unix",
                "Programming Language :: Python",
-               "Programming Language :: Python :: 2",
                "Programming Language :: Python :: 3",
                "Topic :: Utilities"]
 license = "http://creativecommons.org/licenses/BSD/"
