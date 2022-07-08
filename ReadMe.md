@@ -2,13 +2,13 @@
 
 The Python extension module `posix_ipc` gives Python access to POSIX interprocess semaphores, shared memory and message queues on systems that support the POSIX Realtime Extensions a.k.a. POSIX 1003.1b-1993. That includes most (all?) Linuxes with kernel ≥ 2.6, FreeBSD ≥ 7.2, and OpenSolaris ≥ 2008.05.
 
-macOS/OS X and other Unix-y platforms (including Windows + [Cygwin 1.7](http://www.cygwin.com/)) provide partial (or partially broken) support. See [the platform notes below](http://semanchuk.com/philip/posix_ipc/#platforms) for more details.
+macOS/OS X and other Unix-y platforms (including Windows + [Cygwin 1.7](http://www.cygwin.com/)) provide partial (or partially broken) support. See [the platform notes below](#platform-notes) for more details.
 
 This module works under Python 2.7 and 3.x. It is released under a BSD license.
 
-You can **download [posix_ipc version 1.0.5](http://semanchuk.com/philip/posix_ipc/posix_ipc-1.0.5.tar.gz)** [[MD5 sum]](http://semanchuk.com/philip/posix_ipc/posix_ipc-1.0.5.md5.txt) [[SHA1 sum]](http://semanchuk.com/philip/posix_ipc/posix_ipc-1.0.5.sha1.txt) which contains the source code, setup.py, installation instructions, tests, and [sample code](http://semanchuk.com/philip/posix_ipc/#samples). The exact same [posix_ipc tarball is also available on PyPI](https://pypi.python.org/pypi/posix_ipc). You can also find [the `posix_ipc` source code on GitHub](https://github.com/osvenskan/posix_ipc/).
+You can **download [posix_ipc version 1.0.5](http://semanchuk.com/philip/posix_ipc/posix_ipc-1.0.5.tar.gz)** [[MD5 sum]](http://semanchuk.com/philip/posix_ipc/posix_ipc-1.0.5.md5.txt) [[SHA1 sum]](http://semanchuk.com/philip/posix_ipc/posix_ipc-1.0.5.sha1.txt) which contains the source code, setup.py, installation instructions, tests, and [sample code](###sample-code). The exact same [posix_ipc tarball is also available on PyPI](https://pypi.python.org/pypi/posix_ipc). You can also find [the `posix_ipc` source code on GitHub](https://github.com/osvenskan/posix_ipc/).
 
-You might want to read [all of the changes in this version](http://semanchuk.com/philip/posix_ipc/history.html) and about some [known bugs](http://semanchuk.com/philip/posix_ipc/#KnownBugs).
+You might want to read [all of the changes in this version](http://semanchuk.com/philip/posix_ipc/history.html) and about some [known bugs](#known-bugs).
 
 Note that this module doesn't support unnamed (anonymous) POSIX semaphores.
 
@@ -16,7 +16,7 @@ You might be interested in the very similar module `[sysv_ipc` which provides Py
 
 # Module `posix_ipc` Documentation
 
-Jump to [semaphores](http://semanchuk.com/philip/posix_ipc/#semaphore), [shared memory](http://semanchuk.com/philip/posix_ipc/#shared_memory), or [message queues](http://semanchuk.com/philip/posix_ipc/#message_queue).
+Jump to [semaphores](#the-semaphore-class), [shared memory](#the-sharedmemory-class), or [message queues](#the-messagequeue-class).
 
 ### Module Functions
 
@@ -161,7 +161,7 @@ The name provided in the constructor.
 
 **value (read-only)**
 
-The integer value of the semaphore. Not available on macOS. (See [Platforms](http://semanchuk.com/philip/posix_ipc/#platforms))
+The integer value of the semaphore. Not available on macOS. (See [Platforms](#platform-notes))
 
 ### ****Context Manager Support****
 
