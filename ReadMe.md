@@ -32,8 +32,8 @@ Convenience functions that unlink the IPC object described by *name*.
 
 **O_CREX, O_CREAT, O_EXCL and O_TRUNC**
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;These flags are used when creating IPC objects. All except `O_CREX` are bitwise unique and can be ORed together. `O_CREX` is shorthand for `O_CREAT | O_EXCL`.
-`O_TRUNC` is only useful when creating SharedMemory objects.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;These flags are used when creating IPC objects. All except `O_CREX` are bitwise unique and can be ORed &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;together. `O_CREX` is shorthand for `O_CREAT | O_EXCL`.
+`O_TRUNC` is only useful when creating &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SharedMemory objects.
 
 **PAGE_SIZE**
 
