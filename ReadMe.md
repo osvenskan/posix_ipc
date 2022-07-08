@@ -8,7 +8,7 @@ This module works under Python 2.7 and 3.x. It is released under a BSD license.
 
 You can **download [posix_ipc version 1.0.5](http://semanchuk.com/philip/posix_ipc/posix_ipc-1.0.5.tar.gz)** [[MD5 sum]](http://semanchuk.com/philip/posix_ipc/posix_ipc-1.0.5.md5.txt) [[SHA1 sum]](http://semanchuk.com/philip/posix_ipc/posix_ipc-1.0.5.sha1.txt) which contains the source code, setup.py, installation instructions, tests, and [sample code](###sample-code). The exact same [posix_ipc tarball is also available on PyPI](https://pypi.python.org/pypi/posix_ipc). You can also find [the `posix_ipc` source code on GitHub](https://github.com/osvenskan/posix_ipc/).
 
-You might want to read [all of the changes in this version](http://semanchuk.com/philip/posix_ipc/history.html) and about some [known bugs](#known-bugs).
+You might want to read [all of the changes in this version](https://github.com/christopolise/posix_ipc/blob/29-convert-doc-to-markdown/history.md) and about some [known bugs](#known-bugs).
 
 Note that this module doesn't support unnamed (anonymous) POSIX semaphores.
 
