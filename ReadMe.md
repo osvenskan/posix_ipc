@@ -32,51 +32,50 @@ Convenience functions that unlink the IPC object described by *name*.
 
 **O_CREX, O_CREAT, O_EXCL and O_TRUNC**
 
-    These flags are used when creating IPC objects. All except `O_CREX` are bitwise unique and can be ORed together. `O_CREX` is shorthand for `O_CREAT | O_EXCL`.
-    
-    `O_TRUNC` is only useful when creating SharedMemory objects.
+<dd>These flags are used when creating IPC objects. All except `O_CREX` are bitwise unique and can be ORed together. `O_CREX` is shorthand for `O_CREAT | O_EXCL`.
+`O_TRUNC` is only useful when creating SharedMemory objects.</dd><br>
 
 **PAGE_SIZE**
 
-The operating system's memory page size, in bytes. It's probably a good idea to make shared memory segments some multiple of this size.
+<dd>The operating system's memory page size, in bytes. It's probably a good idea to make shared memory segments some multiple of this size.</dd><br>
 
 **SEMAPHORE_TIMEOUT_SUPPORTED**
 
-True if the underlying OS supports `sem_timedwait()`. If False, all timeouts > 0 passed to a semaphore's `acquire()` method are treated as infinity.
-As far as I know, this is only False under macOS.
+<dd>True if the underlying OS supports `sem_timedwait()`. If False, all timeouts > 0 passed to a semaphore's `acquire()` method are treated as infinity.
+As far as I know, this is only False under macOS.</dd><br>
 
 **SEMAPHORE_VALUE_SUPPORTED**
 
-True if the underlying OS supports `sem_getvalue()`. If False, accessing the `value` attribute on a `Semaphore` instance will raise an AttributeError.
-As far as I know, this is only False under macOS.
+<dd>True if the underlying OS supports `sem_getvalue()`. If False, accessing the `value` attribute on a `Semaphore` instance will raise an AttributeError.
+As far as I know, this is only False under macOS.</dd><br>
 
 **SEMAPHORE_VALUE_MAX**
 
-The maximum value that can be assigned to a semaphore.
+<dd>The maximum value that can be assigned to a semaphore.</dd><br>
 
 **MESSAGE_QUEUES_SUPPORTED**
 
-True if the underlying OS supports message queues, False otherwise.
+<dd>True if the underlying OS supports message queues, False otherwise.</dd><br>
 
 **QUEUE_MESSAGES_MAX_DEFAULT**
 
-The default value for a message queue's `max_messages` attribute. This can be quite small under Linux (e.g. 10) but is usually LONG_MAX everywhere else.
+<dd>The default value for a message queue's `max_messages` attribute. This can be quite small under Linux (e.g. 10) but is usually LONG_MAX everywhere else.</dd><br>
 
 **QUEUE_MESSAGE_SIZE_MAX_DEFAULT**
 
-The default value for a message queue's `max_message_size` attribute. This is 8k (or possibly smaller under Linux).
+<dd>The default value for a message queue's `max_message_size` attribute. This is 8k (or possibly smaller under Linux).</dd><br>
 
 **QUEUE_PRIORITY_MAX**
 
-The maximum message queue message priority.
+<dd>The maximum message queue message priority.</dd><br>
 
 **USER_SIGNAL_MIN, USER_SIGNAL_MAX**
 
-The constants define a range of signal values reserved for use by user applications (like yours). They're available only on systems that support the POSIX Realtime Signals Extension. Most systems do; NetBSD versions prior to 6.0 are a notable exception.
+<dd>The constants define a range of signal values reserved for use by user applications (like yours). They're available only on systems that support the POSIX Realtime Signals Extension. Most systems do; NetBSD versions prior to 6.0 are a notable exception.</dd><br>
 
 **VERSION**
 
-The module version string, e.g. `'0.9.8'`. This is also available as `__version__`.
+<dd>The module version string, e.g. `'0.9.8'`. This is also available as `__version__`.</dd><br>
 
 ### Module Errors
 
