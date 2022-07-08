@@ -30,10 +30,10 @@ Convenience functions that unlink the IPC object described by *name*.
 
 ### Module Constants
 
-<dt>**O_CREX, O_CREAT, O_EXCL and O_TRUNC**</dt>
+**O_CREX, O_CREAT, O_EXCL and O_TRUNC**
 
-<dd>These flags are used when creating IPC objects. All except `O_CREX` are bitwise unique and can be ORed together. `O_CREX` is shorthand for `O_CREAT | O_EXCL`.
-`O_TRUNC` is only useful when creating SharedMemory objects.</dd><br>
+::These flags are used when creating IPC objects. All except `O_CREX` are bitwise unique and can be ORed together. `O_CREX` is shorthand for `O_CREAT | O_EXCL`.
+::`O_TRUNC` is only useful when creating SharedMemory objects.
 
 **PAGE_SIZE**
 
