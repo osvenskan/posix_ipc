@@ -12,7 +12,7 @@ You might want to read [all of the changes in this version](https://github.com/c
 
 Note that this module doesn't support unnamed (anonymous) POSIX semaphores.
 
-You might be interested in the very similar module `[sysv_ipc` which provides Python access to IPC using System V semaphores, shared memory and message queues](http://semanchuk.com/philip/sysv_ipc/). System V IPC has broader OS support but is not as easy to use.
+You might be interested in the very similar module [`sysv_ipc` which provides Python access to IPC using System V semaphores, shared memory and message queues](http://semanchuk.com/philip/sysv_ipc/). System V IPC has broader OS support but is not as easy to use.
 
 # Module `posix_ipc` Documentation
 
@@ -219,7 +219,7 @@ The *flags* specify whether you want to create a new shared memory segment or op
 
 If you pass a non-zero size, the segment will be (re)sized accordingly, regardless of whether or not it's a new or existing segment. Prior to version 1.0.4, this documentation incorrectly stated that size was ignored if the segment already existed.
 
-To (re)size the segment, `posix_ipc` calls `ftruncate()`. The same function is available to Python via `[os.ftruncate()](https://docs.python.org/3/library/os.html#os.ftruncate)`. If you prefer to handle segment (re)sizing yourself, leave the `SharedMemory` parameter `size` at its default of `0` and call `os.ftruncate()` when and how you like.
+To (re)size the segment, `posix_ipc` calls `ftruncate()`. The same function is available to Python via [`os.ftruncate()`](https://docs.python.org/3/library/os.html#os.ftruncate). If you prefer to handle segment (re)sizing yourself, leave the `SharedMemory` parameter `size` at its default of `0` and call `os.ftruncate()` when and how you like.
 
 Note that under macOS (up to and including 10.12 at least), you can only call `ftruncate()` once on a segment during its lifetime. This is a limitation of macOS, not `posix_ipc`.
 
@@ -228,7 +228,7 @@ When opening an existing shared memory segment, one can also specify the flag `O
 
 `close_fd()`
 
-Closes the file descriptor associated with this SharedMemory object. Calling `close_fd()` is the same as calling `[os.close()](https://docs.python.org/2/library/os.html#os.close)` on a SharedMemory object's `fd` attribute.
+Closes the file descriptor associated with this SharedMemory object. Calling `close_fd()` is the same as calling [`os.close()`](https://docs.python.org/2/library/os.html#os.close) on a SharedMemory object's `fd` attribute.
 
 You must call `close_fd()` or `os.close()` explicitly; the file descriptor is **not** closed automatically when a SharedMemory object is garbage collected.
 
