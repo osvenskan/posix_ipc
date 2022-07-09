@@ -4,7 +4,7 @@ The Python extension module `posix_ipc` gives Python access to POSIX interproces
 
 macOS/OS X and other Unix-y platforms (including Windows + [Cygwin 1.7](http://www.cygwin.com/)) provide partial (or partially broken) support. See [the platform notes below](#platform-notes) for more details.
 
-This module works under Python 2.7 and 3.x. It is released under a BSD license.
+This module works under Python 2.7 and 3.x. It is released under [a BSD license](LICENSE).
 
 You can **download [posix_ipc version 1.0.5](http://semanchuk.com/philip/posix_ipc/posix_ipc-1.0.5.tar.gz)** [[MD5 sum]](http://semanchuk.com/philip/posix_ipc/posix_ipc-1.0.5.md5.txt) [[SHA1 sum]](http://semanchuk.com/philip/posix_ipc/posix_ipc-1.0.5.sha1.txt) which contains the source code, setup.py, installation instructions, tests, and [sample code](###sample-code). The exact same [posix_ipc tarball is also available on PyPI](https://pypi.python.org/pypi/posix_ipc). You can also find [the `posix_ipc` source code on GitHub](https://github.com/osvenskan/posix_ipc/).
 
@@ -116,26 +116,26 @@ Indicates an error related to the existence or non-existence of an IPC object.
 `BusyError`
 
 Raised when a call times out.
-<br><br>
 
-## ****The Semaphore Class****
+## The Semaphore Class
 
 This is a handle to a semaphore.
 
-### ****Methods****
+### Constructor
 
 `Semaphore(name, [flags = 0, [mode = 0600, [initial_value = 0]]])`
 
 Creates a new semaphore or opens an existing one.
 
-*name* must be `None` or a string. If it is `None`, the module chooses a random unused name. If it is a string, it should begin with a slash and be valid according to pathname rules on your system, e.g. `/wuthering_heights_by_semaphore` 
+*name* must be `None` or a string. If it is `None`, the module chooses a random unused name. If it is a string, it should begin with a slash and be valid according to pathname rules on your system, e.g. `/wuthering_heights_by_semaphore`
 
 The *flags* specify whether you want to create a new semaphore or open an existing one.
 
 - With *flags* set to the default of `0`, the module attempts to open an existing semaphore and raises an error if that semaphore doesn't exist.
 - With *flags* set to `O_CREAT`, the module opens the semaphore if it exists (in which case mode and initial value are ignored) or creates it if it doesn't.
 - With *flags* set to `O_CREAT | O_EXCL` (or `O_CREX`), the module creates a new semaphore identified by *name*. If a semaphore with that name already exists, the call raises an `ExistentialError`.
-<br><br>
+
+### Instance Methods
 
 `acquire([timeout = None])`
 
@@ -174,7 +174,7 @@ Destroys the semaphore, with a caveat. If any processes have the semaphore open 
 Note, however, that once a semaphore has been unlinked, calls to `open()` with the same name should refer to a new semaphore. Sound confusing? It is, and you'd probably be wise structure your code so as to avoid this situation.
 <br><br>
 
-### ****Attributes****
+### Instance Attributes
 
 `name` **(read-only)**
 
@@ -186,7 +186,7 @@ The name provided in the constructor.
 The integer value of the semaphore. Not available on macOS. (See [Platforms](#platform-notes))
 <br><br>
 
-### ****Context Manager Support****
+### Context Manager Support
 
 These semaphores support the context manager protocol so they can be used with Python's `with` statement, just like Python's `threading.Semaphore`. For instance --
 
@@ -197,11 +197,11 @@ with posix_ipc.Semaphore(name) as sem:
 
 Entering the context acquires the semaphore, exiting the context releases the semaphore. See `demo4/child.py` for a complete example. The context manager only manages acquisition and release. If you create a new semaphore as part of executing the `with` statement, you must explicitly unlink it.
 
-## ****The SharedMemory Class****
+## The SharedMemory Class
 
 This is a handle to a shared memory segment. POSIX shared memory segments masquerade as files, and so the handle to a shared memory segment is just a file descriptor that can be mmapped.
 
-### Methods
+### Constructor
 
 `SharedMemory(name, [flags = 0, [mode = 0600, [size = 0, [read_only = false]]]])`
 
@@ -224,7 +224,8 @@ To (re)size the segment, `posix_ipc` calls `ftruncate()`. The same function is a
 Note that under macOS (up to and including 10.12 at least), you can only call `ftruncate()` once on a segment during its lifetime. This is a limitation of macOS, not `posix_ipc`.
 
 When opening an existing shared memory segment, one can also specify the flag `O_TRUNC` to truncate the shared memory to zero bytes. macOS does not support `O_TRUNC`.
-<br><br>
+
+### Instance Methods
 
 `close_fd()`
 
@@ -242,9 +243,8 @@ Marks the shared memory for destruction once all processes have unmapped it.
 [The POSIX specification for `shm_unlink()`](http://www.opengroup.org/onlinepubs/009695399/functions/shm_unlink.html) says, "Even if the object continues to exist after the last shm_unlink(), reuse of the name shall subsequently cause shm_open() to behave as if no shared memory object of this name exists (that is, shm_open() will fail if O_CREAT is not set, or will create a new shared memory object if O_CREAT is set)."
 
 I'll bet a virtual cup of coffee that this tricky part of the standard is not well or consistently implemented in every OS. Caveat emptor.
-<br><br>
 
-### Attributes
+### Instance Attributes
 
 `name` **(read-only)**
 
@@ -259,13 +259,12 @@ The file descriptor that represents the memory segment.
 `size` **(read-only)**
 
 The size (in bytes) of the shared memory segment.
-<br><br>
 
 ## The MessageQueue Class
 
 This is a handle to a message queue.
 
-### Methods
+### Constructor
 
 `MessageQueue(name, [flags = 0, [mode = 0600, [max_messages = QUEUE_MESSAGES_MAX_DEFAULT, [max_message_size = QUEUE_MESSAGE_SIZE_MAX_DEFAULT, [read = True, [write = True]]]]]])`
 
@@ -280,7 +279,8 @@ The *flags* specify whether you want to create a new queue or open an existing o
 *Max_messages* defines how many messages can be in the queue at one time. When the queue is full, calls to `.send()` will wait.
 *Max_message_size* defines the maximum size (in bytes) of a message.
 *Read* and *write* default to True. If *read/write* is False, calling `.receive()/.send()` on this object is not permitted. This doesn't affect other handles to the same queue.
-<br><br>
+
+### Instance Methods
 
 `send(message, [timeout = None, [priority = 0]])`
 
@@ -320,9 +320,8 @@ Closes this reference to the queue.You must call `close()` explicitly; it is **n
 `unlink()`
 
 Requests destruction of the queue. Although the call returns immediately, actual destruction of the queue is postponed until all references to it are closed.
-<br><br>
 
-### Attributes
+### Instance Attributes
 
 `name` **(read-only)**
 
@@ -352,7 +351,6 @@ The maximum message size (in bytes).
 `current_messages` **(read-only)**
 
 The number of messages currently in the queue.
-<br><br>
 
 ## Usage Tips
 
