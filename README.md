@@ -12,7 +12,7 @@ Version 1.0.5 runs under Python 3 and 2.7, but is the last version of `posix_ipc
 
 `posix_ipc` is available on PyPI:
 
-`$ pip install posix-ipc`
+`pip install posix-ipc`
 
 Or you can clone the project and install it using `setup.py`:
 
