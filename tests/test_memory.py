@@ -285,7 +285,12 @@ class TestMemoryResize(tests_base.Base):
         self.assertEqual(mem.size, 0)
         new_size = _get_block_size()
         os.ftruncate(mem.fd, new_size)
-        self.assertEqual(mem.size, new_size)
+        if _IS_MACOS:
+            # macOS sometimes misbehaves a little and returns a memory segment greater than
+            # the requested size. See https://github.com/osvenskan/posix_ipc/issues/35
+            self.assertTrue(mem.size >= new_size)
+        else:
+            self.assertEqual(mem.size, new_size)
 
 
 if __name__ == '__main__':
