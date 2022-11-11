@@ -2,7 +2,8 @@ import posix_ipc
 import selectors
 
 # This program uses `posix_ipc` together with the `selectors`library from the
-# Python standard library. `selectors` provides "high-level I/O multiplexing" akin to having an event library.
+# Python standard library. `selectors` provides "high-level I/O multiplexing" akin to having an
+# event library.
 
 # The message queue is created as usual
 mq = posix_ipc.MessageQueue("/python_ipc_test", flags=posix_ipc.O_CREAT)
@@ -25,6 +26,8 @@ sel = selectors.DefaultSelector()
 sel.register(mq, selectors.EVENT_READ, accept)
 
 # `.select()` will block until an event is triggered
+
+print("Listening...")
 
 events = sel.select()
 for key, mask in events:
