@@ -26,7 +26,7 @@ mq.request_notification((process_notification, mq))
 s = "42"
 while s:
     print("\nEnter a message. A blank message will end the demo:")
-    s = utils.get_input()
+    s = input()
     if s:
         mq.send(s)
 

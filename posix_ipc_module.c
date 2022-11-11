@@ -2,7 +2,7 @@
 posix_ipc - A Python module for accessing POSIX 1003.1b-1993 semaphores,
             shared memory and message queues.
 
-Copyright (c) 2018, Philip Semanchuk
+Copyright (c) 2022, Philip Semanchuk
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -157,7 +157,6 @@ static PyObject *pBusyException;
 #define DPRINTF(fmt, args...)
 #endif
 
-#if PY_MAJOR_VERSION > 2
 static char *
 bytes_to_c_string(PyObject* o, int lock) {
 /* Convert a bytes object to a char *. Optionally lock the buffer if it is a
@@ -191,7 +190,6 @@ release_bytes(PyObject* o)
         o->ob_type->tp_as_buffer->bf_releasebuffer(NULL, 0);
     Py_DECREF(o);
 }
-#endif
 
 
 static int
@@ -236,16 +234,11 @@ convert_name_param(PyObject *py_name_param, void *checked_name) {
     */
     int rc = 0;
     NoneableName *p_name = (NoneableName *)checked_name;
-#if PY_MAJOR_VERSION > 2
     PyObject *py_name_as_bytes = NULL;
     char *p_name_as_c_string = NULL;
-#endif
 
     DPRINTF("inside convert_name_param\n");
     DPRINTF("PyBytes_Check() = %d \n", PyBytes_Check(py_name_param));
-#if PY_MAJOR_VERSION < 3
-    DPRINTF("PyString_Check() = %d \n", PyString_Check(py_name_param));
-#endif
     DPRINTF("PyUnicode_Check() = %d \n", PyUnicode_Check(py_name_param));
 
     p_name->is_none = 0;
@@ -256,7 +249,6 @@ convert_name_param(PyObject *py_name_param, void *checked_name) {
         rc = 1;
         p_name->is_none = 1;
     }
-#if PY_MAJOR_VERSION > 2
     else if (PyUnicode_Check(py_name_param) || PyBytes_Check(py_name_param)) {
         DPRINTF("name is Unicode or bytes\n");
         // The caller passed me a Unicode string or a byte array; I need a
@@ -291,19 +283,6 @@ convert_name_param(PyObject *py_name_param, void *checked_name) {
         // releasing it when I'm done.
         release_bytes(py_name_as_bytes);
     }
-#else
-    else if (PyString_Check(py_name_param) || PyUnicode_Check(py_name_param)) {
-        DPRINTF("name is string or unicode\n");
-        // PyMalloc memory and copy the user-supplied name to it.
-        p_name->name = (char *)PyMem_Malloc(PyString_Size(py_name_param) + 1);
-        if (p_name->name) {
-            rc = 1;
-            strcpy(p_name->name, PyString_AsString(py_name_param));
-        }
-        else
-            PyErr_SetString(PyExc_MemoryError, "Out of memory");
-    }
-#endif
     else
         PyErr_SetString(PyExc_TypeError, "Name must be None or a string");
 
@@ -331,12 +310,6 @@ int convert_timeout(PyObject *py_timeout, void *converted_timeout) {
         rc = 1;
         simple_timeout = PyFloat_AsDouble(py_timeout);
     }
-#if PY_MAJOR_VERSION < 3
-    else if (PyInt_Check(py_timeout)) {
-        rc = 1;
-        simple_timeout = (double)PyInt_AsLong(py_timeout);
-    }
-#endif
     else if (PyLong_Check(py_timeout)) {
         rc = 1;
         simple_timeout = (double)PyLong_AsLong(py_timeout);
@@ -372,11 +345,7 @@ int convert_timeout(PyObject *py_timeout, void *converted_timeout) {
 
 static PyObject *
 generic_str(char *name) {
-#if PY_MAJOR_VERSION > 2
     return PyUnicode_FromString(name ? name : "(no name)");
-#else
-    return PyString_FromString(name ? name : "(no name)");
-#endif
 }
 
 static void
@@ -417,13 +386,8 @@ sem_repr(Semaphore *self) {
 
     mode_to_str(self->mode, mode);
 
-#if PY_MAJOR_VERSION > 2
     return PyUnicode_FromFormat("posix_ipc.Semaphore(\"%s\", mode=%s)",
                                 self->name, mode);
-#else
-    return PyString_FromFormat("posix_ipc.Semaphore(\"%s\", mode=%s)",
-                                self->name, mode);
-#endif
 }
 
 
@@ -867,13 +831,8 @@ shm_repr(SharedMemory *self) {
 
     mode_to_str(self->mode, mode);
 
-#if PY_MAJOR_VERSION > 2
     return PyUnicode_FromFormat("posix_ipc.SharedMemory(\"%s\", mode=%s)",
                                 self->name, mode);
-#else
-    return PyString_FromFormat("posix_ipc.SharedMemory(\"%s\", mode=%s)",
-                                self->name, mode);
-#endif
 }
 
 static PyObject *
@@ -1118,11 +1077,7 @@ SharedMemory_getsize(SharedMemory *self, void *closure) {
 
 PyObject *
 SharedMemory_fileno(SharedMemory *self) {
-#if PY_MAJOR_VERSION > 2
     return PyLong_FromLong((long)self->fd);
-#else
-    return PyInt_FromLong((long)self->fd);
-#endif
 }
 
 
@@ -1186,15 +1141,9 @@ mq_repr(MessageQueue *self) {
     strcpy(write, self->send_permitted ? "True" : "False");
     mode_to_str(self->mode, mode);
 
-#if PY_MAJOR_VERSION > 2
     return PyUnicode_FromFormat("posix_ipc.MessageQueue(\"%s\", mode=%s, max_message_size=%ld, max_messages=%ld, read=%s, write=%s)",
                 self->name, mode, self->max_message_size, self->max_messages,
                 read, write);
-#else
-    return PyString_FromFormat("posix_ipc.MessageQueue(\"%s\", mode=%s, max_message_size=%ld, max_messages=%ld, read=%s, write=%s)",
-                self->name, mode, self->max_message_size, self->max_messages,
-                read, write);
-#endif
 }
 
 
@@ -1516,17 +1465,8 @@ MessageQueue_send(MessageQueue *self, PyObject *args, PyObject *keywords) {
     long priority = 0;
     int rc = 0;
     static char *keyword_list[ ] = {"message", "timeout", "priority", NULL};
-#if PY_MAJOR_VERSION > 2
     static char args_format[] = "s*|O&l";
     Py_buffer msg;
-#else
-    static char args_format[] = "s#|O&l";
-    typedef struct {
-        char *buf;
-        unsigned long len;
-    } MyBuffer;
-    MyBuffer msg;
-#endif
 
     // Initialize this to the default of None.
     timeout.is_none = 1;
@@ -1541,11 +1481,7 @@ MessageQueue_send(MessageQueue *self, PyObject *args, PyObject *keywords) {
     msg.len = 0;
 
     if (!PyArg_ParseTupleAndKeywords(args, keywords, args_format, keyword_list,
-#if PY_MAJOR_VERSION > 2
                                      &msg,
-#else
-                                     &(msg.buf), &(msg.len),
-#endif
                                      convert_timeout, &timeout,
                                      &priority))
         goto error_return;
@@ -1641,16 +1577,12 @@ MessageQueue_send(MessageQueue *self, PyObject *args, PyObject *keywords) {
         goto error_return;
     }
 
-#if PY_MAJOR_VERSION > 2
     PyBuffer_Release(&msg);
-#endif
 
     Py_RETURN_NONE;
 
     error_return:
-#if PY_MAJOR_VERSION > 2
     PyBuffer_Release(&msg);
-#endif
     return NULL;
 }
 
@@ -1754,13 +1686,8 @@ MessageQueue_receive(MessageQueue *self, PyObject *args, PyObject *keywords) {
     }
 
     py_return_tuple = Py_BuildValue("NN",
-#if PY_MAJOR_VERSION > 2
                                     PyBytes_FromStringAndSize(msg, size),
                                     PyLong_FromLong((long)priority)
-#else
-                                    PyString_FromStringAndSize(msg, size),
-                                    PyInt_FromLong((long)priority)
-#endif
                                    );
 
     free(msg);
@@ -1872,18 +1799,10 @@ MessageQueue_request_notification(MessageQueue *self, PyObject *args,
     if (py_notification == Py_None) {
         notification.sigev_notify = SIGEV_NONE;
     }
-#if PY_MAJOR_VERSION > 2
     else if (PyLong_Check(py_notification))
-#else
-    else if (PyInt_Check(py_notification))
-#endif
     {
         notification.sigev_notify = SIGEV_SIGNAL;
-#if PY_MAJOR_VERSION > 2
         notification.sigev_signo = (int)PyLong_AsLong(py_notification);
-#else
-        notification.sigev_signo = (int)PyInt_AsLong(py_notification);
-#endif
     }
     else if (PyTuple_Check(py_notification)) {
         notification.sigev_notify = SIGEV_THREAD;
@@ -1926,18 +1845,6 @@ MessageQueue_request_notification(MessageQueue *self, PyObject *args,
         notification.sigev_value.sival_ptr = self;
         notification.sigev_notify_function = process_notification;
         notification.sigev_notify_attributes = NULL;
-
-        // When notification occurs, it will be in a (new) C thread. In that
-        // thread I'll create a Python thread but beforehand, threads must be
-        // initialized. This is only necessary for Python 2.x and ≤ 3.6.
-        // In Python 3.7, initializing threads (and the GIL) became the job of
-        // Py_Initialize(), so it doesn't need to be done explicitly here.
-#if PY_MAJOR_VERSION < 3 || PY_MINOR_VERSION < 7
-        if (!PyEval_ThreadsInitialized()) {
-            DPRINTF("calling PyEval_InitThreads()\n");
-            PyEval_InitThreads();
-        }
-#endif
 
         dprint_current_thread_id();
     }
@@ -2008,14 +1915,7 @@ PyObject *
 MessageQueue_get_mqd(MessageQueue *self) {
     // This is a little awkward because an mqd is a void * under Solaris
     // and an int under Linux. I cast it and hope for the best.    :-/
-#if PY_MAJOR_VERSION > 2
     return PyLong_FromLong((long)self->mqd);
-#else
-    if ( ((long)self->mqd > PY_INT_MAX) || ((long)self->mqd < (0 - PY_INT_MAX)) )
-        return PyLong_FromLong((long)self->mqd);
-    else
-        return PyInt_FromLong((long)self->mqd);
-#endif
 }
 
 
@@ -2511,7 +2411,6 @@ static PyMethodDef module_methods[ ] = {
 };
 
 
-#if PY_MAJOR_VERSION > 2
 static struct PyModuleDef this_module = {
     PyModuleDef_HEAD_INIT,  // m_base
     "posix_ipc",            // m_name
@@ -2523,14 +2422,9 @@ static struct PyModuleDef this_module = {
     NULL,                   // m_clear
     NULL                    // m_free
 };
-#endif
 
 /* Module init function */
-#if PY_MAJOR_VERSION > 2
 #define POSIX_IPC_INIT_FUNCTION_NAME PyInit_posix_ipc
-#else
-#define POSIX_IPC_INIT_FUNCTION_NAME initposix_ipc
-#endif
 
 /* Module init function */
 PyMODINIT_FUNC
@@ -2541,11 +2435,7 @@ POSIX_IPC_INIT_FUNCTION_NAME(void) {
     // I call this in case I'm asked to create any random names.
     srand((unsigned int)time(NULL));
 
-#if PY_MAJOR_VERSION > 2
     module = PyModule_Create(&this_module);
-#else
-    module = Py_InitModule3("posix_ipc", module_methods, "POSIX IPC module");
-#endif
 
     if (!module)
         goto error_return;
@@ -2654,14 +2544,8 @@ POSIX_IPC_INIT_FUNCTION_NAME(void) {
     else
         PyDict_SetItemString(module_dict, "BusyError", pBusyException);
 
-#if PY_MAJOR_VERSION > 2
     return module;
-#endif
 
     error_return:
-#if PY_MAJOR_VERSION > 2
     return NULL;
-#else
-    ; // Nothing to do
-#endif
 }
