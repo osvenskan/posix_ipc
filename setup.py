@@ -1,7 +1,8 @@
 # Python-ish modules
-# setuptools is apparently distributed with python.org Python now. Does that mean it's
-# standard? Who knows. I need it to build wheels on my machine, otherwise setup can get by just
-# fine with distutils.
+# distutils is deprecated as of Python 3.10 (https://github.com/osvenskan/posix_ipc/issues/28),
+# but its anointed replacement setuptools is not part of the standard library and isn't guaranteed
+# to be present. In practice it probably will be present especially for anyone using a more modern
+# Python like 3.10. In case it's not, I allow the install to skate by on distutils.
 try:
     import setuptools as distutools
 except ImportError:
@@ -20,7 +21,7 @@ with open("README.md") as f:
 author = "Philip Semanchuk"
 author_email = "philip@semanchuk.com"
 maintainer = "Philip Semanchuk"
-url = "http://semanchuk.com/philip/posix_ipc/"
+url = "https://github.com/osvenskan/posix_ipc"
 download_url = f"http://semanchuk.com/philip/posix_ipc/posix_ipc-{VERSION}.tar.gz"
 source_files = ["posix_ipc_module.c"]
 # http://pypi.python.org/pypi?%3Aaction=list_classifiers
