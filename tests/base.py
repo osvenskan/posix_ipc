@@ -1,14 +1,7 @@
 # Python imports
-# Don't add any from __future__ imports here. This code should execute
-# against standard Python.
 import unittest
 import random
-import sys
 import platform
-
-# Project imports
-
-IS_PY3 = (sys.version_info[0] == 3)
 
 
 def _force_int(a_string):

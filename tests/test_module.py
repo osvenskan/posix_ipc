@@ -1,6 +1,4 @@
 # Python imports
-# Don't add any from __future__ imports here. This code should execute
-# against standard Python.
 import unittest
 import os
 import resource

@@ -54,9 +54,6 @@ NAME_CHARACTERS = "abcdefghijklmnopqrstuvwxyz"
 NAME_LENGTH = 10
 
 
-PY_MAJOR_VERSION = sys.version_info[0]
-
-
 def say(s):
     """A wrapper for print() that's compatible with Python 2 & 3"""
     print(s)
@@ -92,8 +89,7 @@ def get_memory_usage():
     #   RSZ      VSZ
     #   944    75964
 
-    if PY_MAJOR_VERSION > 2:
-        s = s.decode(sys.getfilesystemencoding())
+    s = s.decode(sys.getfilesystemencoding())
 
     m = ps_output_regex.match(s)
 
@@ -392,20 +388,19 @@ else:
 
     print_mem_after()
 
-    if PY_MAJOR_VERSION > 2:
-        say("Running message queue send/receive() test with bytes...")
-        print_mem_before()
+    say("Running message queue send/receive() test with bytes...")
+    print_mem_before()
 
-        mq = posix_ipc.MessageQueue("/p_ipc_test", posix_ipc.O_CREX)
+    mq = posix_ipc.MessageQueue("/p_ipc_test", posix_ipc.O_CREX)
 
-        for i in the_range:
-            mq.send(random_string(15).encode("utf-8"))
-            mq.receive()
+    for i in the_range:
+        mq.send(random_string(15).encode("utf-8"))
+        mq.receive()
 
-        mq.close()
-        mq.unlink()
+    mq.close()
+    mq.unlink()
 
-        print_mem_after()
+    print_mem_after()
 
     say("Running lame message queue request_notification() test...")
     print_mem_before()

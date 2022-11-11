@@ -29,7 +29,7 @@ signal.signal(MY_SIGNAL, handle_signal)
 
 # Get user input and send it to the queue.
 print("Enter a message:")
-mq.send(utils.get_input())
+mq.send(input())
 
 # The signal fires almost instantly, but if I don't pause at least
 # briefly then the main thread may exit before the notification fires.

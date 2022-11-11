@@ -1,6 +1,4 @@
 # Python imports
-# Don't add any from __future__ imports here. This code should execute
-# against standard Python.
 import unittest
 from unittest import skipUnless
 import time
@@ -124,35 +122,10 @@ class TestMessageQueueCreation(MessageQueueTestBase):
         mq.unlink()
 
     def test_name_as_bytes(self):
-        """Test that the name can be bytes.
-
-        In Python 2, bytes == str. This test is really only interesting in Python 3.
-        """
-        if tests_base.IS_PY3:
-            name = bytes(tests_base.make_name(), 'ASCII')
-        else:
-            name = bytes(tests_base.make_name())
+        """Test that the name can be bytes."""
+        name = bytes(tests_base.make_name(), 'ASCII')
         mq = posix_ipc.MessageQueue(name, posix_ipc.O_CREX)
-        # No matter what the name is passed as, posix_ipc.name returns the default string type,
-        # i.e. str in Python 2 and unicode in Python 3.
-        if tests_base.IS_PY3:
-            self.assertEqual(name, bytes(mq.name, 'ASCII'))
-        else:
-            self.assertEqual(name, mq.name)
-        mq.unlink()
-        mq.close()
-
-    def test_name_as_unicode(self):
-        """Test that the name can be unicode.
-
-        In Python 3, str == unicode. This test is really only interesting in Python 2.
-        """
-        if tests_base.IS_PY3:
-            name = tests_base.make_name()
-        else:
-            name = unicode(tests_base.make_name(), 'ASCII')
-        mq = posix_ipc.MessageQueue(name, posix_ipc.O_CREX)
-        self.assertEqual(name, mq.name)
+        self.assertEqual(name, bytes(mq.name, 'ASCII'))
         mq.unlink()
         mq.close()
 
