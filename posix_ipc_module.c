@@ -1156,10 +1156,13 @@ mq_cancel_notification(MessageQueue *self) {
     // and this function is always successful.
 
     // I hope this doesn't come back to bite me...
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
     int rc;
 
     rc = mq_notify(self->mqd, NULL);
     DPRINTF("Notification cancelled, rc=%d\n", rc);
+    #pragma GCC diagnostic pop
 
     Py_XDECREF(self->notification_callback);
     self->notification_callback = NULL;
@@ -1921,7 +1924,7 @@ MessageQueue_get_mqd(MessageQueue *self) {
 
 PyObject *
 MessageQueue_fileno(MessageQueue *self) {
-	return MessageQueue_get_mqd(self);
+    return MessageQueue_get_mqd(self);
 }
 
 
