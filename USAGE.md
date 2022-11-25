@@ -366,7 +366,7 @@ python -m unittest discover
 
 ### Sample Code
 
-This module comes with four demonstrations. The first (in the directory `demo`) shows how to use shared memory and semaphores. The second (in the directory `demo2`) shows how to use message queues. The third (`demo3`) shows how to use message queue notifications. The fourth (`demo4`) shows how to use a semaphore in a context manager.
+This module comes with five demonstrations. The first (in the directory `demo`) shows how to use shared memory and semaphores. The second (in the directory `demo2`) shows how to use message queues. The third (`demo3`) shows how to use message queue notifications. The fourth (`demo4`) shows how to use a semaphore in a context manager. The fifth (`demo5`) demonstrates use of message queues in combination with Python's `selectors` module.
 
 ### Nobody Likes a Mr. Messy
 
