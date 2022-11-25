@@ -13,8 +13,6 @@ STDERR = subprocess.PIPE
 # This is the max length that I want a printed line to be.
 MAX_LINE_LENGTH = 78
 
-PY_MAJOR_VERSION = sys.version_info[0]
-
 
 def line_wrap_paragraph(s):
     # Format s with terminal-friendly line wraps.
@@ -214,6 +212,7 @@ def sniff_mq_prio_max():
             print_bad_news("the value of PRIORITY_MAX", max_priority)
 
     # Under OS X, os.sysconf("SC_MQ_PRIO_MAX") returns -1.
+    # This is still true in Nov 2022 under MacOS 12.6.
     if max_priority < 0:
         max_priority = DEFAULT_PRIORITY_MAX
 
@@ -386,10 +385,6 @@ def probe():
     d["QUEUE_MESSAGES_MAX_DEFAULT"] = sniff_mq_max_messages()
     d["QUEUE_MESSAGE_SIZE_MAX_DEFAULT"] = sniff_mq_max_message_size_default()
     d["QUEUE_PRIORITY_MAX"] = sniff_mq_prio_max()
-
-    if PY_MAJOR_VERSION == 2:
-        # I only need this for Python 2.x
-        d["PY_INT_MAX"] = sys.maxint
 
     msg = """/*
 This header file was generated when you ran setup. Once created, the setup

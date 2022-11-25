@@ -22,7 +22,7 @@ mq.request_notification((process_notification, mq))
 
 # Get user input and send it to the queue.
 print("Enter a message:")
-mq.send(utils.get_input())
+mq.send(input())
 
 # The callback happens almost instantly, but if I don't pause at least
 # briefly then the main thread may exit before the notification fires.

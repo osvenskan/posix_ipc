@@ -1,6 +1,5 @@
 This demonstrates use of shared memory and semaphores via two applications 
 named after Mrs. Premise and Mrs. Conclusion of the Monty Python sketch. 
-http://www.youtube.com/watch?v=crIJvcWkVcs
 
 Like those two characters, these programs chat back and forth and the result 
 is a lot of nonsense. In this case, what the programs are saying isn't the
@@ -37,9 +36,7 @@ memory will probably get corrupted in fewer than 1000 iterations.
 To run the demo, start Mrs. Premise first in one window and then run
 Mrs. Conclusion in another. 
 
-
-   The Fancy Version 
-   =================
+## The Fancy Version
 
 If you want to get fancy, you can play with C versions of Mrs. Premise and 
 Mrs. Conclusion. The script make_all.sh will compile them for you. (Linux
@@ -51,4 +48,3 @@ the same as their Python counterparts. You can have the two C programs talk
 to one another, or you can have premise.py talk to the C version of 
 conclusion...the possibilities are endless. (Actually, there are only four 
 possible combinations but "endless" sounds better.)
-

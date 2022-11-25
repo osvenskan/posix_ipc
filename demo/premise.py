@@ -1,7 +1,6 @@
 # Python modules
 import time
 import mmap
-import sys
 import hashlib
 
 # 3rd party modules
@@ -10,7 +9,6 @@ import posix_ipc
 # Utils for this demo
 import utils
 
-PY_MAJOR_VERSION = sys.version_info[0]
 
 utils.say("Oooo 'ello, I'm Mrs. Premise!")
 
@@ -64,18 +62,15 @@ for i in range(params["ITERATIONS"]):
 
     # What I read must be the md5 of what I wrote or something's
     # gone wrong.
-    if PY_MAJOR_VERSION > 2:
-        what_i_wrote = what_i_wrote.encode()
+    what_i_wrote = what_i_wrote.encode()
 
     try:
         assert(s == hashlib.md5(what_i_wrote).hexdigest())
     except AssertionError:
-        utils.raise_error(AssertionError,
-                          "Shared memory corruption after %d iterations." % i)
+        raise AssertionError("Shared memory corruption after %d iterations." % i)
 
     # MD5 the reply and write back to Mrs. Conclusion.
-    if PY_MAJOR_VERSION > 2:
-        s = s.encode()
+    s = s.encode()
     what_i_wrote = hashlib.md5(s).hexdigest()
     utils.write_to_memory(mapfile, what_i_wrote)
 

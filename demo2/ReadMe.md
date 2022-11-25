@@ -1,6 +1,5 @@
 This demonstrates use of message queues via two applications named after
 Mrs. Premise and Mrs. Conclusion of the Monty Python sketch. 
-http://www.youtube.com/watch?v=crIJvcWkVcs
 
 Like those two characters, these programs chat back and forth and the result 
 is a lot of nonsense. In this case, what the programs are saying isn't the
@@ -38,4 +37,3 @@ expose any concurrency problems that might be present.
 
 Real code would want to sleep (or do something useful) in between calling
 send() and receive(). 
-
