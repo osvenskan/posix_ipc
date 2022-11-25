@@ -2468,7 +2468,7 @@ POSIX_IPC_INIT_FUNCTION_NAME(void) {
 
     PyModule_AddStringConstant(module, "VERSION", POSIX_IPC_VERSION);
     PyModule_AddStringConstant(module, "__version__", POSIX_IPC_VERSION);
-    PyModule_AddStringConstant(module, "__copyright__", "Copyright 2018 Philip Semanchuk");
+    PyModule_AddStringConstant(module, "__copyright__", "Copyright 2022 Philip Semanchuk");
     PyModule_AddStringConstant(module, "__author__", "Philip Semanchuk");
     PyModule_AddStringConstant(module, "__license__", "BSD");
 

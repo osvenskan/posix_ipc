@@ -1,22 +1,30 @@
 # The posix_ipc Module for POSIX IPC Under Python -- Version History
 
-This is the version history for the [posix_ipc module](http://semanchuk.com/philip/posix_ipc/).
+This is the version history for the [posix_ipc module](https://github.com/osvenskan/posix_ipc).
 
-As of version 1.0.0, I consider this module complete. I will continue to suppport it and look for useful features to add, but right now I don't see any.
+As of version 1.0.0, I consider this module complete. I will continue to support it and look for useful features to add, but right now I don't see any.
 
-- **Current – 1.0.5 (10 October 2020) –**
+- **Current – 1.1.0 (25 November 2022) –**
     
-    **This is the last version that will support Python 2.7.**
+    - Drop support for Python 2.7 and ≤ 3.6.
+    - Converted doc to Markdown. Thanks to GreatBahram and christopolise.
+    - On macOS, relax a test related to shared memory size (https://github.com/osvenskan/posix_ipc/issues/35).
+
+- 1.0.5 (10 October 2020) –
+
+    This is the last version that will support Python 2.7.
     
     - Added a `fileno` method to `SharedMemory` and `MessageQueue` objects to support Python's `selectors` standard library module.
     - Added a demo (in the demo5 directory) demonstrating use of `selectors`. *Mange tak* to Henrik Enggaard for the `fileno()` suggestion and for contributing the demo.
     - Added automatic Travis testing on GitHub for Python 3.7 thanks to Ben Harper, and for Python 2.7 under macOS.
     - Fixed a [deprecation warning under Python 3.9](https://github.com/osvenskan/posix_ipc/issues/22). *Merci* to sbraz for the bug report.
     - Updated HTML documentation (including this file) to HTML 5.
+
 - 1.0.4 (13 Feb 2018) –
     - Fixed bug where the `SharedMemory` and `Semaphore` classes [didn't behave correctly](https://github.com/osvenskan/posix_ipc/issues/2) when assigned a file descriptor of 0. Thanks to Thomas Troeger for the bug report.
     - Fixed a small but [significant documentation bug](https://github.com/osvenskan/posix_ipc/issues/3) which stated that the `size` param was ignored when opening an existing `SharedMemory` segment. Thanks to Thomas Troeger, again.
     - Fixed a compilation failure under Python 3 when the internal use `POSIX_IPC_DEBUG` flag was on. Děkuji to Tomáš Zahradnický for the bug report.
+
 - 1.0.3 (10 Jan 2018) –
     
     A *mea culpa* release to clean up some accumulated technical debt.
@@ -27,6 +35,7 @@ As of version 1.0.0, I consider this module complete. I will continue to supppor
     - Removed dependency on `setuptools` from `setup.py`.
     - Added code to semaphore tests to avoid triggering a bug on older FreeBSDs (and perhaps other BSDs).
     - PEP8 improvements.
+
 - 1.0.2 (10 Jan 2018) –
     
     This version was also skipped due to a release error. Those responsible for sacking the people who have just been sacked, have been sacked.

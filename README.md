@@ -6,7 +6,9 @@
 
 **For complete documentation, see [the usage notes](USAGE.md).**
 
-Version 1.0.5 runs under Python 3 and 2.7, but is the last version of `posix_ipc` to do so. No changes (neither fixes nor features) will be backported to 1.0.5.
+## Python 2.7 Support
+
+Version 1.0.5 was the last version of `posix_ipc` to support both Python 2.7 and Python 3.x. Starting with version 1.1.0, only Python ≥ 3.6 is supported. No changes (neither fixes nor features) will be backported to 1.0.5.
 
 ## Installation
 
