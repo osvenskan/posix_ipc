@@ -1,21 +1,7 @@
 import time
 import sys
 
-PY_MAJOR_VERSION = sys.version_info[0]
-
-if PY_MAJOR_VERSION > 2:
-    NULL_CHAR = 0
-else:
-    NULL_CHAR = '\0'
-
-
-def raise_error(error, message):
-    # I have to exec() this code because the Python 2 syntax is invalid
-    # under Python 3 and vice-versa.
-    s = "raise "
-    s += "error, message" if (PY_MAJOR_VERSION == 2) else "error(message)"
-
-    exec(s)
+NULL_CHAR = 0
 
 
 def say(s):
@@ -34,8 +20,7 @@ def write_to_memory(mapfile, s):
     mapfile.seek(0)
     # I append a trailing NULL in case I'm communicating with a C program.
     s += '\0'
-    if PY_MAJOR_VERSION > 2:
-        s = s.encode()
+    s = s.encode()
     mapfile.write(s)
 
 
@@ -48,9 +33,7 @@ def read_from_memory(mapfile):
         s.append(c)
         c = mapfile.read_byte()
 
-    if PY_MAJOR_VERSION > 2:
-        s = [chr(c) for c in s]
-    s = ''.join(s)
+    s = ''.join([chr(c) for c in s])
 
     say("read %s" % s)
 
