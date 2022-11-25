@@ -11,8 +11,6 @@ import posix_ipc
 import utils
 
 
-PY_MAJOR_VERSION = sys.version_info[0]
-
 utils.say("Oooo 'ello, I'm Mrs. Conclusion!")
 
 params = utils.read_params()
@@ -53,16 +51,13 @@ for i in range(0, params["ITERATIONS"]):
         s = utils.read_from_memory(mapfile)
 
     if what_i_wrote:
-        if PY_MAJOR_VERSION > 2:
-            what_i_wrote = what_i_wrote.encode()
+        what_i_wrote = what_i_wrote.encode()
         try:
             assert(s == hashlib.md5(what_i_wrote).hexdigest())
         except AssertionError:
-            utils.raise_error(AssertionError,
-                              "Shared memory corruption after %d iterations." % i)
+            raise AssertionError("Shared memory corruption after %d iterations." % i)
 
-    if PY_MAJOR_VERSION > 2:
-        s = s.encode()
+    s = s.encode()
     what_i_wrote = hashlib.md5(s).hexdigest()
 
     utils.write_to_memory(mapfile, what_i_wrote)

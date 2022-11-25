@@ -33,7 +33,7 @@ signal.signal(MY_SIGNAL, handle_signal)
 msg = "42"
 while msg:
     print("\nEnter a message. A blank message will end the demo:")
-    msg = utils.get_input()
+    msg = input()
     if msg:
         mq.send(msg)
 

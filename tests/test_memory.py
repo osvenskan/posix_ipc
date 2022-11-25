@@ -1,6 +1,4 @@
 # Python imports
-# Don't add any from __future__ imports here. This code should execute
-# against standard Python.
 import numbers
 import platform
 import unittest
@@ -98,35 +96,10 @@ class TestMemory(tests_base.Base):
         mem.unlink()
 
     def test_name_as_bytes(self):
-        """Test that the name can be bytes.
-
-        In Python 2, bytes == str. This test is really only interesting in Python 3.
-        """
-        if tests_base.IS_PY3:
-            name = bytes(tests_base.make_name(), 'ASCII')
-        else:
-            name = bytes(tests_base.make_name())
+        """Test that the name can be bytes."""
+        name = bytes(tests_base.make_name(), 'ASCII')
         mem = posix_ipc.SharedMemory(name, posix_ipc.O_CREX, size=4096)
-        # No matter what the name is passed as, posix_ipc.name returns the default string type,
-        # i.e. str in Python 2 and unicode in Python 3.
-        if tests_base.IS_PY3:
-            self.assertEqual(name, bytes(mem.name, 'ASCII'))
-        else:
-            self.assertEqual(name, mem.name)
-        mem.close_fd()
-        mem.unlink()
-
-    def test_name_as_unicode(self):
-        """Test that the name can be unicode.
-
-        In Python 3, str == unicode. This test is really only interesting in Python 2.
-        """
-        if tests_base.IS_PY3:
-            name = tests_base.make_name()
-        else:
-            name = tests_base.make_name().decode('ASCII')
-        mem = posix_ipc.SharedMemory(name, posix_ipc.O_CREX, size=4096)
-        self.assertEqual(name, mem.name)
+        self.assertEqual(name, bytes(mem.name, 'ASCII'))
         mem.close_fd()
         mem.unlink()
 
@@ -312,7 +285,12 @@ class TestMemoryResize(tests_base.Base):
         self.assertEqual(mem.size, 0)
         new_size = _get_block_size()
         os.ftruncate(mem.fd, new_size)
-        self.assertEqual(mem.size, new_size)
+        if _IS_MACOS:
+            # macOS sometimes misbehaves a little and returns a memory segment greater than
+            # the requested size. See https://github.com/osvenskan/posix_ipc/issues/35
+            self.assertTrue(mem.size >= new_size)
+        else:
+            self.assertEqual(mem.size, new_size)
 
 
 if __name__ == '__main__':
