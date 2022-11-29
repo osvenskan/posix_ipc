@@ -15,14 +15,6 @@ import base as tests_base  # noqa
 _IS_MACOS = "Darwin" in platform.uname()
 
 
-def _get_block_size():
-    """Return block size as reported by operating system"""
-    # I thought it would be a good idea to pass self.mem.name to os.statvfs in case that
-    # filesystem is different from the regular one, but I get 'No such file or directory'
-    # when I do so. This happens on macOS and Linux, didn't test elsewhere.
-    return os.statvfs('.')[1]
-
-
 class TestMemory(tests_base.Base):
     """Exercise the SharedMemory class"""
     # SIZE should be something that's not a power of 2 since that's more
@@ -112,20 +104,18 @@ class TestMemory(tests_base.Base):
         # e.g. when self.SIZE = 3333, the
         # mmapped file is also 3333 bytes.
         #
-        # OS X's mmapped files always have sizes that are mod 4096 which is
-        # probably block size.
+        # macOS's mmapped files always have sizes that are mod mmap.PAGESIZE.
         #
         # I haven't tested other operating systems.
         #
         # AFAICT the specification doesn't demand that the size has to match
         # exactly, so this code accepts either value as correct.
-        block_size = _get_block_size()
 
-        delta = self.SIZE % block_size
+        delta = self.SIZE % mmap.PAGESIZE
 
         if delta:
             # Round up to nearest block size
-            crude_size = (self.SIZE - delta) + block_size
+            crude_size = (self.SIZE - delta) + mmap.PAGESIZE
         else:
             crude_size = self.SIZE
 
@@ -239,7 +229,7 @@ class TestMemoryResize(tests_base.Base):
         # Creating a segment that's twice the size of the block size seems the best option since
         # dividing it in half still leaves a segment size that's likely to be acceptable on
         # all platforms.
-        self.original_size = _get_block_size() * 2
+        self.original_size = mmap.PAGESIZE * 2
         self.mem = posix_ipc.SharedMemory(None, posix_ipc.O_CREX, size=self.original_size)
 
     def tearDown(self):
@@ -283,14 +273,9 @@ class TestMemoryResize(tests_base.Base):
         """exercise increasing the size of an existing segment from 0 via ftruncate()"""
         mem = posix_ipc.SharedMemory(None, posix_ipc.O_CREX)
         self.assertEqual(mem.size, 0)
-        new_size = _get_block_size()
+        new_size = mmap.PAGESIZE
         os.ftruncate(mem.fd, new_size)
-        if _IS_MACOS:
-            # macOS sometimes misbehaves a little and returns a memory segment greater than
-            # the requested size. See https://github.com/osvenskan/posix_ipc/issues/35
-            self.assertTrue(mem.size >= new_size)
-        else:
-            self.assertEqual(mem.size, new_size)
+        self.assertEqual(mem.size, new_size)
 
 
 if __name__ == '__main__':
