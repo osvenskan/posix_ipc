@@ -10,7 +10,7 @@ This module works under Python ≥ 3.6. It is released under [a BSD license](LIC
 
 You can **download [posix_ipc version 1.1.0](http://semanchuk.com/philip/posix_ipc/releases/posix_ipc-1.1.0.tar.gz)** ([MD5](http://semanchuk.com/philip/posix_ipc/releases/posix_ipc-1.1.0.md5.txt), [SHA1](http://semanchuk.com/philip/posix_ipc/releases/posix_ipc-1.1.0.sha1.txt)) which contains the source code, `setup.py`, installation instructions, tests, and [sample code](###sample-code). The exact same [posix_ipc tarball is also available on PyPI](https://pypi.python.org/pypi/posix_ipc). You can also find [the `posix_ipc` source code on GitHub](https://github.com/osvenskan/posix_ipc/).
 
-You might want to read [all of the changes in this version](https://github.com/christopolise/posix_ipc/blob/29-convert-doc-to-markdown/history.md) and about some [known bugs](#known-bugs).
+You might want to read [all of the changes in this version](history.md) and about some [known bugs](#known-bugs).
 
 Note that this module doesn't support unnamed (anonymous) POSIX semaphores.
 
