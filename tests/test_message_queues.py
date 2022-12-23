@@ -52,7 +52,11 @@ def threaded_notification_handler_rearm(test_case_instance):
 class MessageQueueTestBase(tests_base.Base):
     """base class for MessageQueue test classes"""
     def setUp(self):
-        self.mq = posix_ipc.MessageQueue(None, posix_ipc.O_CREX)
+        # Create a small queue to reduce the likelihood of resource exhaustion
+        # See https://github.com/osvenskan/posix_ipc/issues/42
+        self.mq = posix_ipc.MessageQueue(None, posix_ipc.O_CREX,
+                                         max_messages=10,
+                                         max_message_size=10)
 
     def tearDown(self):
         if self.mq:
@@ -126,8 +130,8 @@ class TestMessageQueueCreation(MessageQueueTestBase):
         name = bytes(tests_base.make_name(), 'ASCII')
         mq = posix_ipc.MessageQueue(name, posix_ipc.O_CREX)
         self.assertEqual(name, bytes(mq.name, 'ASCII'))
-        mq.unlink()
         mq.close()
+        mq.unlink()
 
     # don't bother testing mode, it's ignored by the OS?
 
@@ -177,8 +181,7 @@ class TestMessageQueueCreation(MessageQueueTestBase):
 
     def test_kwargs(self):
         """ensure init accepts keyword args as advertised"""
-        # mode 0x180 = 0600. Octal is difficult to express in Python 2/3 compatible code.
-        mq = posix_ipc.MessageQueue(None, flags=posix_ipc.O_CREX, mode=0x180, max_messages=1,
+        mq = posix_ipc.MessageQueue(None, flags=posix_ipc.O_CREX, mode=0o0600, max_messages=1,
                                     max_message_size=256, read=True, write=True)
         mq.close()
         mq.unlink()
