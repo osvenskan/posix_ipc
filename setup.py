@@ -16,7 +16,7 @@ with open("VERSION") as f:
 
 name = "posix_ipc"
 description = "POSIX IPC primitives (semaphores, shared memory and message queues) for Python"
-with open("README.md") as f:
+with open("README.md", encoding='utf-8') as f:
     long_description = f.read().strip()
 author = "Philip Semanchuk"
 author_email = "philip@semanchuk.com"
