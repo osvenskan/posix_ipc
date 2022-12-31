@@ -4,7 +4,13 @@ This is the version history for the [posix_ipc module](https://github.com/osvens
 
 As of version 1.0.0, I consider this module complete. I will continue to support it and look for useful features to add, but right now I don't see any.
 
-- **Current – 1.1.0 (25 November 2022) –**
+- **Current – 1.1.1 (31 December 2022) –**
+
+    - Fixed a bug introduced in 1.1.0 where setup would fail on systems where [the default file system encoding is not UTF-8](https://github.com/osvenskan/posix_ipc/issues/40).
+    - Made message queue tests more conservative to avoid resource exhaustion that [could occur on a system with an atypical configuration](https://github.com/osvenskan/posix_ipc/issues/42).
+    - Fixed (again) [a bug related to shared memory size](https://github.com/osvenskan/posix_ipc/issues/35), this time for real! Thanks to Rudolf Hornig for the fix.
+
+- 1.1.0 (25 November 2022) –
     
     - Drop support for Python 2.7 and ≤ 3.6.
     - Converted doc to Markdown. Thanks to GreatBahram and christopolise.

@@ -14,11 +14,11 @@ Version 1.0.5 was the last version of `posix_ipc` to support both Python 2.7 and
 
 `posix_ipc` is available on PyPI:
 
-`pip install posix-ipc`
+	pip install posix-ipc
 
 Or you can clone the project and install it using `setup.py`:
 
-`python setup.py install`
+	python setup.py install
 
 ## License
 

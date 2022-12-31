@@ -4,13 +4,13 @@ The Python extension module `posix_ipc` gives Python access to POSIX interproces
 
 macOS/OS X and other Unix-y platforms (including Windows + [Cygwin 1.7](http://www.cygwin.com/)) provide partial (or partially broken) support. See [the platform notes below](#platform-notes) for more details.
 
-This extension allows Python to interact with non-Python apps via IPC. If you want IPC between Python apps, you're better off using the [`multiprocessing` module](https://docs.python.org/3/library/multiprocessing.html) or the `multiprocessing.shared_memory module`(https://docs.python.org/3/library/multiprocessing.shared_memory.html) from Python's standard library.
+This extension allows Python to interact with non-Python apps via IPC. If you want IPC between Python apps, you're better off using the [`multiprocessing` module](https://docs.python.org/3/library/multiprocessing.html) or the [`multiprocessing.shared_memory module`](https://docs.python.org/3/library/multiprocessing.shared_memory.html) from Python's standard library.
 
 This module works under Python ≥ 3.6. It is released under [a BSD license](LICENSE).
 
-You can **download [posix_ipc version 1.1.0](http://semanchuk.com/philip/posix_ipc/posix_ipc-1.1.0.tar.gz)** [[MD5 sum]](http://semanchuk.com/philip/posix_ipc/posix_ipc-1.1.0.md5.txt) [[SHA1 sum]](http://semanchuk.com/philip/posix_ipc/posix_ipc-1.1.0.sha1.txt) which contains the source code, setup.py, installation instructions, tests, and [sample code](###sample-code). The exact same [posix_ipc tarball is also available on PyPI](https://pypi.python.org/pypi/posix_ipc). You can also find [the `posix_ipc` source code on GitHub](https://github.com/osvenskan/posix_ipc/).
+You can **download [posix_ipc version 1.1.1](http://semanchuk.com/philip/posix_ipc/releases/posix_ipc-1.1.1.tar.gz)** ([MD5](http://semanchuk.com/philip/posix_ipc/releases/posix_ipc-1.1.1.md5.txt), [SHA1](http://semanchuk.com/philip/posix_ipc/releases/posix_ipc-1.1.1.sha1.txt)) which contains the source code, `setup.py`, installation instructions, tests, and [sample code](###sample-code). The exact same [posix_ipc tarball is also available on PyPI](https://pypi.python.org/pypi/posix_ipc), along with pip-installable wheels for some platforms. You can also find [the `posix_ipc` source code on GitHub](https://github.com/osvenskan/posix_ipc/).
 
-You might want to read [all of the changes in this version](https://github.com/christopolise/posix_ipc/blob/29-convert-doc-to-markdown/history.md) and about some [known bugs](#known-bugs).
+You might want to read [all of the changes in this version](history.md) and about some [known bugs](#known-bugs).
 
 Note that this module doesn't support unnamed (anonymous) POSIX semaphores.
 
@@ -415,7 +415,7 @@ I don't know of any bugs in this code, but FreeBSD users should check the platfo
 
 ## Support for Older Pythons
 
-If you need to support Python < 2.7, try [posix_ipc version 0.9.9](http://semanchuk.com/philip/posix_ipc/posix_ipc-0.9.9.tar.gz) [[MD5 sum]](http://semanchuk.com/philip/posix_ipc/posix_ipc-0.9.9.md5.txt) [[SHA1 sum]](http://semanchuk.com/philip/posix_ipc/posix_ipc-0.9.9.sha1.txt).
+If you need to support Python < 2.7, try [posix_ipc version 0.9.9](http://semanchuk.com/philip/posix_ipc/releases/posix_ipc-0.9.9.tar.gz) [[MD5 sum]](http://semanchuk.com/philip/posix_ipc/releases/posix_ipc-0.9.9.md5.txt) [[SHA1 sum]](http://semanchuk.com/philip/posix_ipc/releases/posix_ipc-0.9.9.sha1.txt).
 
 # Platform Notes
 
