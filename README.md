@@ -20,6 +20,22 @@ Or you can clone the project and install it using `setup.py`:
 
 	python setup.py install
 
+## Cross compiling
+
+In the event of building this library in a cross environment the way `setup.py` probes the build system will likely cause problems.
+The behavior can be changed with two environment variables:
+
+* SKIP_BUILDSYSTEM_PROBE
+	- which skips the probe all togheter, this will require you to manually create a `probe_results.h` file ahead of running setuptools, see `probe_results_template.h`
+* LINK_WITH_RT
+	- set this variable to force compiling with `-lrt`
+
+A example of setting up an environment for cross compilation:
+
+```bash
+$ SKIP_BUILDSYSTEM_PROBE=1 LINK_WITH_RT=1 pip install .
+```
+
 ## License
 
 `posix_ipc` is free software (free as in speech and free as in beer) released under a 3-clause BSD license. Complete licensing information is available in [the LICENSE file](LICENSE).
