@@ -8,6 +8,8 @@ try:
 except ImportError:
     import distutils.core as distutools
 
+import os
+
 # My modules
 import prober
 
@@ -41,12 +43,15 @@ license = "http://creativecommons.org/licenses/BSD/"
 keywords = "ipc inter-process communication semaphore shared memory shm message queue"
 
 libraries = []
-
-d = prober.probe()
+d = {}
+# do note that setting the env flag SKIP_BUILDSYSTEM_PROBE will require you
+# to generate a probe_results.h file
+if not os.environ.get('SKIP_BUILDSYSTEM_PROBE'):
+    d = prober.probe()
 
 # Linux & FreeBSD require linking against the realtime libs
 # This causes an error on other platforms
-if "REALTIME_LIB_IS_NEEDED" in d:
+if "REALTIME_LIB_IS_NEEDED" in d or os.environ.get('LINK_WITH_RT'):
     libraries.append("rt")
 
 ext_modules = [distutools.Extension("posix_ipc",
