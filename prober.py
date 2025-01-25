@@ -59,7 +59,8 @@ def does_build_succeed(filename, linker_options=""):
     #   - Some versions of Linux place the sem_xxx() functions in libpthread.
     #     Rather than testing whether or not it's needed, I just specify it
     #     everywhere since it's harmless to specify it when it's not needed.
-    cmd = "cc -Wall -o ./prober/foo ./prober/%s %s -lpthread" % (filename, linker_options)
+    cc = os.getenv("CC", "cc")
+    cmd = "%s -Wall -o ./prober/foo ./prober/%s %s -lpthread" % (cc, filename, linker_options)
 
     p = subprocess.Popen(cmd, shell=True, stdout=STDOUT, stderr=STDERR)
 
@@ -71,17 +72,22 @@ def does_build_succeed(filename, linker_options=""):
 def compile_and_run(filename, linker_options=""):
     # Utility function that returns the stdout output from running the
     # compiled source file; None if the compile fails.
-    cmd = "cc -Wall -o ./prober/foo %s ./prober/%s" % (linker_options, filename)
+    cc = os.getenv("CC", "cc")
+    cmd = "%s -Wall -o ./prober/foo %s ./prober/%s" % (cc, linker_options, filename)
 
     p = subprocess.Popen(cmd, shell=True, stdout=STDOUT, stderr=STDERR)
 
     if p.wait():
         # uh-oh, compile failed
         return None
-    else:
+    
+    try:
         s = subprocess.Popen(["./prober/foo"],
                              stdout=subprocess.PIPE).communicate()[0]
         return s.strip().decode()
+    except:
+        # execution resulted in an error
+        return None
 
 
 def get_sysctl_value(name):
