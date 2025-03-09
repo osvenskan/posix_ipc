@@ -9,7 +9,7 @@ on:
 
 jobs:
   build_wheels:
-    uses: ./.github/workflows/build-wheels.yml
+    uses: ./.github/workflows/build-wheels.yaml
 
   build_sdist:
     name: Build source distribution
