@@ -1,4 +1,4 @@
-name: Build and upload to PyPI
+name: Build, test, and upload wheels to PyPI
 
 on:
   push:
@@ -38,6 +38,6 @@ jobs:
           name: artifact
           path: dist
 
-      # - uses: pypa/gh-action-pypi-publish@release/v1
-        # with:
-        #   repository-url: https://upload.pypi.org/legacy/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
