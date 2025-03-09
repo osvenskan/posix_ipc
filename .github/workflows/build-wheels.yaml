@@ -1,9 +1,10 @@
-name: Build
+name: Build and test wheels
 
 on:
   push:
     branches:
       - develop
+      - master
   pull_request:
   workflow_call:
 
@@ -12,6 +13,7 @@ jobs:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         # macos-13 is an intel runner, macos-14 is apple silicon
         os: [ubuntu-latest, ubuntu-24.04-arm, macos-13, macos-14]
@@ -19,10 +21,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build wheels
+      - name: Build and test wheels
         uses: pypa/cibuildwheel@v2.23.0
+        env:
+          CIBW_ENABLE: pypy
+          CIBW_TEST_COMMAND: python -m unittest discover
 
       - uses: actions/upload-artifact@v4
         with:
-          name: cibw-wheels-${{ matrix.os }}-${{ strategy.job-index }}
+          name: cibw-wheels-${{ matrix.os }}
           path: ./wheelhouse/*.whl
