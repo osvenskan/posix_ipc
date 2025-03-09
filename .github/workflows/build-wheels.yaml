@@ -31,7 +31,7 @@ jobs:
           CIBW_ENABLE: pypy
           CIBW_TEST_COMMAND: python -m unittest discover --start-directory {package}
           # there are some failing tests on apple silicon
-          CIBW_TEST_SKIP: "*-macosx_*:arm64"
+          CIBW_TEST_SKIP: "*-macosx_arm64"
 
       - uses: actions/upload-artifact@v4
         with:
