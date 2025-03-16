@@ -1,7 +1,7 @@
 # Python imports
 import unittest
 import os
-import resource
+import mmap
 
 # Project imports
 import posix_ipc
@@ -20,7 +20,7 @@ class TestModule(tests_base.Base):
         self.assertEqual(posix_ipc.O_CREX, posix_ipc.O_CREAT | posix_ipc.O_EXCL)
         self.assertEqual(posix_ipc.O_TRUNC, os.O_TRUNC)
 
-        self.assertEqual(posix_ipc.PAGE_SIZE, resource.getpagesize())
+        self.assertEqual(posix_ipc.PAGE_SIZE, mmap.PAGESIZE)
 
         self.assertIn(posix_ipc.SEMAPHORE_TIMEOUT_SUPPORTED, (True, False))
         self.assertIn(posix_ipc.SEMAPHORE_VALUE_SUPPORTED, (True, False))
