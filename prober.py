@@ -85,7 +85,7 @@ def compile_and_run(filename, linker_options=""):
         s = subprocess.Popen(["./prober/foo"],
                              stdout=subprocess.PIPE).communicate()[0]
         return s.strip().decode()
-    except:
+    except Exception:
         # execution resulted in an error
         return None
 
