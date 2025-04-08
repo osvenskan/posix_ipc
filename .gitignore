@@ -3,12 +3,9 @@
 releases/*
 dist/*
 build/*
-probe_results.h
+src/system_info.h
 prober/foo
 notes.md
 posix_ipc.egg-info/*
 test.c
-demo/*.o
-demo/premise
-demo/conclusion
 post_dist.py

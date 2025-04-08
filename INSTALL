@@ -1,7 +1,7 @@
-To install, just use the normal setup.py routine:
+`posix_ipc` is available from PyPI:
 
-python setup.py install
+	pip install posix-ipc
 
-If you get a permissions error, try this:
+If you have the source code, you can install `posix_ipc` with this command:
 
-sudo python setup.py install
+	python -m pip install .

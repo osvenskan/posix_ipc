@@ -60,7 +60,7 @@ def does_build_succeed(filename, linker_options=""):
     #     Rather than testing whether or not it's needed, I just specify it
     #     everywhere since it's harmless to specify it when it's not needed.
     cc = os.getenv("CC", "cc")
-    cmd = "%s -Wall -o ./prober/foo ./prober/%s %s -lpthread" % (cc, filename, linker_options)
+    cmd = "%s -Wall -o ./build_support/src/foo ./build_support/src/%s %s -lpthread" % (cc, filename, linker_options)
 
     p = subprocess.Popen(cmd, shell=True, stdout=STDOUT, stderr=STDERR)
 
@@ -73,7 +73,7 @@ def compile_and_run(filename, linker_options=""):
     # Utility function that returns the stdout output from running the
     # compiled source file; None if the compile fails.
     cc = os.getenv("CC", "cc")
-    cmd = "%s -Wall -o ./prober/foo %s ./prober/%s" % (cc, linker_options, filename)
+    cmd = "%s -Wall -o ./build_support/src/foo %s ./build_support/src/%s" % (cc, linker_options, filename)
 
     p = subprocess.Popen(cmd, shell=True, stdout=STDOUT, stderr=STDERR)
 
@@ -82,7 +82,7 @@ def compile_and_run(filename, linker_options=""):
         return None
     
     try:
-        s = subprocess.Popen(["./prober/foo"],
+        s = subprocess.Popen(["./build_support/src/foo"],
                              stdout=subprocess.PIPE).communicate()[0]
         return s.strip().decode()
     except Exception:
@@ -218,7 +218,7 @@ def sniff_mq_prio_max():
             print_bad_news("the value of PRIORITY_MAX", max_priority)
 
     # Under OS X, os.sysconf("SC_MQ_PRIO_MAX") returns -1.
-    # This is still true in Nov 2022 under MacOS 12.6.
+    # This is still true in April 2025 under MacOS 15.3.
     if max_priority < 0:
         max_priority = DEFAULT_PRIORITY_MAX
 
@@ -339,7 +339,7 @@ def sniff_mq_max_message_size_default():
     return mq_max_message_size_default
 
 
-def probe():
+def discover():
     linker_options = ""
     d = {}
 
@@ -406,7 +406,7 @@ To recreate this file, just delete it and re-run setup.py.
 */
 
 """
-    filename = "probe_results.h"
+    filename = "./src/system_info.h"
     if not os.path.exists(filename):
         lines = ["#define %s\t\t%s" % (key, d[key]) for key in d if key != "PAGE_SIZE"]
 
@@ -425,4 +425,4 @@ To recreate this file, just delete it and re-run setup.py.
 
 
 if __name__ == "__main__":
-    print(probe())
+    print(discover())
