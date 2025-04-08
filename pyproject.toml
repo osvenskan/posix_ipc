@@ -8,7 +8,7 @@ dynamic = ["version"]
 authors = [{name = "Philip Semanchuk", email = "philip@semanchuk.com"}]
 description = "POSIX IPC primitives (semaphores, shared memory and message queues) for Python"
 readme = "README.md"
-license = "BSD-3-Clause"
+license = {file = "LICENSE"}
 classifiers = [
 	"Development Status :: 5 - Production/Stable",
 	"Intended Audience :: Developers",
