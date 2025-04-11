@@ -6,7 +6,7 @@ Mac and other Unix-y platforms (including Windows + [Cygwin 1.7](http://www.cygw
 
 This extension allows Python to interact with non-Python apps via IPC. If you want IPC between Python apps, you're better off using the [`multiprocessing` module](https://docs.python.org/3/library/multiprocessing.html) or the [`multiprocessing.shared_memory module`](https://docs.python.org/3/library/multiprocessing.shared_memory.html) from Python's standard library.
 
-The [source code for `posix_ipc` is on GitHub](https://github.com/osvenskan/posix_ipc/), along with [some sample code](###sample-code).
+The [source code for `posix_ipc` is on GitHub](https://github.com/osvenskan/posix_ipc/), along with [some sample code](#sample-code).
 
 You might want to read [all of the changes in this version](history.md) and about some [known bugs](#known-bugs).
 
