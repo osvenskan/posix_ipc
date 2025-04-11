@@ -4,7 +4,7 @@
 
 **For complete documentation, see [the usage notes](USAGE.md).**
 
-`posix_ipc` is compatible with all supported versions of Python 3. Older versions of `posix_ipc` may [still work under Python 2.x](usage.md##support-for-older-pythons).
+`posix_ipc` is compatible with all supported versions of Python 3. Older versions of `posix_ipc` may [still work under Python 2.x](USAGE.md##support-for-older-pythons).
 
 If you want to build your own copy of `posix_ipc`, see [the build notes](building.md).
 
