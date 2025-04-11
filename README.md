@@ -2,15 +2,11 @@
 
 `posix_ipc` is a Python module (written in C) that permits creation and manipulation of POSIX inter-process semaphores, shared memory and message queues on platforms supporting the POSIX Realtime Extensions a.k.a. POSIX 1003.1b-1993. This includes nearly all Unices, and Windows + Cygwin ≥ 1.7.
 
-`posix_ipc` is compatible with all supported versions of Python 3.
-
 **For complete documentation, see [the usage notes](USAGE.md).**
 
-For some help with building your own copy of `posix_ipc`, see [the build notes](building.md).
+`posix_ipc` is compatible with all supported versions of Python 3. Older versions of `posix_ipc` may [still work under Python 2.x](USAGE.md#support-for-older-pythons).
 
-## Python 2.7 Support
-
-Version 1.0.5 was the last version of `posix_ipc` to support both Python 2.7 and Python 3.x. Starting with version 1.1.0, only Python 3 is supported. No changes (neither fixes nor features) will be backported to 1.0.5.
+If you want to build your own copy of `posix_ipc`, see [the build notes](building.md).
 
 ## Installation
 

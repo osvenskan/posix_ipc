@@ -10,17 +10,17 @@ This kind of information needs to be known before `posix_ipc` is compiled. To ge
 
 ## The Script
 
-The best documentation for the script is currently the script itself. I hope to provide more formal documentation in a future release. Please don't laugh at the code too much. It's been adjusted over the years, but the core of it was written in 2008 when both Python and I had different standards. In releases prior to 1.2, this script was called `prober.py`.
+The best documentation for the script is currently the script itself. I hope to provide more formal documentation in a future release. Please don't laugh at the code too much. It's been adjusted over the years, but the core of it was written in 2008 when both Python and I had different standards. In `posix_ipc` releases prior to 1.2, this script was called `prober.py`.
 
-The script typically writes a C header file which is described below.
+The script writes a C header file which is described below.
 
 ## The Header File
 
-The goal of `discover_system_info.py` is to write `src/system_info.h`. (In releases prior to 1.2, this file was called `probe_results.h`.) This header file isn't part of the source distribution, nor should it be. It contains values that are specific to the system on which `posix_ipc` is built.
+The goal of `discover_system_info.py` is to write `src/system_info.h`. (In `posix_ipc` releases prior to 1.2, this file was called `probe_results.h`.) This header file isn't part of the source distribution, nor should it be. It contains values that are specific to the system on which `posix_ipc` is built.
 
 If the file exists when `discover_system_info.py` runs, it will not be overwritten. This allows developers to create their own `system_info.h` (to enable debugging messages from `posix_ipc`, for instance.)
 
-It's critical to understand that the values in the header file _describe_ your system to `posix_ipc`. They don't change the behavior of your operating system. For instance, if you decide to change `SEM_VALUE_MAX` to a larger number, that won't actually increase the maximum valid value for a semaphore on your system. It will only misinform `posix_ipc` about what your system accepts, and a misinformed `posix_ipc` will probably behave badly.
+It's critical to understand that the values in the header file _describe_ your system to `posix_ipc`. They don't change the behavior of your operating system. For instance, if you decide to change `SEM_VALUE_MAX` in `system_info.h` to a larger number, that won't actually increase the maximum valid value for a semaphore on your system. It will only misinform `posix_ipc` about what your system accepts, and a misinformed `posix_ipc` will probably behave badly.
 
 ### Header File Values
 
