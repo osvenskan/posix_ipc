@@ -4,7 +4,16 @@ This is the version history for the [posix_ipc module](https://github.com/osvens
 
 As of version 1.0.0, I consider this module complete. I will continue to support it and look for useful features to add, but right now I don't see any.
 
-- **Current – 1.1.1 (31 December 2022) –**
+- **Current – 1.2.0 (11 April 2025) –**
+
+	This release modernizes the file layout, building, and packaging of `posix_ipc`. There are no changes to the core code.
+
+    - Thanks to [Matiiss](https://github.com/Matiiss), this version integrates with `cibuildwheel` to automate testing and create wheels for many platforms.
+    - The `discover_system_info.py` script (formerly `prober.py`) now respects the `CC` environment variable instead of using a hardcoded `cc` to launch the compiler. Thanks to [György Sárvári](https://github.com/OldManYellsAtCloud) for the patch.
+    - Added `building.md` to begin documenting `discover_system_info.py` and the header file it creates.
+    - Modernized the project to use `pyproject.toml` and modern build practices (e.g. `python -m build`). I reorganized the project's files to make it easier to use `pyproject.toml`.
+
+- 1.1.1 (31 December 2022) –
 
     - Fixed a bug introduced in 1.1.0 where setup would fail on systems where [the default file system encoding is not UTF-8](https://github.com/osvenskan/posix_ipc/issues/40).
     - Made message queue tests more conservative to avoid resource exhaustion that [could occur on a system with an atypical configuration](https://github.com/osvenskan/posix_ipc/issues/42).
