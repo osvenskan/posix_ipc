@@ -1,5 +1,8 @@
 [build-system]
-requires = ["setuptools"]
+# setuptools ≥ 77.0.3 is required to read SPDX expressions in the license
+# field. Non-SPDX expressions raise a deprecation warning in some contexts.
+# https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license-and-license-files
+requires = ["setuptools >= 77.0.3"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,7 +11,7 @@ dynamic = ["version"]
 authors = [{name = "Philip Semanchuk", email = "philip@semanchuk.com"}]
 description = "POSIX IPC primitives (semaphores, shared memory and message queues) for Python"
 readme = "README.md"
-license = {file = "LICENSE"}
+license = "BSD-3-Clause"
 classifiers = [
 	"Development Status :: 5 - Production/Stable",
 	"Intended Audience :: Developers",
