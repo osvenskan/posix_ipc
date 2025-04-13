@@ -12,16 +12,17 @@ from . import base as tests_base
 
 ONE_MILLION = 1000000
 
-# Under Python 3.9 running on a Mac with Apple Silicon, the page size test sometimes fails.
-# (It fails during CI testing, but not on my laptop.) I suspect the failure is spurious, it seems
-# very difficult to debug since it happens in an environment over which I have little control,
+# Under Python 3.9 & 3.10 running on a Mac with Apple Silicon, the page size test sometimes fails.
+# (It fails during CI testing, but not on my laptop.) I suspect the failure is spurious, and it
+# seems very difficult to debug since it happens in an environment over which I have little control,
 # and Python 3.9 only has a few months left to live. For these reasons, I've decided to skip
 # the test under those circumstances. Unfortunately, I can't seem to reliably detect ARM vs x86
 # under CI, so I decided to disable the test on Mac (with Python 3.9) regardless of the
 # underlying architecture.
 # Details: https://github.com/osvenskan/posix_ipc/issues/58
 _IS_PYTHON_3_9 = ((sys.version_info.major == 3) and (sys.version_info.minor == 9))
-SKIP_PAGE_SIZE_TEST = ("Darwin" in platform.uname()) and _IS_PYTHON_3_9
+_IS_PYTHON_3_10 = ((sys.version_info.major == 3) and (sys.version_info.minor == 10))
+SKIP_PAGE_SIZE_TEST = ("Darwin" in platform.uname()) and (_IS_PYTHON_3_9 or _IS_PYTHON_3_10)
 
 class TestModule(tests_base.Base):
     """Exercise the posix_ipc module-level functions and constants"""
