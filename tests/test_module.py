@@ -18,7 +18,7 @@ ONE_MILLION = 1000000
 # and Python 3.9 only has a few months left to live. For these reasons, I've decided to skip
 # the test under those circumstances.
 # Details: https://github.com/osvenskan/posix_ipc/issues/58
-_IS_APPLE_SILICON = ("Darwin" in platform.uname()) and ('arm' in platform.processor().lower())
+_IS_APPLE_SILICON = ("Darwin" in platform.uname()) and ('86' in platform.processor().lower())
 _IS_PYTHON_3_9 = ((sys.version_info.major == 3) and (sys.version_info.minor == 9))
 SKIP_PAGE_SIZE_TEST = _IS_APPLE_SILICON and _IS_PYTHON_3_9
 
