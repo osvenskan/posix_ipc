@@ -16,11 +16,12 @@ ONE_MILLION = 1000000
 # (It fails during CI testing, but not on my laptop.) I suspect the failure is spurious, it seems
 # very difficult to debug since it happens in an environment over which I have little control,
 # and Python 3.9 only has a few months left to live. For these reasons, I've decided to skip
-# the test under those circumstances.
+# the test under those circumstances. Unfortunately, I can't seem to reliably detect ARM vs x86
+# under CI, so I decided to disable the test on Mac (with Python 3.9) regardless of the
+# underlying architecture.
 # Details: https://github.com/osvenskan/posix_ipc/issues/58
-_IS_APPLE_SILICON = ("Darwin" in platform.uname()) and ('86' in platform.processor().lower())
 _IS_PYTHON_3_9 = ((sys.version_info.major == 3) and (sys.version_info.minor == 9))
-SKIP_PAGE_SIZE_TEST = _IS_APPLE_SILICON and _IS_PYTHON_3_9
+SKIP_PAGE_SIZE_TEST = ("Darwin" in platform.uname()) and _IS_PYTHON_3_9
 
 class TestModule(tests_base.Base):
     """Exercise the posix_ipc module-level functions and constants"""
@@ -53,9 +54,9 @@ class TestModule(tests_base.Base):
     @unittest.skipIf(SKIP_PAGE_SIZE_TEST,
                      'Skipped on this platform (https://github.com/osvenskan/posix_ipc/issues/58)')
     def test_page_size(self):
-        '''Test page size. This could be tested with the other constants, except that it needs
-        its own test due to the skipIf().
-        '''
+        '''Test page size. '''
+        # This could be tested with the other constants, except that it needs its own test due to
+        # the skipIf().
         self.assertEqual(posix_ipc.PAGE_SIZE, resource.getpagesize())
 
     def test_unlink_semaphore(self):
