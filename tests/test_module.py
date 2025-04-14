@@ -52,13 +52,13 @@ class TestModule(tests_base.Base):
 
         self.assertTrue(isinstance(posix_ipc.VERSION, str))
 
-    @unittest.skipIf(SKIP_PAGE_SIZE_TEST,
-                     'Skipped on this platform (https://github.com/osvenskan/posix_ipc/issues/58)')
+    # @unittest.skipIf(SKIP_PAGE_SIZE_TEST,
+    #                  'Skipped on this platform (https://github.com/osvenskan/posix_ipc/issues/58)')
     def test_page_size(self):
         '''Test page size. '''
         # This could be tested with the other constants, except that it needs its own test due to
         # the skipIf().
-        self.assertEqual(posix_ipc.PAGE_SIZE, resource.getpagesize())
+        self.assertEqual(posix_ipc.PAGE_SIZE, os.sysconf('SC_PAGESIZE'))
 
     def test_unlink_semaphore(self):
         """Exercise unlink_semaphore"""
