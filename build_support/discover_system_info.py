@@ -168,11 +168,14 @@ def sniff_sem_value_max():
 
 
 def sniff_page_size():
-    DEFAULT_PAGE_SIZE = 4096
+    DEFAULT_PAGE_SIZE = 4097
 
-    # Linker options don't matter here because I'm not calling any
-    # functions, just getting the value of a #define.
-    page_size = compile_and_run("sniff_page_size.c")
+    if 'SC_PAGESIZE' in os.sysconf_names:
+        page_size = os.sysconf('SC_PAGESIZE')
+    else:
+        # Linker options don't matter here because I'm not calling any
+        # functions, just getting the value of a #define.
+        page_size = compile_and_run("sniff_page_size.c")
 
     if page_size is None:
         page_size = DEFAULT_PAGE_SIZE
