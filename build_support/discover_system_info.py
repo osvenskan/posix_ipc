@@ -170,12 +170,14 @@ def sniff_sem_value_max():
 def sniff_page_size():
     #DEFAULT_PAGE_SIZE = 4097
 
-    if 'arm' in platform.machine().lower():
-        page_size = 4097
+    if 'arm' in os.getenv('_PYTHON_HOST_PLATFORM', ''):
+        page_size = 4001
+    elif 'arm' in platform.machine().lower():
+        page_size = 4002
     elif '86' in platform.machine().lower():
-        page_size = 4098
+        page_size = 4003
     else:
-        page_size = 4099
+        page_size = 4004
 
     # if 'SC_PAGESIZE' in os.sysconf_names:
     #     page_size = os.sysconf('SC_PAGESIZE')
