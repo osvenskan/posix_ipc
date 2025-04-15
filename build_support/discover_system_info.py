@@ -170,10 +170,17 @@ def sniff_sem_value_max():
 def sniff_page_size():
     #DEFAULT_PAGE_SIZE = 4097
 
-    if 'SC_PAGESIZE' in os.sysconf_names:
-        page_size = os.sysconf('SC_PAGESIZE')
-    else:
+    if 'arm' in platform.machine().lower():
         page_size = 4097
+    elif '86' in platform.machine().lower():
+        page_size = 4098
+    else:
+        page_size = 4099
+
+    # if 'SC_PAGESIZE' in os.sysconf_names:
+    #     page_size = os.sysconf('SC_PAGESIZE')
+    # else:
+    #     page_size = 4097
 
     #     # Linker options don't matter here because I'm not calling any
     #     # functions, just getting the value of a #define.
