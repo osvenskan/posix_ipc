@@ -168,7 +168,24 @@ def sniff_sem_value_max():
 
 
 def sniff_page_size():
-    DEFAULT_PAGE_SIZE = 4096
+    # DEFAULT_PAGE_SIZE = 4096
+
+
+    page_size = 0
+
+    if 'arm' in os.getenv('_PYTHON_HOST_PLATFORM', ''):
+        page_size |= 0x0001
+
+    if '86' in os.getenv('_PYTHON_HOST_PLATFORM', ''):
+        page_size |= 0x0010
+
+    if 'arm' in platform.machine().lower():
+        page_size |= 0x0100
+
+    if '86' in platform.machine().lower():
+        page_size |= 0x1000
+
+
 
     # if 'arm' in os.getenv('_PYTHON_HOST_PLATFORM', ''):
     #     page_size = 4001
@@ -186,11 +203,11 @@ def sniff_page_size():
 
     # Linker options don't matter here because I'm not calling any
     # functions, just getting the value of a #define.
-    page_size = compile_and_run("sniff_page_size.c")
+    # page_size = compile_and_run("sniff_page_size.c")
 
-    if page_size is None:
-        page_size = DEFAULT_PAGE_SIZE
-        print_bad_news("the value of PAGE_SIZE", page_size)
+    # if page_size is None:
+    #     page_size = DEFAULT_PAGE_SIZE
+    #     print_bad_news("the value of PAGE_SIZE", page_size)
 
     return page_size
 
