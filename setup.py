@@ -8,6 +8,10 @@ import sys
 sys.path.append('.')
 import build_support.discover_system_info
 
+# As of April 2025, specifying the license metadata here (rather than in pyproject.toml) seems
+# like the best solution for now. See https://github.com/osvenskan/posix_ipc/issues/68
+LICENSE = "BSD-3-Clause"
+
 # As of April 2025, use of tool.setuptools.ext-modules is stil experimental in pyproject.toml.
 # Also, this code needs to dynamically adjust the `libraries` value that's passed to setuptools,
 # so I can't get rid of setup.py just yet.
@@ -31,4 +35,6 @@ ext_modules = [Extension("posix_ipc",
                          # extra_compile_args=['-E'],
                          )]
 
-setuptools.setup(ext_modules=ext_modules)
+setuptools.setup(ext_modules=ext_modules,
+                 license=LICENSE,
+                 )
