@@ -168,13 +168,29 @@ def sniff_sem_value_max():
 
 
 def sniff_page_size():
+    # 4096 is a common page size on x86. As the world moves increasingly to ARM architectures,
+    # this might not be a good default anymore, but the default value isn't really supposed to
+    # be used except when all else fails (and in that case the user gets a warning).
     DEFAULT_PAGE_SIZE = 4096
 
-    # Linker options don't matter here because I'm not calling any
-    # functions, just getting the value of a #define.
-    page_size = compile_and_run("sniff_page_size.c")
+    page_size = None
 
-    if page_size is None:
+    # When cross compiling under cibuildwheel, I need to rely on their custom env var to set the
+    # page size correctly. See https://github.com/osvenskan/posix_ipc/issues/58
+    if 'arm' in os.getenv('_PYTHON_HOST_PLATFORM', ''):
+        page_size = 16384
+
+    if not page_size:
+        # Maybe I can find page size in os.sysconf(). If so, that saves a compilation step.
+        if 'SC_PAGESIZE' in os.sysconf_names:
+            page_size = os.sysconf('SC_PAGESIZE')
+
+    if not page_size:
+        # OK, I have to do it the hard way. I don't need to worry about linker options here
+        # because I'm not calling any functions, just getting the value of a #define.
+        page_size = compile_and_run("sniff_page_size.c")
+
+    if not page_size:
         page_size = DEFAULT_PAGE_SIZE
         print_bad_news("the value of PAGE_SIZE", page_size)
 
