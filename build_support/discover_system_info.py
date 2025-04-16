@@ -168,46 +168,31 @@ def sniff_sem_value_max():
 
 
 def sniff_page_size():
-    # DEFAULT_PAGE_SIZE = 4096
+    # 4096 is a common page size on x86. As the world moves increasingly to ARM architectures,
+    # this might not be a good default anymore, but the default value isn't really supposed to
+    # be used.
+    DEFAULT_PAGE_SIZE = 4096
 
+    page_size = None
 
-    page_size = 0
-
+    # When cross compiling under cibuildwheel, I need to rely on their custom env var to set the
+    # page size correctly. See https://github.com/osvenskan/posix_ipc/issues/58
     if 'arm' in os.getenv('_PYTHON_HOST_PLATFORM', ''):
-        page_size |= 0x0001
+        page_size = 16384
 
-    if '86' in os.getenv('_PYTHON_HOST_PLATFORM', ''):
-        page_size |= 0x0010
+    if not page_size:
+        # Maybe I can find it in os.sysconf(), which will save a compilation step.
+        if 'SC_PAGESIZE' in os.sysconf_names:
+            page_size = os.sysconf('SC_PAGESIZE')
 
-    if 'arm' in platform.machine().lower():
-        page_size |= 0x0100
+    if not page_size:
+        # OK, I have to do it the hard way. I don't need to worry about linker options here
+        # because I'm not calling any functions, just getting the value of a #define.
+        page_size = compile_and_run("sniff_page_size.c")
 
-    if '86' in platform.machine().lower():
-        page_size |= 0x1000
-
-
-
-    # if 'arm' in os.getenv('_PYTHON_HOST_PLATFORM', ''):
-    #     page_size = 4001
-    # elif 'arm' in platform.machine().lower():
-    #     page_size = 4002
-    # elif '86' in platform.machine().lower():
-    #     page_size = 4003
-    # else:
-    #     page_size = 4004
-
-    # # if 'SC_PAGESIZE' in os.sysconf_names:
-    # #     page_size = os.sysconf('SC_PAGESIZE')
-    # # else:
-    # #     page_size = 4097
-
-    # Linker options don't matter here because I'm not calling any
-    # functions, just getting the value of a #define.
-    # page_size = compile_and_run("sniff_page_size.c")
-
-    # if page_size is None:
-    #     page_size = DEFAULT_PAGE_SIZE
-    #     print_bad_news("the value of PAGE_SIZE", page_size)
+    if not page_size:
+        page_size = DEFAULT_PAGE_SIZE
+        print_bad_news("the value of PAGE_SIZE", page_size)
 
     return page_size
 
