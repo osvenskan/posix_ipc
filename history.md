@@ -4,7 +4,7 @@ This is the version history for the [posix_ipc module](https://github.com/osvens
 
 As of version 1.0.0, I consider this module complete. I will continue to support it and look for useful features to add, but right now I don't see any.
 
-- **Current – 1.2.0 (11 April 2025) –**
+- **Current – 1.2.0 (16 April 2025) –**
 
 	This release modernizes the file layout, building, and packaging of `posix_ipc`. There are no changes to the core code.
 
