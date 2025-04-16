@@ -1,12 +1,15 @@
 include INSTALL LICENSE VERSION
 include README.md USAGE.md history.md
-include setup.py prober.py
-include posix_ipc_module.c
-recursive-include prober *.c
-recursive-include demo *.h *.c *.py *.sh *.png *.txt *.md
-recursive-include demo2 *.py *.txt *.png *.md
-recursive-include demo3 *.py *.txt *.md
-recursive-include demo4 *.py *.txt *.md
-recursive-include demo5 *.py *.txt *.md
-recursive-include tests *
-global-exclude *.pyc
+include src/posix_ipc_module.c
+# Don't include system_info.h. It's system specific, and should be re-created
+# for each build except under unusual circumstances.
+exclude src/system_info.h
+graft build_support
+graft tests
+# I use recursive-include instead of graft so that I don't accidentally
+# include any compiled object files or executables that might be laying around
+# on my hard drive.
+recursive-include demos *.h *.c *.py *.sh *.png *.txt *.md
+
+global-exclude .DS_Store
+global-exclude *.py[cod]

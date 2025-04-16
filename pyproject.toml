@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "posix_ipc"
+dynamic = ["version", "license"]
+authors = [{name = "Philip Semanchuk", email = "philip@semanchuk.com"}]
+description = "POSIX IPC primitives (semaphores, shared memory and message queues) for Python"
+readme = "README.md"
+classifiers = [
+	"Development Status :: 5 - Production/Stable",
+	"Intended Audience :: Developers",
+	"Operating System :: MacOS :: MacOS X",
+	"Operating System :: POSIX :: BSD :: FreeBSD",
+	"Operating System :: POSIX :: Linux",
+	"Operating System :: POSIX :: SunOS/Solaris",
+	"Operating System :: POSIX",
+	"Operating System :: Unix",
+	"Programming Language :: Python",
+	"Programming Language :: Python :: 3",
+	"Topic :: Utilities",
+]
+
+[project.urls]
+Homepage = "https://github.com/osvenskan/posix_ipc/"
+
+[tool.setuptools]
+# I set include-package-data to false, because when it's true (the default),
+# files might get included in the wheel that aren't needed.
+include-package-data = false
+
+[tool.setuptools.package-dir]
+posix_ipc = "src"
+
+[tool.setuptools.dynamic]
+version = {file = ["VERSION"]}

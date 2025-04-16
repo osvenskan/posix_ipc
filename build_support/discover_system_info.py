@@ -59,7 +59,8 @@ def does_build_succeed(filename, linker_options=""):
     #   - Some versions of Linux place the sem_xxx() functions in libpthread.
     #     Rather than testing whether or not it's needed, I just specify it
     #     everywhere since it's harmless to specify it when it's not needed.
-    cmd = "cc -Wall -o ./prober/foo ./prober/%s %s -lpthread" % (filename, linker_options)
+    cc = os.getenv("CC", "cc")
+    cmd = "%s -Wall -o ./build_support/src/foo ./build_support/src/%s %s -lpthread" % (cc, filename, linker_options)
 
     p = subprocess.Popen(cmd, shell=True, stdout=STDOUT, stderr=STDERR)
 
@@ -71,17 +72,22 @@ def does_build_succeed(filename, linker_options=""):
 def compile_and_run(filename, linker_options=""):
     # Utility function that returns the stdout output from running the
     # compiled source file; None if the compile fails.
-    cmd = "cc -Wall -o ./prober/foo %s ./prober/%s" % (linker_options, filename)
+    cc = os.getenv("CC", "cc")
+    cmd = "%s -Wall -o ./build_support/src/foo %s ./build_support/src/%s" % (cc, linker_options, filename)
 
     p = subprocess.Popen(cmd, shell=True, stdout=STDOUT, stderr=STDERR)
 
     if p.wait():
         # uh-oh, compile failed
         return None
-    else:
-        s = subprocess.Popen(["./prober/foo"],
+    
+    try:
+        s = subprocess.Popen(["./build_support/src/foo"],
                              stdout=subprocess.PIPE).communicate()[0]
         return s.strip().decode()
+    except Exception:
+        # execution resulted in an error
+        return None
 
 
 def get_sysctl_value(name):
@@ -162,13 +168,29 @@ def sniff_sem_value_max():
 
 
 def sniff_page_size():
+    # 4096 is a common page size on x86. As the world moves increasingly to ARM architectures,
+    # this might not be a good default anymore, but the default value isn't really supposed to
+    # be used except when all else fails (and in that case the user gets a warning).
     DEFAULT_PAGE_SIZE = 4096
 
-    # Linker options don't matter here because I'm not calling any
-    # functions, just getting the value of a #define.
-    page_size = compile_and_run("sniff_page_size.c")
+    page_size = None
 
-    if page_size is None:
+    # When cross compiling under cibuildwheel, I need to rely on their custom env var to set the
+    # page size correctly. See https://github.com/osvenskan/posix_ipc/issues/58
+    if 'arm' in os.getenv('_PYTHON_HOST_PLATFORM', ''):
+        page_size = 16384
+
+    if not page_size:
+        # Maybe I can find page size in os.sysconf(). If so, that saves a compilation step.
+        if 'SC_PAGESIZE' in os.sysconf_names:
+            page_size = os.sysconf('SC_PAGESIZE')
+
+    if not page_size:
+        # OK, I have to do it the hard way. I don't need to worry about linker options here
+        # because I'm not calling any functions, just getting the value of a #define.
+        page_size = compile_and_run("sniff_page_size.c")
+
+    if not page_size:
         page_size = DEFAULT_PAGE_SIZE
         print_bad_news("the value of PAGE_SIZE", page_size)
 
@@ -212,7 +234,7 @@ def sniff_mq_prio_max():
             print_bad_news("the value of PRIORITY_MAX", max_priority)
 
     # Under OS X, os.sysconf("SC_MQ_PRIO_MAX") returns -1.
-    # This is still true in Nov 2022 under MacOS 12.6.
+    # This is still true in April 2025 under MacOS 15.3.
     if max_priority < 0:
         max_priority = DEFAULT_PRIORITY_MAX
 
@@ -333,7 +355,7 @@ def sniff_mq_max_message_size_default():
     return mq_max_message_size_default
 
 
-def probe():
+def discover():
     linker_options = ""
     d = {}
 
@@ -400,7 +422,7 @@ To recreate this file, just delete it and re-run setup.py.
 */
 
 """
-    filename = "probe_results.h"
+    filename = "./src/system_info.h"
     if not os.path.exists(filename):
         lines = ["#define %s\t\t%s" % (key, d[key]) for key in d if key != "PAGE_SIZE"]
 
@@ -419,4 +441,4 @@ To recreate this file, just delete it and re-run setup.py.
 
 
 if __name__ == "__main__":
-    print(probe())
+    print(discover())

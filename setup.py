@@ -1,75 +1,40 @@
-# Python-ish modules
-# distutils is deprecated as of Python 3.10 (https://github.com/osvenskan/posix_ipc/issues/28),
-# but its anointed replacement setuptools is not part of the standard library and isn't guaranteed
-# to be present. In practice it probably will be present especially for anyone using a more modern
-# Python like 3.10. In case it's not, I allow the install to skate by on distutils.
-try:
-    import setuptools as distutools
-except ImportError:
-    import distutils.core as distutools
+import setuptools
+from setuptools.extension import Extension
+import sys
 
-# My modules
-import prober
+# When python -m build runs, sys.path contains a minimum of entries. I add the current directory
+# to it (which is guaranteed by setuptools to be the project's root) so that I can import my
+# build_support tools.
+sys.path.append('.')
+import build_support.discover_system_info
 
-with open("VERSION") as f:
-    VERSION = f.read().strip()
+# As of April 2025, specifying the license metadata here (rather than in pyproject.toml) seems
+# like the best solution for now. See https://github.com/osvenskan/posix_ipc/issues/68
+LICENSE = "BSD-3-Clause"
 
-name = "posix_ipc"
-description = "POSIX IPC primitives (semaphores, shared memory and message queues) for Python"
-with open("README.md", encoding='utf-8') as f:
-    long_description = f.read().strip()
-author = "Philip Semanchuk"
-author_email = "philip@semanchuk.com"
-maintainer = "Philip Semanchuk"
-url = "https://github.com/osvenskan/posix_ipc"
-download_url = f"http://semanchuk.com/philip/posix_ipc/posix_ipc-{VERSION}.tar.gz"
-source_files = ["posix_ipc_module.c"]
-# http://pypi.python.org/pypi?%3Aaction=list_classifiers
-classifiers = ["Development Status :: 5 - Production/Stable",
-               "Intended Audience :: Developers",
-               "License :: OSI Approved :: BSD License",
-               "Operating System :: MacOS :: MacOS X",
-               "Operating System :: POSIX :: BSD :: FreeBSD",
-               "Operating System :: POSIX :: Linux",
-               "Operating System :: POSIX :: SunOS/Solaris",
-               "Operating System :: POSIX",
-               "Operating System :: Unix",
-               "Programming Language :: Python",
-               "Programming Language :: Python :: 3",
-               "Topic :: Utilities"]
-license = "http://creativecommons.org/licenses/BSD/"
-keywords = "ipc inter-process communication semaphore shared memory shm message queue"
+# As of April 2025, use of tool.setuptools.ext-modules is stil experimental in pyproject.toml.
+# Also, this code needs to dynamically adjust the `libraries` value that's passed to setuptools,
+# so I can't get rid of setup.py just yet.
+SOURCE_FILES = ["src/posix_ipc_module.c"]
+DEPENDS = ["src/posix_ipc_module.c", "src/system_info.h"]
 
 libraries = []
 
-d = prober.probe()
+system_info = build_support.discover_system_info.discover()
 
-# Linux & FreeBSD require linking against the realtime libs
+# Linux & FreeBSD require linking against the realtime libs.
 # This causes an error on other platforms
-if "REALTIME_LIB_IS_NEEDED" in d:
+if "REALTIME_LIB_IS_NEEDED" in system_info:
     libraries.append("rt")
 
-ext_modules = [distutools.Extension("posix_ipc",
-                                    source_files,
-                                    libraries=libraries,
-                                    depends=["posix_ipc_module.c",
-                                             "probe_results.h",
-                                             ],
-                                    # extra_compile_args=['-E']
-                                    )
-               ]
+ext_modules = [Extension("posix_ipc",
+                         SOURCE_FILES,
+                         libraries=libraries,
+                         depends=DEPENDS,
+                         # -E is useful for debugging compile errors.
+                         # extra_compile_args=['-E'],
+                         )]
 
-distutools.setup(name=name,
-                 version=VERSION,
-                 description=description,
-                 long_description=long_description,
-                 author=author,
-                 author_email=author_email,
-                 maintainer=maintainer,
-                 url=url,
-                 download_url=download_url,
-                 classifiers=classifiers,
-                 license=license,
-                 keywords=keywords,
-                 ext_modules=ext_modules
+setuptools.setup(ext_modules=ext_modules,
+                 license=LICENSE,
                  )

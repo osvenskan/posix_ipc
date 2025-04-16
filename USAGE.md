@@ -1,20 +1,16 @@
 # POSIX IPC for Python - Semaphores, Shared Memory and Message Queues
 
-The Python extension module `posix_ipc` gives Python access to POSIX interprocess semaphores, shared memory and message queues on systems that support the POSIX Realtime Extensions a.k.a. POSIX 1003.1b-1993. That includes most (all?) Linuxes with kernel ≥ 2.6, FreeBSD ≥ 7.2, and OpenSolaris ≥ 2008.05.
+The Python extension module `posix_ipc` gives Python access to POSIX interprocess semaphores, shared memory and message queues on systems that support the POSIX Realtime Extensions a.k.a. POSIX 1003.1b-1993. That includes most (all?) Linuxes with kernel ≥ 2.6, FreeBSD ≥ 7.2, and OpenSolaris ≥ 2008.05. This module doesn't support unnamed (anonymous) POSIX semaphores. It is released under [a BSD license](LICENSE).
 
-macOS/OS X and other Unix-y platforms (including Windows + [Cygwin 1.7](http://www.cygwin.com/)) provide partial (or partially broken) support. See [the platform notes below](#platform-notes) for more details.
+Mac and other Unix-y platforms (including Windows + [Cygwin 1.7](http://www.cygwin.com/)) provide partial (or partially broken) support. See [the platform notes below](#platform-notes) for more details.
 
 This extension allows Python to interact with non-Python apps via IPC. If you want IPC between Python apps, you're better off using the [`multiprocessing` module](https://docs.python.org/3/library/multiprocessing.html) or the [`multiprocessing.shared_memory module`](https://docs.python.org/3/library/multiprocessing.shared_memory.html) from Python's standard library.
 
-This module works under Python ≥ 3.6. It is released under [a BSD license](LICENSE).
-
-You can **download [posix_ipc version 1.1.1](http://semanchuk.com/philip/posix_ipc/releases/posix_ipc-1.1.1.tar.gz)** ([MD5](http://semanchuk.com/philip/posix_ipc/releases/posix_ipc-1.1.1.md5.txt), [SHA1](http://semanchuk.com/philip/posix_ipc/releases/posix_ipc-1.1.1.sha1.txt)) which contains the source code, `setup.py`, installation instructions, tests, and [sample code](###sample-code). The exact same [posix_ipc tarball is also available on PyPI](https://pypi.python.org/pypi/posix_ipc), along with pip-installable wheels for some platforms. You can also find [the `posix_ipc` source code on GitHub](https://github.com/osvenskan/posix_ipc/).
+The [source code for `posix_ipc` is on GitHub](https://github.com/osvenskan/posix_ipc/), along with [some sample code](#sample-code).
 
 You might want to read [all of the changes in this version](history.md) and about some [known bugs](#known-bugs).
 
-Note that this module doesn't support unnamed (anonymous) POSIX semaphores.
-
-You might be interested in the very similar module [`sysv_ipc` which provides Python access to IPC using System V semaphores, shared memory and message queues](https://github.com/osvenskan/sysv_ipc/). System V IPC has broader OS support but is not as easy to use.
+You might be interested in the very similar module [`sysv_ipc` which provides Python access to IPC using System V semaphores, shared memory and message queues](https://github.com/osvenskan/sysv_ipc/). System V IPC has broader OS support, but many people find it less easy to use.
 
 # Module `posix_ipc` Documentation
 
@@ -231,7 +227,7 @@ When opening an existing shared memory segment, one can also specify the flag `O
 
 `close_fd()`
 
-Closes the file descriptor associated with this SharedMemory object. Calling `close_fd()` is the same as calling [`os.close()`](https://docs.python.org/2/library/os.html#os.close) on a SharedMemory object's `fd` attribute.
+Closes the file descriptor associated with this SharedMemory object. Calling `close_fd()` is the same as calling [`os.close()`](hhttps://docs.python.org/3/library/os.html#os.close) on a SharedMemory object's `fd` attribute.
 
 You must call `close_fd()` or `os.close()` explicitly; the file descriptor is **not** closed automatically when a SharedMemory object is garbage collected.
 
@@ -366,7 +362,7 @@ python -m unittest discover
 
 ### Sample Code
 
-This module comes with five demonstrations. The first (in the directory `demo`) shows how to use shared memory and semaphores. The second (in the directory `demo2`) shows how to use message queues. The third (`demo3`) shows how to use message queue notifications. The fourth (`demo4`) shows how to use a semaphore in a context manager. The fifth (`demo5`) demonstrates use of message queues in combination with Python's `selectors` module.
+This module comes with five sets of demonstration code, all [in the `demos` directory](https://github.com/osvenskan/posix_ipc/tree/develop/demos). The first (in the directory `demo1`) shows how to use shared memory and semaphores. The second (in the directory `demo2`) shows how to use message queues. The third (`demo3`) shows how to use message queue notifications. The fourth (`demo4`) shows how to use a semaphore in a context manager. The fifth (`demo5`) demonstrates use of message queues in combination with Python's `selectors` module.
 
 ### Nobody Likes a Mr. Messy
 
@@ -378,7 +374,7 @@ In short, remember to clean up after yourself.
 
 I know it's *verboten* to talk about pointers in Python, but I'm going to do it anyway.
 
-Each Semaphore object created by this module contains a C pointer to the IPC object created by the system. When you call `sem.close()`, the object's internal pointer is set to `NULL`. This leaves the object in a not-quite-useless state. You can still call `sem.unlink()` or print `sem.name`, but calls to `sem.aquire()` or `sem.release()` will raise an `ExistentialError`.
+Each Semaphore object created by this module contains a C pointer to the IPC object created by the system. When you call `sem.close()`, the object's internal pointer is set to `NULL`. This leaves the Python object in a not-quite-useless state. You can still call `sem.unlink()` or print `sem.name`, but calls to `sem.aquire()` or `sem.release()` will raise an `ExistentialError`.
 
 If you know you're not going to use a Semaphore object after calling `sem.close()` or `sem.unlink()`, you could you set your semaphore variable to the return from the function (which is always `None`) like so:
 
@@ -405,9 +401,7 @@ and `mq_notify` will probably cover them.
 
 ### Last But Not Least
 
-For Pythonistas –
-
-- [A meditation on the inaccuracy of shared memories](https://www.youtube.com/watch?v=VKHFZBUTA4k)
+For Pythonistas, [a meditation on the inaccuracy of shared memories](https://www.youtube.com/watch?v=VKHFZBUTA4k)
 
 ## Known Bugs
 
@@ -415,7 +409,9 @@ I don't know of any bugs in this code, but FreeBSD users should check the platfo
 
 ## Support for Older Pythons
 
-If you need to support Python < 2.7, try [posix_ipc version 0.9.9](http://semanchuk.com/philip/posix_ipc/releases/posix_ipc-0.9.9.tar.gz) [[MD5 sum]](http://semanchuk.com/philip/posix_ipc/releases/posix_ipc-0.9.9.md5.txt) [[SHA1 sum]](http://semanchuk.com/philip/posix_ipc/releases/posix_ipc-0.9.9.sha1.txt).
+[Version 1.0.5 of `posix_ipc`](https://pypi.org/project/posix-ipc/1.0.5/) was the last to support both Python 2.7 and Python 3.x. No changes (neither fixes nor features) will be backported to 1.0.5.
+
+If you need to support Python < 2.7, try [posix_ipc version 0.9.9](https://pypi.org/project/posix-ipc/0.9.9/).
 
 # Platform Notes
 
@@ -437,7 +433,7 @@ Type `kldstat` to list loaded modules, and `kldload sem` or `kldload mqueuefs` i
 Prior to 7.2, FreeBSD POSIX semaphore support was [broken](http://www.freebsd.org/cgi/query-pr.cgi?pr=127545).
 Under FreeBSD 11.1, I have seen segfaults during the message queue threaded notification rearm test. I don't know if `posix_ipc` or FreeBSD (or both!) are culprits.
 
-**macOS/OS X (up to and including 10.12)**
+**macOS/OS X (up to and including 15.4)**
 
 macOS' implementation of POSIX IPC has some significant holes. Message queues are not supported at all. Also, `sem_getvalue()` and `sem_timedwait()` are not supported.
 

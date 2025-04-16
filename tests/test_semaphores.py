@@ -5,11 +5,8 @@ import datetime
 
 # Project imports
 import posix_ipc
-# Hack -- add tests directory to sys.path so Python 3 can find base.py.
-import sys
-import os
-sys.path.insert(0, os.path.join(os.getcwd(), 'tests'))
-import base as tests_base  # noqa
+
+from . import base as tests_base
 
 
 # N_RELEASES is the number of times release() is called in test_release()
