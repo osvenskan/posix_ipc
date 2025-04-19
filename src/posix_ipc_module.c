@@ -2,6 +2,7 @@
 posix_ipc - A Python module for accessing POSIX 1003.1b-1993 semaphores,
             shared memory and message queues.
 
+Copyright (c) 2025, Szymon Janora
 Copyright (c) 2008 - 2025, Philip Semanchuk
 All rights reserved.
 
@@ -19,7 +20,7 @@ modification, are permitted provided that the following conditions are met:
 THIS SOFTWARE IS PROVIDED BY ITS CONTRIBUTORS ''AS IS'' AND ANY
 EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL Philip Semanchuk BE LIABLE FOR ANY
+DISCLAIMED. IN NO EVENT SHALL Philip Semanchuk OR Szymon Janora BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -92,6 +93,7 @@ typedef struct {
     long max_message_size;
     int send_permitted;
     int receive_permitted;
+    char *msg;
     PyObject *notification_callback;
     PyObject *notification_callback_param;
     // In the event that the user requests notifications in a new thread,
@@ -1262,6 +1264,7 @@ MessageQueue_init(MessageQueue *self, PyObject *args, PyObject *keywords) {
     self->mqd = POSIX_IPC_MQ_NO_VALUE;
     self->name = NULL;
     self->mode = 0600;
+    self->msg = NULL;
     self->notification_callback = NULL;
     self->notification_callback_param = NULL;
 
@@ -1432,6 +1435,15 @@ MessageQueue_init(MessageQueue *self, PyObject *args, PyObject *keywords) {
         goto error_return;
     }
 
+    if (self->receive_permitted) {
+        self->msg = (char *)malloc(self->max_message_size);
+
+        if (!self->msg) {
+            PyErr_SetString(PyExc_MemoryError, "Out of memory");
+            goto error_return;
+        }
+    }
+
     // Last but not least, get a reference to the interpreter state. I only
     // need this if the caller requests queue notifications that occur in
     // a new thread, so much of the time this goes unused.
@@ -1452,6 +1464,9 @@ MessageQueue_dealloc(MessageQueue *self) {
     DPRINTF("dealloc\n");
     PyMem_Free(self->name);
     self->name = NULL;
+
+    free(self->msg);
+    self->msg = NULL;
 
     Py_XDECREF(self->notification_callback);
     self->notification_callback = NULL;
@@ -1593,7 +1608,6 @@ MessageQueue_send(MessageQueue *self, PyObject *args, PyObject *keywords) {
 static PyObject *
 MessageQueue_receive(MessageQueue *self, PyObject *args, PyObject *keywords) {
     NoneableTimeout timeout;
-    char *msg = NULL;
     unsigned int priority = 0;
     ssize_t size = 0;
     PyObject *py_return_tuple = NULL;
@@ -1611,20 +1625,13 @@ MessageQueue_receive(MessageQueue *self, PyObject *args, PyObject *keywords) {
         goto error_return;
     }
 
-    msg = (char *)malloc(self->max_message_size);
-
-    if (!msg) {
-        PyErr_SetString(PyExc_MemoryError, "Out of memory");
-        goto error_return;
-    }
-
     Py_BEGIN_ALLOW_THREADS
     // timeout == None: no timeout, i.e. wait forever.
     // timeout >= 0: wait no longer than t seconds before raising an error.
     if (timeout.is_none) {
         DPRINTF("Calling mq_receive(), mqd=%ld; msg buffer length = %ld\n",
                 (long)self->mqd, self->max_message_size);
-        size = mq_receive(self->mqd, msg, self->max_message_size, &priority);
+        size = mq_receive(self->mqd, self->msg, self->max_message_size, &priority);
     }
     else {
         // Timeout is not None (i.e. is numeric)
@@ -1634,7 +1641,7 @@ MessageQueue_receive(MessageQueue *self, PyObject *args, PyObject *keywords) {
                 timeout.timestamp.tv_sec,
                 timeout.timestamp.tv_nsec);
 
-        size = mq_timedreceive(self->mqd, msg, self->max_message_size,
+        size = mq_timedreceive(self->mqd, self->msg, self->max_message_size,
                                &priority, &(timeout.timestamp));
     }
     Py_END_ALLOW_THREADS
@@ -1689,16 +1696,13 @@ MessageQueue_receive(MessageQueue *self, PyObject *args, PyObject *keywords) {
     }
 
     py_return_tuple = Py_BuildValue("NN",
-                                    PyBytes_FromStringAndSize(msg, size),
+                                    PyBytes_FromStringAndSize(self->msg, size),
                                     PyLong_FromLong((long)priority)
                                    );
-
-    free(msg);
 
     return py_return_tuple;
 
     error_return:
-    free(msg);
 
     return NULL;
 }
