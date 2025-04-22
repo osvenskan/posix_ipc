@@ -1593,9 +1593,11 @@ MessageQueue_send(MessageQueue *self, PyObject *args, PyObject *keywords) {
 static PyObject *
 MessageQueue_receive(MessageQueue *self, PyObject *args, PyObject *keywords) {
     NoneableTimeout timeout;
-    char *msg = NULL;
+    PyObject *py_return_msg = NULL;
+    char *msg_buffer = NULL;
     unsigned int priority = 0;
     ssize_t size = 0;
+    PyObject *py_return_priority = NULL;
     PyObject *py_return_tuple = NULL;
     static char *keyword_list[ ] = {"timeout", NULL};
 
@@ -1611,12 +1613,12 @@ MessageQueue_receive(MessageQueue *self, PyObject *args, PyObject *keywords) {
         goto error_return;
     }
 
-    msg = (char *)malloc(self->max_message_size);
-
-    if (!msg) {
+    py_return_msg = PyBytes_FromStringAndSize(NULL, self->max_message_size);
+    if (!py_return_msg) {
         PyErr_SetString(PyExc_MemoryError, "Out of memory");
         goto error_return;
     }
+    msg_buffer = PyBytes_AS_STRING(py_return_msg);
 
     Py_BEGIN_ALLOW_THREADS
     // timeout == None: no timeout, i.e. wait forever.
@@ -1624,7 +1626,7 @@ MessageQueue_receive(MessageQueue *self, PyObject *args, PyObject *keywords) {
     if (timeout.is_none) {
         DPRINTF("Calling mq_receive(), mqd=%ld; msg buffer length = %ld\n",
                 (long)self->mqd, self->max_message_size);
-        size = mq_receive(self->mqd, msg, self->max_message_size, &priority);
+        size = mq_receive(self->mqd, msg_buffer, self->max_message_size, &priority);
     }
     else {
         // Timeout is not None (i.e. is numeric)
@@ -1634,7 +1636,7 @@ MessageQueue_receive(MessageQueue *self, PyObject *args, PyObject *keywords) {
                 timeout.timestamp.tv_sec,
                 timeout.timestamp.tv_nsec);
 
-        size = mq_timedreceive(self->mqd, msg, self->max_message_size,
+        size = mq_timedreceive(self->mqd, msg_buffer, self->max_message_size,
                                &priority, &(timeout.timestamp));
     }
     Py_END_ALLOW_THREADS
@@ -1687,18 +1689,29 @@ MessageQueue_receive(MessageQueue *self, PyObject *args, PyObject *keywords) {
 
         goto error_return;
     }
+    // Set the received size to python message bytes
+    Py_SET_SIZE(py_return_msg, size);
+    msg_buffer[size] = '\0';
 
-    py_return_tuple = Py_BuildValue("NN",
-                                    PyBytes_FromStringAndSize(msg, size),
-                                    PyLong_FromLong((long)priority)
-                                   );
+    py_return_priority = PyLong_FromUnsignedLong((unsigned long)priority);
+    if (!py_return_priority) {
+        PyErr_SetString(PyExc_MemoryError, "Out of memory");
+        goto error_return;
+    }
 
-    free(msg);
+    py_return_tuple = PyTuple_New(2);
+    if (!py_return_tuple) {
+        PyErr_SetString(PyExc_MemoryError, "Out of memory");
+        goto error_return;
+    }
+    PyTuple_SET_ITEM(py_return_tuple, 0, py_return_msg);
+    PyTuple_SET_ITEM(py_return_tuple, 1, py_return_priority);
 
     return py_return_tuple;
 
     error_return:
-    free(msg);
+    PyObject_Free(py_return_msg);
+    PyObject_Free(py_return_priority);
 
     return NULL;
 }

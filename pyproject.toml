@@ -4,6 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "posix_ipc"
+requires-python = ">=3.9"
 dynamic = ["version", "license"]
 authors = [{name = "Philip Semanchuk", email = "philip@semanchuk.com"}]
 description = "POSIX IPC primitives (semaphores, shared memory and message queues) for Python"
