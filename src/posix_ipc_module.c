@@ -1590,6 +1590,17 @@ MessageQueue_send(MessageQueue *self, PyObject *args, PyObject *keywords) {
 }
 
 
+/* Copied from https://docs.python.org/3/whatsnew/3.11.html#whatsnew311-c-api-porting
+Since Py_SIZE() is changed to a inline static function, Py_SIZE(obj) = new_size must be replaced with Py_SET_SIZE(obj, new_size):
+see the Py_SET_SIZE() function (available since Python 3.9). For backward compatibility, this macro can be used:
+*/
+#if PY_VERSION_HEX < 0x030900A4 && !defined(Py_SET_SIZE)
+static inline void _Py_SET_SIZE(PyVarObject *ob, Py_ssize_t size)
+{ ob->ob_size = size; }
+#define Py_SET_SIZE(ob, size) _Py_SET_SIZE((PyVarObject*)(ob), size)
+#endif
+
+
 static PyObject *
 MessageQueue_receive(MessageQueue *self, PyObject *args, PyObject *keywords) {
     NoneableTimeout timeout;
