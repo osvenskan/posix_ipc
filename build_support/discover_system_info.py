@@ -72,21 +72,16 @@ def does_build_succeed(filename, linker_options=""):
 def compile_and_run(filename, linker_options=""):
     # Utility function that returns the stdout output from running the
     # compiled source file; None if the compile fails.
-    cc = os.getenv("CC", "cc")
-    cmd = "%s -Wall -o ./build_support/src/%s ./build_support/src/%s %s -lpthread" % (cc, filename[:-2], filename, linker_options)
-
-    p = subprocess.Popen(cmd, shell=True, stdout=STDOUT, stderr=STDERR)
-
-    if p.wait():
+    if does_build_succeed(filename, linker_options=""):
+        try:
+            s = subprocess.Popen(["./build_support/src/%s" % filename[:-2]],
+                                 stdout=subprocess.PIPE).communicate()[0]
+            return s.strip().decode()
+        except Exception:
+            # execution resulted in an error
+            return None
+    else:
         # uh-oh, compile failed
-        return None
-    
-    try:
-        s = subprocess.Popen(["./build_support/src/%s" % filename[:-2]],
-                             stdout=subprocess.PIPE).communicate()[0]
-        return s.strip().decode()
-    except Exception:
-        # execution resulted in an error
         return None
 
 
@@ -211,11 +206,9 @@ def sniff_mq_prio_max():
     # ref: http://www.opengroup.org/onlinepubs/009695399/basedefs/limits.h.html
     DEFAULT_PRIORITY_MAX = 32
 
-    max_priority = None
     # OS X up to and including 10.8 doesn't support POSIX messages queues and
     # doesn't define MQ_PRIO_MAX. Maybe this aggravation will cease in 10.9?
-    if does_build_succeed("sniff_mq_prio_max.c"):
-        max_priority = compile_and_run("sniff_mq_prio_max.c")
+    max_priority = compile_and_run("sniff_mq_prio_max.c")
 
     if max_priority:
         try:
