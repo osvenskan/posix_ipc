@@ -223,7 +223,7 @@ def sniff_mq_prio_max():
         except ValueError:
             max_priority = None
 
-    if max_priority is None:
+    if not max_priority:
         # Looking for a #define didn't work; ask sysconf() instead.
         # Note that sys.sysconf_names doesn't exist under Cygwin.
         if hasattr(os, "sysconf_names") and \
