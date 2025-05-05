@@ -60,7 +60,7 @@ def does_build_succeed(filename, linker_options=""):
     #     Rather than testing whether or not it's needed, I just specify it
     #     everywhere since it's harmless to specify it when it's not needed.
     cc = os.getenv("CC", "cc")
-    cmd = "%s -Wall -o ./build_support/src/foo ./build_support/src/%s %s -lpthread" % (cc, filename, linker_options)
+    cmd = "%s -Wall -o ./build_support/src/%s ./build_support/src/%s %s -lpthread" % (cc, filename[:-2], filename, linker_options)
 
     p = subprocess.Popen(cmd, shell=True, stdout=STDOUT, stderr=STDERR)
 
@@ -73,7 +73,7 @@ def compile_and_run(filename, linker_options=""):
     # Utility function that returns the stdout output from running the
     # compiled source file; None if the compile fails.
     cc = os.getenv("CC", "cc")
-    cmd = "%s -Wall -o ./build_support/src/foo %s ./build_support/src/%s" % (cc, linker_options, filename)
+    cmd = "%s -Wall -o ./build_support/src/%s ./build_support/src/%s %s -lpthread" % (cc, filename[:-2], filename, linker_options)
 
     p = subprocess.Popen(cmd, shell=True, stdout=STDOUT, stderr=STDERR)
 
@@ -82,7 +82,7 @@ def compile_and_run(filename, linker_options=""):
         return None
     
     try:
-        s = subprocess.Popen(["./build_support/src/foo"],
+        s = subprocess.Popen(["./build_support/src/%s" % filename[:-2]],
                              stdout=subprocess.PIPE).communicate()[0]
         return s.strip().decode()
     except Exception:
