@@ -84,7 +84,7 @@ def compile_and_run(filename, linker_options=""):
     try:
         s = subprocess.Popen(["./build_support/src/foo"],
                              stdout=subprocess.PIPE).communicate()[0]
-        return s.strip().decode()
+        return s.strip().decode() or None
     except Exception:
         # execution resulted in an error
         return None
