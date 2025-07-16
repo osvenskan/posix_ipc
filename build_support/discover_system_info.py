@@ -24,45 +24,6 @@ class POSIXNonComplianceWarning(UserWarning):
     pass
 
 
-# This is the max length that I want a printed line to be.
-MAX_LINE_LENGTH = 78
-
-
-def line_wrap_paragraph(s):
-    # Format s with terminal-friendly line wraps.
-    done = False
-    beginning = 0
-    end = MAX_LINE_LENGTH - 1
-    lines = []
-    while not done:
-        if end >= len(s):
-            done = True
-            lines.append(s[beginning:])
-        else:
-            last_space = s[beginning:end].rfind(' ')
-
-            lines.append(s[beginning:beginning + last_space])
-            beginning += (last_space + 1)
-            end = beginning + MAX_LINE_LENGTH - 1
-
-    return lines
-
-
-def print_bad_news(value_name, default):
-    s = "Setup can't determine %s on your system, so it will default to %s which " \
-        "may not be correct." % (value_name, default)
-    plea = "Please report this message and your operating system info to the package " \
-           "maintainer listed in the README file."
-
-    lines = line_wrap_paragraph(s) + [''] + line_wrap_paragraph(plea)
-
-    border = '*' * MAX_LINE_LENGTH
-
-    s = border + "\n* " + ('\n* '.join(lines)) + '\n' + border
-
-    print(s)
-
-
 def does_build_succeed(filename, linker_options=""):
     # Utility function that returns True if the file compiles and links
     # successfully, False otherwise.
@@ -235,41 +196,36 @@ def sniff_mq_existence(linker_options):
 
 
 def sniff_mq_prio_max():
-    # MQ_PRIO_MAX is #defined in limits.h on all of the systems that I
-    # checked that support message queues at all. (I checked 2 Linux boxes,
-    # OpenSolaris and FreeBSD 8.0.)
+    '''Returns the value of MQ_PRIO_MAX, formatted for inclusion in system_info.h.
 
-    # 32 = minimum allowable max priority per POSIX; systems are permitted
-    # to define a larger value.
-    # ref: http://www.opengroup.org/onlinepubs/009695399/basedefs/limits.h.html
-    DEFAULT_PRIORITY_MAX = 32
+    Raises a DiscoveryError exception if unable to determine the value.
+    '''
+    # Max queue priority should be present in sysconf() on POSIX-compliant systems, and checking
+    # sysconf is easier than invoking the compiler.
+    max_priority = maybe_get_sysconf_value('SC_MQ_PRIO_MAX', True)
 
-    max_priority = None
-    # OS X up to and including 10.8 doesn't support POSIX messages queues and
-    # doesn't define MQ_PRIO_MAX. Maybe this aggravation will cease in 10.9?
-    if does_build_succeed("sniff_mq_prio_max.c"):
+    if not max_priority:
+        # OK, try to get it via compilation.
         max_priority = compile_and_run("sniff_mq_prio_max.c")
 
-    if max_priority:
-        try:
-            max_priority = int(max_priority)
-        except ValueError:
-            max_priority = None
+    # Regardless of where I got the value from, it should be int-able (if it's not an int already).
+    try:
+        max_priority = int(max_priority)
+    except Exception:
+        # I don't care why the conversion to int failed.
+        max_priority = None
+
+    # At this point, max_priority is an int, or None.
+
+    # Under OS X, os.sysconf("SC_MQ_PRIO_MAX") returns -1. This is still true in June 2025 under
+    # MacOS 15.5. sniff_mq_prio_max() shouldn't even be called when building on the Mac, but
+    # I'll leave this code here because maybe Mac isn't the only platform that behaves that way.
+    if max_priority and (max_priority < 0):
+        max_priority = None
 
     if max_priority is None:
-        # Looking for a #define didn't work; ask sysconf() instead.
-        # Note that sys.sysconf_names doesn't exist under Cygwin.
-        if hasattr(os, "sysconf_names") and \
-           ("SC_MQ_PRIO_MAX" in os.sysconf_names):
-            max_priority = os.sysconf("SC_MQ_PRIO_MAX")
-        else:
-            max_priority = DEFAULT_PRIORITY_MAX
-            print_bad_news("the value of PRIORITY_MAX", max_priority)
-
-    # Under OS X, os.sysconf("SC_MQ_PRIO_MAX") returns -1.
-    # This is still true in April 2025 under MacOS 15.3.
-    if max_priority < 0:
-        max_priority = DEFAULT_PRIORITY_MAX
+        # At this point, I've exhausted all of my options.
+        raise DiscoveryError('Unable to determine max message queue priority')
 
     # Adjust for the fact that these are 0-based values; i.e. permitted
     # priorities range from 0 - (MQ_PRIO_MAX - 1). So why not just make
