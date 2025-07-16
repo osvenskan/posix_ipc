@@ -76,11 +76,8 @@ def compile_and_run(filename, linker_options=""):
 
 
 def get_sysctl_value(name):
-    """Given a sysctl name (e.g. 'kern.mqueue.maxmsg'), returns sysctl's value
-    for that variable or None if the sysctl call fails (unknown name, not
-    a BSD-ish system, etc.)
-
-    Only makes sense on systems that implement sysctl (BSD derivatives).
+    """Given a sysctl name (e.g. 'kern.mqueue.maxmsg'), returns sysctl's value for that variable
+    or None if the sysctl call fails (unknown name, sysctl not supported, etc.)
     """
     s = None
     try:
@@ -94,7 +91,7 @@ def get_sysctl_value(name):
                              stdout=subprocess.PIPE,
                              stderr=open(os.devnull, 'rw')).communicate()[0]
         s = s.strip().decode()
-    except:
+    except Exception:
         pass
 
     return s
