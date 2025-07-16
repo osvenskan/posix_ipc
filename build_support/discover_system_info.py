@@ -25,19 +25,30 @@ class POSIXNonComplianceWarning(UserWarning):
 
 
 def does_build_succeed(filename, linker_options=""):
-    # Utility function that returns True if the file compiles and links
-    # successfully, False otherwise.
-    # Two things to note here --
+    '''Returns True if the file compiles and links successfully, False otherwise.
+
+    It can be perfectly normal for the build to fail, e.g. when building sniff_sem_getvalue.c on
+    a system where sem_getvalue() doesn't exist.
+
+    Note that unlike compile_and_run(), this just builds an executable. It does not attempt to
+    run that executable.
+    '''
+    # There are two things to note about the command --
     #   - If there's a linker option like -lrt, it needs to come *after*
     #     the specification of the C file or linking will fail on Ubuntu 11.10
     #     (maybe because of the gcc version?)
     #   - Some versions of Linux place the sem_xxx() functions in libpthread.
     #     Rather than testing whether or not it's needed, I just specify it
     #     everywhere since it's harmless to specify it when it's not needed.
-    cc = os.getenv("CC", "cc")
-    cmd = "%s -Wall -o ./build_support/src/foo ./build_support/src/%s %s -lpthread" % (cc, filename, linker_options)
-
-    p = subprocess.Popen(cmd, shell=True, stdout=STDOUT, stderr=STDERR)
+    cmd = [os.getenv("CC", "cc"),
+           '-Wall',
+           '-o',
+           f'./build_support/src/{filename[:-2]}',
+           f'./build_support/src/{filename}',
+           linker_options,
+           '-lpthread'
+           ]
+    p = subprocess.Popen(cmd, stdout=STDOUT, stderr=STDERR)
 
     # p.wait() returns the process' return code, so 0 implies that
     # the compile & link succeeded.
@@ -45,24 +56,23 @@ def does_build_succeed(filename, linker_options=""):
 
 
 def compile_and_run(filename, linker_options=""):
-    # Utility function that returns the stdout output from running the
-    # compiled source file; None if the compile fails.
-    cc = os.getenv("CC", "cc")
-    cmd = "%s -Wall -o ./build_support/src/foo %s ./build_support/src/%s" % (cc, linker_options, filename)
+    '''Compiles and links the file, runs the executable, and returns whatever the executable
+    prints to stdout.
 
-    p = subprocess.Popen(cmd, shell=True, stdout=STDOUT, stderr=STDERR)
-
-    if p.wait():
-        # uh-oh, compile failed
-        return None
-    
-    try:
-        s = subprocess.Popen(["./build_support/src/foo"],
-                             stdout=subprocess.PIPE).communicate()[0]
-        return s.strip().decode()
-    except Exception:
-        # execution resulted in an error
-        return None
+    Failure of any of the steps (compile, link, run) is unexepected. This function returns None
+    in that case.
+    '''
+    if does_build_succeed(filename, linker_options):
+        cmd = f"./build_support/src/{filename[:-2]}"
+        try:
+            s = subprocess.Popen([cmd], stdout=subprocess.PIPE).communicate()[0]
+            return s.strip().decode()
+        except Exception:
+            # Execution resulted in an error. This is unexpected.
+            return None
+    else:
+        # Build resulted in an error. This is unexpected.
+         return None
 
 
 def get_sysctl_value(name):
@@ -369,7 +379,7 @@ def discover():
 
     if realtime_lib_is_needed:
         d["REALTIME_LIB_IS_NEEDED"] = ""
-        linker_options = " -lrt "
+        linker_options = "-lrt"
 
     d["PAGE_SIZE"] = sniff_page_size()
 
