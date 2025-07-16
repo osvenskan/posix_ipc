@@ -174,11 +174,10 @@ def sniff_sem_value_max():
 
 
 def sniff_page_size():
-    # 4096 is a common page size on x86. As the world moves increasingly to ARM architectures,
-    # this might not be a good default anymore, but the default value isn't really supposed to
-    # be used except when all else fails (and in that case the user gets a warning).
-    DEFAULT_PAGE_SIZE = 4096
+    '''Returns the page size (usually 4096 or 16384) suitable for inclusion in system_info.h.
 
+    Raises a DiscoveryError exception if unable to determine the page size.
+    '''
     page_size = None
 
     # When cross compiling under cibuildwheel, I need to rely on their custom env var to set the
@@ -187,9 +186,9 @@ def sniff_page_size():
         page_size = 16384
 
     if not page_size:
-        # Maybe I can find page size in os.sysconf(). If so, that saves a compilation step.
-        if 'SC_PAGESIZE' in os.sysconf_names:
-            page_size = os.sysconf('SC_PAGESIZE')
+        # Page size should be present in sysconf() on POSIX-compliant systems, and checking
+        # sysconf is easier than invoking the compiler.
+        page_size = maybe_get_sysconf_value('SC_PAGESIZE', True)
 
     if not page_size:
         # OK, I have to do it the hard way. I don't need to worry about linker options here
