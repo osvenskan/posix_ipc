@@ -161,21 +161,14 @@ def sniff_sem_timedwait(linker_options):
 
 
 def sniff_sem_value_max():
-    # default is to return None which means that it is #defined in a standard
-    # header file and doesn't need to be added to my custom header file.
-    sem_value_max = None
+    '''Returns either None, or a value suitable for inclusion in system_info.h.'''
+    # The max semaphore value should be present in sysconf() on POSIX-compliant systems.
+    sem_value_max = maybe_get_sysconf_value('SC_SEM_VALUE_MAX', True)
 
-    if not does_build_succeed("sniff_sem_value_max.c"):
-        # OpenSolaris 2008.05 doesn't #define SEM_VALUE_MAX. (This may
-        # be true elsewhere too.) Ask sysconf() instead if it exists.
-        # Note that sys.sysconf_names doesn't exist under Cygwin.
-        if hasattr(os, "sysconf_names") and \
-           ("SC_SEM_VALUE_MAX" in os.sysconf_names):
-            sem_value_max = os.sysconf("SC_SEM_VALUE_MAX")
-        else:
-            # This value of last resort should be #defined everywhere. What
-            # could possibly go wrong?
-            sem_value_max = "_POSIX_SEM_VALUE_MAX"
+    if not sem_value_max:
+        # This value of last resort should be #defined everywhere. What
+        # could possibly go wrong?
+        sem_value_max = "_POSIX_SEM_VALUE_MAX"
 
     return sem_value_max
 
