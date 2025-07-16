@@ -1,9 +1,6 @@
 include INSTALL LICENSE VERSION
 include README.md USAGE.md history.md
 include src/posix_ipc_module.c
-# Don't include system_info.h. It's system specific, and should be re-created
-# for each build except under unusual circumstances.
-exclude src/system_info.h
 graft build_support
 graft tests
 # I use recursive-include instead of graft so that I don't accidentally
