@@ -10,6 +10,10 @@ STDERR = subprocess.PIPE
 # STDOUT = None
 # STDERR = None
 
+class DiscoveryError(Exception):
+    '''Exception raised when this script is unable to discover a value that it needs.'''
+    pass
+
 # This is the max length that I want a printed line to be.
 MAX_LINE_LENGTH = 78
 
@@ -130,11 +134,7 @@ def sniff_realtime_lib():
             rc = True
 
     if rc is None:
-        # Unable to determine whether or not I needed the realtime libs.
-        # That's bad! Print a warning, set the return code to False
-        # and hope for the best.
-        rc = False
-        print_bad_news("if it needs to link to the realtime libraries", "'no'")
+        raise DiscoveryError('Unable to determine whether realtime lib is needed to build')
 
     return rc
 
@@ -191,8 +191,7 @@ def sniff_page_size():
         page_size = compile_and_run("sniff_page_size.c")
 
     if not page_size:
-        page_size = DEFAULT_PAGE_SIZE
-        print_bad_news("the value of PAGE_SIZE", page_size)
+        raise DiscoveryError('Unable to determine page size')
 
     return page_size
 
