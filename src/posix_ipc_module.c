@@ -2,7 +2,7 @@
 posix_ipc - A Python module for accessing POSIX 1003.1b-1993 semaphores,
             shared memory and message queues.
 
-Copyright (c) 2008 - 2025, Philip Semanchuk
+Copyright (c) 2008 - 2025, Philip Semanchuk and contributors
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -2468,7 +2468,8 @@ POSIX_IPC_INIT_FUNCTION_NAME(void) {
 
     PyModule_AddStringConstant(module, "VERSION", POSIX_IPC_VERSION);
     PyModule_AddStringConstant(module, "__version__", POSIX_IPC_VERSION);
-    PyModule_AddStringConstant(module, "__copyright__", "Copyright 2022 Philip Semanchuk");
+    PyModule_AddStringConstant(module, "__copyright__",
+    						   "Copyright 2008 - 2025 Philip Semanchuk and contributors");
     PyModule_AddStringConstant(module, "__author__", "Philip Semanchuk");
     PyModule_AddStringConstant(module, "__license__", "BSD");
 
