@@ -11,6 +11,10 @@ STDERR = subprocess.PIPE
 # STDERR = None
 
 
+# A few behaviors depend on whether or not this runs on a Mac.
+IS_MAC = ("Darwin" in platform.uname())
+
+
 class DiscoveryError(Exception):
     '''Exception raised when this script is unable to discover a value that it needs.'''
     pass
@@ -142,7 +146,14 @@ def sniff_realtime_lib():
 
 
 def sniff_sem_getvalue(linker_options):
-    return does_build_succeed("sniff_sem_getvalue.c", linker_options)
+    '''Returns True if sem_getvalue() works on this system, False otherwise.'''
+    if IS_MAC:
+        # On the Mac, sem_getvalue() exists but always returns -1 (under OS X ≥ 10.9) or
+        # ENOSYS ("Function not implemented") under some earlier version(s). It's a waste of
+        # time to look for it on that platform.
+        return False
+    else:
+        return does_build_succeed("sniff_sem_getvalue.c", linker_options)
 
 
 def sniff_sem_timedwait(linker_options):
@@ -382,12 +393,6 @@ def discover():
 
     if sniff_sem_getvalue(linker_options):
         d["SEM_GETVALUE_EXISTS"] = ""
-
-    if ("SEM_GETVALUE_EXISTS" in d) and ("Darwin" in platform.uname()):
-        # sem_getvalue() isn't available on OS X. The function exists but
-        # always returns -1 (under OS X 10.9) or ENOSYS ("Function not
-        # implemented") under some earlier version(s).
-        del d["SEM_GETVALUE_EXISTS"]
 
     if sniff_sem_timedwait(linker_options):
         d["SEM_TIMEDWAIT_EXISTS"] = ""
