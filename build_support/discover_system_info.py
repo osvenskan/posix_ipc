@@ -10,9 +10,19 @@ STDERR = subprocess.PIPE
 # STDOUT = None
 # STDERR = None
 
+
 class DiscoveryError(Exception):
     '''Exception raised when this script is unable to discover a value that it needs.'''
     pass
+
+
+class POSIXNonComplianceWarning(UserWarning):
+    '''Warning emitted when the underlying OS appears not to be POSIX compliant. POSIX compliance
+    ensures (among other things) that important system information is available via sysconf().
+    See https://github.com/osvenskan/posix_ipc/issues/81 for details.
+    '''
+    pass
+
 
 # This is the max length that I want a printed line to be.
 MAX_LINE_LENGTH = 78
@@ -117,6 +127,30 @@ def get_sysctl_value(name):
         pass
 
     return s
+
+
+def maybe_get_sysconf_value(name, complain_if_not_present=False):
+    """Returns the value of a sysconf entry (e.g. 'SC_PAGESIZE') if the entry exists. If the value
+    isn't available via sysconf, this function returns None.
+
+    When complain_if_not_present is True, that means the sysconf value must be present for the
+    system to be POSIX compliant. If the value is required but not present, this function raises
+    a POSIXNonComplianceWarning to alert the user.
+
+    Reference: https://pubs.opengroup.org/onlinepubs/9799919799.2024edition/functions/sysconf.html
+    """
+    value = None
+
+    # Years ago, Cygwin didn't support os.sysconf_names. That has probably changed, but I don't
+    # want to assume.
+    if hasattr(os, 'sysconf_names'):
+        if name in os.sysconf_names:
+            value = os.sysconf(name)
+
+    if complain_if_not_present and (value is None):
+        raise POSIXNonComplianceWarning(f'Value "{name}" is missing from sysconf')
+
+    return value
 
 
 def sniff_realtime_lib():
