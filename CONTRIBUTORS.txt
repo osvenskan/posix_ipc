@@ -1,0 +1,25 @@
+I wrote the original code in 2008 and have been the maintainer ever since
+(Philip Semanchuk, https://github.com/osvenskan).
+
+Several people have contributed code to this project. In addition, others
+have contributed detailed problem reports, suggestions, troubleshooting, and
+documentation updates.
+
+Below is an incomplete list of contributors, in no particular order. I'm
+grateful for all of the help.
+
+- Piet van Oostrum
+- Greg
+- René Liebscher
+- Kyle Tippetts
+- Philip D. Bober
+- Russel
+- Matt Ruffalo
+- Takashi Yamamoto
+- Henrik Enggaard (https://github.com/henrikh)
+- Ben Harper
+- Bahram Aghaei (https://github.com/GreatBahram)
+- Chris Kitras (https://github.com/christopolise)
+- Rudolf Hornig (https://github.com/rhornig)
+- Matiiss (https://github.com/Matiiss)
+- Martin Jansa (https://github.com/shr-project)
