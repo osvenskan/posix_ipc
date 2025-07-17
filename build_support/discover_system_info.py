@@ -246,7 +246,16 @@ def sniff_mq_prio_max():
     return str(max_priority).strip() + "U"
 
 
-def sniff_mq_max_messages():
+def sniff_mq_max_messages_default():
+    '''Returns the value (in bytes) that will be used for the module constant
+    QUEUE_MESSAGES_MAX_DEFAULT. This value is only used when creating a MessageQueue; it is the
+    default value if the caller doesn't supply one.
+
+    The value returned by this function is formatted for inclusion in system_info.h.
+
+    Since this value is of minor consequence, I return a default value (instead of raising an error)
+    if this function can't find a system-supplied value.
+    '''
     # This value is not defined by POSIX.
 
     # On most systems I've tested, msg Qs are implemented via mmap-ed files
@@ -272,9 +281,9 @@ def sniff_mq_max_messages():
     mq_max_messages = None
 
     # Try to get the value from where Linux stores it.
-    try:
-        mq_max_messages = int(open("/proc/sys/fs/mqueue/msg_max").read())
-    except:
+    with open("/proc/sys/fs/mqueue/msg_max") as f:
+        mq_max_messages = int(f.read())
+    except Exception:
         # Oh well.
         pass
 
@@ -285,26 +294,9 @@ def sniff_mq_max_messages():
             mq_max_messages = int(mq_max_messages)
 
     if not mq_max_messages:
-        # We're on a non-Linux, non-BSD system, or OS X, or BSD with
-        # the mqueuefs kernel module not loaded (which it's not, by default,
-        # under FreeBSD 8.x and 9.x which are the only systems I've tested).
-        #
-        # If we're on FreeBSD and mqueuefs isn't loaded when this code runs,
-        # sysctl won't be able to provide mq_max_messages to me. (I assume other
-        # BSDs behave the same.) If I use too large of a default, then every
-        # attempt to create a message queue via posix_ipc will fail with
-        # "ValueError: Invalid parameter(s)"  unless the user explicitly sets
-        # the max_messages param.
-        if platform.system().endswith("BSD"):
-            # 100 is the value I see under FreeBSD 9.2. I hope this works
-            # elsewhere!
-            mq_max_messages = 100
-        else:
-            # We're on a non-Linux, non-BSD system. I take a wild guess at an
-            # appropriate value. The max possible is > 2 billion, but the
-            # values used by Linux and FreeBSD suggest that a smaller default
-            # is wiser.
-            mq_max_messages = 1024
+        # I take a wild guess at an appropriate value. The max possible is > 2 billion, but the
+        # values used by Linux and FreeBSD suggest that a smaller default is wiser.
+        mq_max_messages = 100
 
     return mq_max_messages
 
