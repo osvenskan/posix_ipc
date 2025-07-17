@@ -1,7 +1,6 @@
 import subprocess
 import platform
 import os
-import sys
 
 # Set these to None for compile/link debugging or subprocess.PIPE to silence
 # compiler warnings and errors.
@@ -157,6 +156,7 @@ def sniff_sem_getvalue(linker_options):
 
 
 def sniff_sem_timedwait(linker_options):
+    '''Returns True if sem_timedwait() works on this system, False otherwise.'''
     return does_build_succeed("sniff_sem_timedwait.c", linker_options)
 
 
@@ -202,6 +202,7 @@ def sniff_page_size():
 
 
 def sniff_mq_existence(linker_options):
+    '''Returns True if the system supports message queues, False otherwise.'''
     return does_build_succeed("sniff_mq_existence.c", linker_options)
 
 
