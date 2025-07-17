@@ -302,6 +302,15 @@ def sniff_mq_max_messages_default():
 
 
 def sniff_mq_max_message_size_default():
+    '''Returns the value (in bytes) that will be used for the module constant
+    QUEUE_MESSAGE_SIZE_MAX_DEFAULT. This value is only used when creating a MessageQueue; it is the
+    default value if the caller doesn't supply one.
+
+    The value returned by this function is formatted for inclusion in system_info.h.
+
+    Since this value is of minor consequence, I return a default value (instead of raising an error)
+    if this function can't find a system-supplied value.
+    '''
     # The max message size is not defined by POSIX.
 
     # On most systems I've tested, msg Qs are implemented via mmap-ed files
@@ -328,19 +337,20 @@ def sniff_mq_max_message_size_default():
 
     # Try to get the value from where Linux stores it.
     try:
-        mq_max_message_size_default = \
-                            int(open("/proc/sys/fs/mqueue/msgsize_max").read())
-    except:
+        with open("/proc/sys/fs/mqueue/msgsize_max") as f:
+            mq_max_message_size_default = int(f.read())
+    except Exception:
         # oh well
         pass
 
     if not mq_max_message_size_default:
-        # Maybe we're on BSD.
+        # Try sysctl
         mq_max_message_size_default = get_sysctl_value('kern.mqueue.maxmsgsize')
         if mq_max_message_size_default:
             mq_max_message_size_default = int(mq_max_message_size_default)
 
     if not mq_max_message_size_default:
+        # Just use the default.
         mq_max_message_size_default = DEFAULT
 
     return mq_max_message_size_default
