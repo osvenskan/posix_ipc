@@ -10,6 +10,12 @@ STDERR = subprocess.PIPE
 # STDERR = None
 
 
+# OUTPUT_FILEPATH is the file that this script will write, if necessary. The path is relative
+# to the project root. Setuptools guarantees that the project root will be the current working
+# directory when this script executes.
+OUTPUT_FILEPATH = "./src/system_info.h"
+
+
 # A few behaviors depend on whether or not this runs on a Mac.
 IS_MAC = ("Darwin" in platform.uname())
 
@@ -358,82 +364,95 @@ def sniff_mq_max_message_size_default():
 
 
 def discover():
-    linker_options = ""
-    d = {}
+    '''This is the main entry point for this script. It returns a dict of information it has
+    discovered about the buld system. If system_info.h already exists when this script is
+    invoked, then the returned dict consists only of one entry which describes whether or not
+    posix_ipc needs to be linked to the realtime library.
 
-    f = open("VERSION")
-    d["POSIX_IPC_VERSION"] = '"%s"' % f.read().strip()
-    f.close()
+    If system_info.h does not exist, this script creates and populates it, and the values in the
+    returned dict are what it wrote to system_info.h.
+    '''
+    sys_info = {}
 
-    # Sniffing of the realtime libs has to go early in the list so as
-    # to provide correct linker options to the rest of the tests.
-    if "Darwin" in platform.uname():
-        # I skip the test under Darwin/OS X for two reasons. First, I know
-        # it isn't needed there. Second, I can't even compile the test for
-        # the realtime lib because it references mq_unlink() which OS X
-        # doesn't support. Unfortunately sniff_realtime_lib.c *must*
-        # reference mq_unlink() or some other mq_xxx() function because
-        # it is only the message queues that need the realtime libs under
-        # FreeBSD.
+    # First things first -- I need to figure out whether or not the realtime library is needed.
+    if IS_MAC:
+        # I skip the test under Darwin/Mac/OS X for two reasons. First, I know it isn't needed
+        # there. Second, I can't even compile the test for the realtime lib because it
+        # references mq_unlink() which OS X doesn't support. Unfortunately sniff_realtime_lib.c
+        # *must* reference mq_unlink() or some other mq_xxx() function, because only the message
+        # queues need the realtime libs under FreeBSD.
         realtime_lib_is_needed = False
     else:
-        # Some platforms (e.g. Linux & OpenSuse) require linking to librt
+        # Some platforms (e.g. Linux) require linking to librt
         realtime_lib_is_needed = sniff_realtime_lib()
 
-    if realtime_lib_is_needed:
-        d["REALTIME_LIB_IS_NEEDED"] = ""
-        linker_options = "-lrt"
+    sys_info['realtime_lib_is_needed'] = realtime_lib_is_needed
 
-    d["PAGE_SIZE"] = sniff_page_size()
+    linker_options = "-lrt" if realtime_lib_is_needed else ""
 
-    if sniff_sem_getvalue(linker_options):
-        d["SEM_GETVALUE_EXISTS"] = ""
+    if os.path.exists(OUTPUT_FILEPATH):
+        # As guaranteed in building.md, this script is (mostly) a no-op if the output file already
+        # exists.
+        pass
+    else:
+        # system_info.h doesn't exist, so I need to figure out what values should go into it.
 
-    if sniff_sem_timedwait(linker_options):
-        d["SEM_TIMEDWAIT_EXISTS"] = ""
+        # Version info is easy. :-)
+        with open("VERSION") as f:
+            sys_info["POSIX_IPC_VERSION"] = f'"{f.read().strip()}"'
 
-    d["SEM_VALUE_MAX"] = sniff_sem_value_max()
-    # A return of None means that I don't need to #define this myself.
-    if d["SEM_VALUE_MAX"] is None:
-        del d["SEM_VALUE_MAX"]
+        # Figure out the page size.
+        sys_info["PAGE_SIZE"] = sniff_page_size()
 
-    if sniff_mq_existence(linker_options):
-        d["MESSAGE_QUEUE_SUPPORT_EXISTS"] = ""
+        # Sniff sem_getvalue()
+        if sniff_sem_getvalue(linker_options):
+            sys_info["SEM_GETVALUE_EXISTS"] = ""
 
-    d["QUEUE_MESSAGES_MAX_DEFAULT"] = sniff_mq_max_messages()
-    d["QUEUE_MESSAGE_SIZE_MAX_DEFAULT"] = sniff_mq_max_message_size_default()
-    d["QUEUE_PRIORITY_MAX"] = sniff_mq_prio_max()
+        # Sniff sem_timedwait()
+        if sniff_sem_timedwait(linker_options):
+            sys_info["SEM_TIMEDWAIT_EXISTS"] = ""
 
-    msg = """/*
-This header file was generated when you ran setup. Once created, the setup
-process won't overwrite it, so you can adjust the values by hand and
-recompile if you need to.
+        # Sniff the max value of a semaphore.
+        sys_info["SEM_VALUE_MAX"] = sniff_sem_value_max()
 
-On your platform, this file may contain only this comment -- that's OK!
+        # Figure out if message queues are supported at all.
+        message_queue_support_exists = sniff_mq_existence(linker_options)
 
-To enable lots of debug output, add this line and re-run setup.py:
-#define POSIX_IPC_DEBUG
+        if message_queue_support_exists:
+            sys_info["MESSAGE_QUEUE_SUPPORT_EXISTS"] = ""
+            sys_info["QUEUE_MESSAGES_MAX_DEFAULT"] = sniff_mq_max_messages_default()
+            sys_info["QUEUE_MESSAGE_SIZE_MAX_DEFAULT"] = sniff_mq_max_message_size_default()
+            sys_info["QUEUE_PRIORITY_MAX"] = sniff_mq_prio_max()
 
-To recreate this file, just delete it and re-run setup.py.
-*/
-
-"""
-    filename = "./src/system_info.h"
-    if not os.path.exists(filename):
-        lines = ["#define %s\t\t%s" % (key, d[key]) for key in d if key != "PAGE_SIZE"]
+        # Turn each of the values in sys_info into lines that will be written to system_info.h
+        # PAGE_SIZE and SEM_VALUE_MAX get special handling, and realtime_lib_is_needed doesn't
+        # need to go in the header file.
+        ignore = ("PAGE_SIZE", "SEM_VALUE_MAX", "realtime_lib_is_needed")
+        lines = [f"#define {key} {value}" for key, value in sys_info.items() if key not in ignore]
 
         # PAGE_SIZE gets some special treatment. It's defined in header files
         # on some systems in which case I might get a redefinition error in
         # my header file, so I wrap it in #ifndef/#endif.
-
         lines.append("#ifndef PAGE_SIZE")
-        lines.append("#define PAGE_SIZE\t\t%s" % d["PAGE_SIZE"])
+        lines.append(f"#define PAGE_SIZE {sys_info['PAGE_SIZE']}")
         lines.append("#endif")
+        # Ditto for SEM_VALUE_MAX.
+        lines.append("#ifndef SEM_VALUE_MAX")
+        lines.append(f"#define SEM_VALUE_MAX {sys_info['SEM_VALUE_MAX']}")
+        lines.append("#endif")
+        # A trailing blank line keeps compilers happy.
+        lines.append('')
 
-        # A trailing '\n' keeps compilers happy...
-        open(filename, "w").write(msg + '\n'.join(lines) + '\n')
+        msg = """/*
+This header file was generated by discover_system_info.py. You can delete it,
+edit it, or even write your own. See building.md for details.
+*/
 
-    return d
+"""
+        with open(OUTPUT_FILEPATH, 'w') as f:
+            f.write(msg + '\n'.join(lines))
+
+    return sys_info
 
 
 if __name__ == "__main__":
