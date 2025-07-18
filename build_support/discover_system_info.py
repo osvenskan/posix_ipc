@@ -288,14 +288,15 @@ def sniff_mq_max_messages_default():
     mq_max_messages = None
 
     # Try to get the value from where Linux stores it.
-    with open("/proc/sys/fs/mqueue/msg_max") as f:
-        mq_max_messages = int(f.read())
+    try:
+        with open("/proc/sys/fs/mqueue/msg_max") as f:
+            mq_max_messages = int(f.read())
     except Exception:
         # Oh well.
         pass
 
     if not mq_max_messages:
-        # Maybe we're on BSD.
+        # Try sysctl
         mq_max_messages = get_sysctl_value('kern.mqueue.maxmsg')
         if mq_max_messages:
             mq_max_messages = int(mq_max_messages)
