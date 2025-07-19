@@ -24,7 +24,7 @@ system_info = build_support.discover_system_info.discover()
 
 # Linux & FreeBSD require linking against the realtime libs.
 # This causes an error on other platforms
-if "REALTIME_LIB_IS_NEEDED" in system_info:
+if "realtime_lib_is_needed" in system_info:
     libraries.append("rt")
 
 ext_modules = [Extension("posix_ipc",
