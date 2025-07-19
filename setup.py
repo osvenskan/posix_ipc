@@ -22,9 +22,12 @@ libraries = []
 
 system_info = build_support.discover_system_info.discover()
 
-# Linux & FreeBSD require linking against the realtime libs.
-# This causes an error on other platforms
-if "realtime_lib_is_needed" in system_info:
+# Linux requires linking against the realtime libs. My notes say that FreeBSD also required this,
+# but it looks like librt on FreeBSD is a raytracing library so maybe not. :-) In any case,
+# adding "rt" to the list of linked libraries on platforms where it doesn't exist (e.g. Mac)
+# causes a build failure (due to a link error), so I need to be careful about only adding it
+# where it's needed.
+if system_info['realtime_lib_is_needed']:
     libraries.append("rt")
 
 ext_modules = [Extension("posix_ipc",
