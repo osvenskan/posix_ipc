@@ -23,3 +23,5 @@ grateful for all of the help.
 - Rudolf Hornig (https://github.com/rhornig)
 - Matiiss (https://github.com/Matiiss)
 - Martin Jansa (https://github.com/shr-project)
+- Douglas Young
+- György Sárvári (https://github.com/OldManYellsAtCloud)
