@@ -6,9 +6,9 @@ You can build `posix_ipc` with a normal build command like `python -m build`. If
 
 `posix_ipc` needs to know various IPC-related facts about its host system. For instance, some operating systems don't offer a timed wait function for semaphores. This module wants to make that functionality available when it's present, and also needs to know when it's _not_ present and therefore can't be used.
 
-This kind of information needs to be known before `posix_ipc` is compiled. To get that information, `build_support/discover_system_info.py` runs when `setup.py` is invoked. (In `posix_ipc` releases prior to 1.2, this script was called `prober.py`.)
+This kind of information needs to be known before `posix_ipc` is compiled. To get that information, `build_support/discover_system_info.py` runs when `setup.py` is invoked. (In `posix_ipc` releases prior to 1.2.0, this script was called `prober.py`.)
 
-The goal of `discover_system_info.py` is to write a C header file called `src/system_info.h`. (In `posix_ipc` releases prior to 1.2, this file was called `probe_results.h`.) This header file isn't part of the source distribution, nor should it be. It contains values that are specific to the system on which `posix_ipc` is built.
+The goal of `discover_system_info.py` is to write a C header file called `src/system_info.h`. (In `posix_ipc` releases prior to 1.2.0, this file was called `probe_results.h`.) This header file isn't part of the source distribution, nor should it be. It contains values that are specific to the system on which `posix_ipc` is built.
 
 ## The System Info Header File
 
