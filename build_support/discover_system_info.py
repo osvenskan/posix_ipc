@@ -1,6 +1,7 @@
 import subprocess
 import platform
 import os
+import shlex
 
 # Set these to None for compile/link debugging or subprocess.PIPE to silence
 # compiler warnings and errors.
@@ -49,7 +50,9 @@ def does_build_succeed(filename, linker_options=""):
     #   - Some versions of Linux place the sem_xxx() functions in libpthread.
     #     Rather than testing whether or not it's needed, I just specify it
     #     everywhere since it's harmless to specify it when it's not needed.
-    cmd = [os.getenv("CC", "cc"),
+    cc = os.getenv("CC", "cc")
+    cmd = [
+           *shlex.split(cc),
            '-Wall',
            '-o',
            f'./build_support/src/{filename[:-2]}',
