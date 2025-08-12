@@ -25,3 +25,4 @@ grateful for all of the help.
 - Martin Jansa (https://github.com/shr-project)
 - Douglas Young
 - György Sárvári (https://github.com/OldManYellsAtCloud)
+- HaixiaoYanWind (https://github.com/HaixiaoYanWind)
