@@ -313,6 +313,14 @@ class TestMessageQueueSendReceive(MessageQueueTestBase):
 
     # FIXME how to test that timeout=None waits forever?
 
+    def test_receive_max_length(self):
+        '''Test that messages of maximum length are handled correctly.'''
+        # Ensure the max message size is what I think it is.
+        assert self.mq.max_message_size == 10
+
+        self.mq.send('abcdefghij')
+        msg, _ = self.mq.receive()
+        assert msg == b'abcdefghij'
 
 @skipUnless(posix_ipc.MESSAGE_QUEUES_SUPPORTED, "Requires MessageQueue support")
 class TestMessageQueueNotification(MessageQueueTestBase):

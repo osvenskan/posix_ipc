@@ -19,7 +19,7 @@ modification, are permitted provided that the following conditions are met:
 THIS SOFTWARE IS PROVIDED BY ITS CONTRIBUTORS ''AS IS'' AND ANY
 EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL Philip Semanchuk BE LIABLE FOR ANY
+DISCLAIMED. IN NO EVENT SHALL Philip Semanchuk and contributors BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -58,6 +58,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef MESSAGE_QUEUE_SUPPORT_EXISTS
 // For msg queues
 #include <mqueue.h>
+#endif
+
+/* Copied from https://docs.python.org/3/whatsnew/3.11.html#whatsnew311-c-api-porting
+Since Py_SIZE() is changed to a inline static function,
+Py_SIZE(obj) = new_size must be replaced with Py_SET_SIZE(obj, new_size):
+see the Py_SET_SIZE() function (available since Python 3.9).
+For backward compatibility, this macro can be used:
+*/
+#if PY_VERSION_HEX < 0x030900A4 && !defined(Py_SET_SIZE)
+static inline void _Py_SET_SIZE(PyVarObject *ob, Py_ssize_t size)
+{ ob->ob_size = size; }
+#define Py_SET_SIZE(ob, size) _Py_SET_SIZE((PyVarObject*)(ob), size)
 #endif
 
 /* POSIX says that a mode_t "shall be an integer type". To avoid the need
@@ -1588,17 +1600,6 @@ MessageQueue_send(MessageQueue *self, PyObject *args, PyObject *keywords) {
     PyBuffer_Release(&msg);
     return NULL;
 }
-
-
-/* Copied from https://docs.python.org/3/whatsnew/3.11.html#whatsnew311-c-api-porting
-Since Py_SIZE() is changed to a inline static function, Py_SIZE(obj) = new_size must be replaced with Py_SET_SIZE(obj, new_size):
-see the Py_SET_SIZE() function (available since Python 3.9). For backward compatibility, this macro can be used:
-*/
-#if PY_VERSION_HEX < 0x030900A4 && !defined(Py_SET_SIZE)
-static inline void _Py_SET_SIZE(PyVarObject *ob, Py_ssize_t size)
-{ ob->ob_size = size; }
-#define Py_SET_SIZE(ob, size) _Py_SET_SIZE((PyVarObject*)(ob), size)
-#endif
 
 
 static PyObject *
