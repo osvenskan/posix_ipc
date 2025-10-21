@@ -4,16 +4,19 @@ This is the version history for the [posix_ipc module](https://github.com/osvens
 
 I consider this module complete. I will continue to support it, and I'm open to adding useful features, but right now I don't see any.
 
-# Current/Latest – 1.3.0 (29 July 2025)
+# Current/Latest – 1.3.1 (21 Oct 2025)
 
-The goal of this release is to make the build process more robust and flexible. This should make life easier for those who are cross compiling `posix_ipc`.
+This release features two small changes --
 
-*There are no changes to the core code in this release. There are, however, two deprecated constants, and many changes to how the module's build system collects information from the host system.* This is the first significant update to this code in 17 years. I hope I didn't introduce too many new bugs. 😬
+ - Fixed a bug (introduced in 1.3.0) where system discovery failed if the `CC` environment variable contained flags. Thanks to [HaixiaoYanWind](https://github.com/HaixiaoYanWind) for the bug report and PR (#92).
+ - Improved the performance of the `MessageQueue.receive()` method by eliminating one copy operation. If you receive a lot of long messages, you might notice a 5-10% improvement in the performance of `receive()`. Dziękuję to [Szymon Janora](https://github.com/szymon-janora) for the PR (#75).
+
+Please keep in mind that the module constants `PAGE_SIZE` and `SEMAPHORE_VALUE_MAX` have been deprecated as of version 1.3.0 (see below). They will be removed in a future version.
 
 ## Deprecations
 
 > [!IMPORTANT]
-> The module constants `PAGE_SIZE` and `SEMAPHORE_VALUE_MAX` are deprecated as of this version. They will be removed in a future version. See https://github.com/osvenskan/posix_ipc/issues/81 for background.
+> The module constants `PAGE_SIZE` and `SEMAPHORE_VALUE_MAX` have been deprecated as of version 1.3.0. They will be removed in a future version. See https://github.com/osvenskan/posix_ipc/issues/81 for background.
 
 ## Changes to System Discovery
 
@@ -36,6 +39,37 @@ The goal of this release is to make the build process more robust and flexible. 
 - Added a GitHub issue template to make people more aware of the mailing list https://groups.io/g/python-posix-ipc/topics.
 
 # Older Versions
+
+## 1.3.0 (29 July 2025)
+
+The goal of this release is to make the build process more robust and flexible. This should make life easier for those who are cross compiling `posix_ipc`.
+
+*There are no changes to the core code in this release. There are, however, two deprecated constants, and many changes to how the module's build system collects information from the host system.* This is the first significant update to this code in 17 years. I hope I didn't introduce too many new bugs. 😬
+
+### Deprecations
+
+> [!IMPORTANT]
+> The module constants `PAGE_SIZE` and `SEMAPHORE_VALUE_MAX` are deprecated as of this version. They will be removed in a future version. See https://github.com/osvenskan/posix_ipc/issues/81 for background.
+
+### Changes to System Discovery
+
+ - `discover_system_info.py` now raises `DiscoveryError` if it encounters a situation it can't handle.
+ - `discover_system_info.py` now emits `POSIXNonComplianceWarning` if it detects that the host (build) system is not POSIX compliant.
+ - Prioritized `os.sysconf()` as a source of system information where possible, especially over compilation.
+ - Improved `does_build_succeed()` and `compile_and_run()`, including some ideas suggested by [Martin Jansa](https://github.com/shr-project) in https://github.com/osvenskan/posix_ipc/pull/77.
+ - Added and expanded docstrings.
+ - Removed some platform-specific comments that were mostly speculative and out of date.
+ - Changed to always write `SEM_VALUE_MAX` to `system_info.h`, and surround it with `#ifndef/#endif`.
+
+### Other Changes
+
+- Fixed a bug (https://github.com/osvenskan/posix_ipc/issues/82) introduced in 1.2.0 where a custom `system_info.h` was ignored.
+- Added a sample file (`system_info.sample.h`) that can be used as a template for writing your own.
+- Updated `USAGE.md` with more details about module constants.
+- Added macOS 15 wheels.
+- Reformatted this file.
+- Added `CONTRIBUTORS.txt` and updated copyright notices to address https://github.com/osvenskan/posix_ipc/issues/76.
+- Added a GitHub issue template to make people more aware of the mailing list https://groups.io/g/python-posix-ipc/topics.
 
 ## 1.2.0 (16 April 2025)
 
