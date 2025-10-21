@@ -8,8 +8,8 @@ I consider this module complete. I will continue to support it, and I'm open to 
 
 This release features two small changes --
 
- - Fixed a bug (introduced in 1.3.0) where system discovery failed if the `CC` environment variable contained flags. Thanks to [HaixiaoYanWind](https://github.com/HaixiaoYanWind) for the bug report and PR (#92).
- - Improved the performance of the `MessageQueue.receive()` method by eliminating one copy operation. If you receive a lot of long messages, you might notice a 5-10% improvement in the performance of `receive()`. Dziękuję to [Szymon Janora](https://github.com/szymon-janora) for the PR (#75).
+ - Fixed a bug (introduced in 1.3.0) where system discovery failed if the `CC` environment variable contained flags. Thanks to [HaixiaoYanWind](https://github.com/HaixiaoYanWind) for the bug report and PR (https://github.com/osvenskan/posix_ipc/pull/92).
+ - Improved the performance of the `MessageQueue.receive()` method by eliminating one copy operation. If you receive a lot of long messages, you might notice a 5-10% improvement in the performance of `receive()`. Dziękuję to [Szymon Janora](https://github.com/szymon-janora) for the PR (https://github.com/osvenskan/posix_ipc/pull/75).
 
 Please keep in mind that the module constants `PAGE_SIZE` and `SEMAPHORE_VALUE_MAX` have been deprecated as of version 1.3.0 (see below). They will be removed in a future version.
 
