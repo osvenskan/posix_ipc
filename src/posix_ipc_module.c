@@ -1722,8 +1722,8 @@ MessageQueue_receive(MessageQueue *self, PyObject *args, PyObject *keywords) {
     return py_return_tuple;
 
     error_return:
-    PyObject_Free(py_return_msg);
-    PyObject_Free(py_return_priority);
+    Py_XDECREF(py_return_msg);
+    Py_XDECREF(py_return_priority);
 
     return NULL;
 }
