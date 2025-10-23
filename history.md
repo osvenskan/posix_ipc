@@ -4,7 +4,15 @@ This is the version history for the [posix_ipc module](https://github.com/osvens
 
 I consider this module complete. I will continue to support it, and I'm open to adding useful features, but right now I don't see any.
 
-# Current/Latest – 1.3.1 (21 Oct 2025)
+# Current/Latest – 1.3.2 (22 Oct 2025)
+
+This release fixes a buglet introduced yesterday in 1.3.1 in `MessageQueue.receive()`. Cleanup of the message and priority was not handled correctly under some conditions. Dziękuję to [Szymon Janora](https://github.com/szymon-janora) for the PR (https://github.com/osvenskan/posix_ipc/pull/95).
+
+Please keep in mind that the module constants `PAGE_SIZE` and `SEMAPHORE_VALUE_MAX` have been deprecated as of version 1.3.0 (see below). They will be removed in a future version.
+
+# Older Versions
+
+## 1.3.1 (21 Oct 2025)
 
 This release features two small changes --
 
@@ -12,8 +20,6 @@ This release features two small changes --
  - Improved the performance of the `MessageQueue.receive()` method by eliminating one copy operation. If you receive a lot of long messages, you might notice a 5-10% improvement in the performance of `receive()`. Dziękuję to [Szymon Janora](https://github.com/szymon-janora) for the PR (https://github.com/osvenskan/posix_ipc/pull/75).
 
 Please keep in mind that the module constants `PAGE_SIZE` and `SEMAPHORE_VALUE_MAX` have been deprecated as of version 1.3.0 (see below). They will be removed in a future version.
-
-# Older Versions
 
 ## 1.3.0 (29 July 2025)
 
