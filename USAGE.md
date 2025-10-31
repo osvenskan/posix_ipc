@@ -217,7 +217,7 @@ When opening an existing shared memory segment, one can also specify the flag `O
 
 #### `close_fd()`
 
-Closes the file descriptor associated with this SharedMemory object. Calling `close_fd()` is the same as calling [`os.close()`](hhttps://docs.python.org/3/library/os.html#os.close) on a SharedMemory object's `fd` attribute.
+Closes the file descriptor associated with this SharedMemory object. Calling `close_fd()` is the same as calling [`os.close()`](https://docs.python.org/3/library/os.html#os.close) on a SharedMemory object's `fd` attribute.
 
 You must call `close_fd()` or `os.close()` explicitly; the file descriptor is **not** closed automatically when a SharedMemory object is garbage collected.
 
