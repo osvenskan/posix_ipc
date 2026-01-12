@@ -4,7 +4,9 @@ This is the version history for the [posix_ipc module](https://github.com/osvens
 
 I consider this module complete. I will continue to support it, and I'm open to adding useful features, but right now I don't see any.
 
-# Current/Latest – 1.3.2 (22 Oct 2025)
+# Current/Latest
+
+## 1.3.2 (22 Oct 2025)
 
 This release fixes a buglet introduced yesterday in 1.3.1 in `MessageQueue.receive()`. Cleanup of the message and priority was not handled correctly under some conditions. Dziękuję to [Szymon Janora](https://github.com/szymon-janora) for the PR (https://github.com/osvenskan/posix_ipc/pull/95).
 
