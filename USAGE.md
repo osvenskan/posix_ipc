@@ -2,7 +2,7 @@
 
 The Python extension module `posix_ipc` gives Python access to POSIX interprocess semaphores, shared memory and message queues on systems that support the POSIX Realtime Extensions a.k.a. POSIX 1003.1b-1993. That includes most modern Unix and Unix-like platforms, including Linux. This module doesn't support unnamed (anonymous) POSIX semaphores. It is released under [a BSD license](LICENSE).
 
-Mac and other Unix-y platforms (including Windows + [Cygwin](http://www.cygwin.com/)) provide partial (or partially broken) support. See [the platform notes below](#platform-notes) for more details.
+Mac and other Unix-y platforms (including possibly Windows) provide partial (or partially broken) support. See [the platform notes below](#platform-notes) for more details.
 
 The goal of this module is to allow Python to interact with non-Python apps via IPC. If you want IPC between Python apps, you're better off using the [`multiprocessing` module](https://docs.python.org/3/library/multiprocessing.html) or the [`multiprocessing.shared_memory module`](https://docs.python.org/3/library/multiprocessing.shared_memory.html) from Python's standard library.
 
@@ -387,7 +387,7 @@ For Pythonistas, [a meditation on the inaccuracy of shared memories](https://www
 
 [Version 1.0.5 of `posix_ipc`](https://pypi.org/project/posix-ipc/1.0.5/) was the last to support both Python 2.7 and Python 3.x. No changes (neither fixes nor features) will be backported to 1.0.5.
 
-If you need to support Python < 2.7, try [posix_ipc version 0.9.9](https://pypi.org/project/posix-ipc/0.9.9/).
+If you need to support Python < 2.7 (🙀), try [posix_ipc version 0.9.9](https://pypi.org/project/posix-ipc/0.9.9/).
 
 ## Platform Notes
 
@@ -395,4 +395,4 @@ This module is just a wrapper around the operating system's functions, so if the
 
 In general, modern Unix-based and Unix-like operating systems (including Linux, BSD variants, etc.) offer very good support. One glaring exception is Mac OS up to and including 15.5 (which is the most recent I've checked as of July 2025). Under Mac OS, message queues, `sem_getvalue()` and `sem_timedwait()` are not supported.
 
-Windows doesn't provide any POSIX IPC support by default. It can be provided by other packages. It's been over a decade since I tested `posix_ipc`'s compatability with [Cygwin](http://www.cygwin.com/), but it worked then and probably still does. There may be other options to get POSIX IPC support under Windows (perhaps the Windows Subsystem for Linux), too. I haven't used Windows in many years, so I'm out of touch with that ecosystem and can't provide advice on it.
+Windows doesn't provide any POSIX IPC support by default. The [Windows Subsystem for Linux](https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux) sounds like it does, and [Cygwin](http://www.cygwin.com/) might too. It's been over a decade since I tested `posix_ipc`'s compatability with [Cygwin](http://www.cygwin.com/), but it worked then and probably still does. I haven't used Windows in many years, so I'm out of touch with that ecosystem and can't provide advice on it.
