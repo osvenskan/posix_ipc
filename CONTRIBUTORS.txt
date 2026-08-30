@@ -27,3 +27,4 @@ grateful for all of the help.
 - György Sárvári (https://github.com/OldManYellsAtCloud)
 - HaixiaoYanWind (https://github.com/HaixiaoYanWind)
 - Szymon Janora (https://github.com/szymon-janora)
+- Asger Gitz-Johansen (https://github.com/sillydan1)
