@@ -346,7 +346,7 @@ This module comes with five sets of demonstration code, all [in the `demos` dire
 
 ### Typing
 
-Type hints exist but should be considered a beta-level feature with known imperfections. See FIXME for details.
+Type hints exist but should be considered a beta-level feature with known imperfections. See #108 for details.
 
 ### Nobody Likes a Mr. Messy
 
