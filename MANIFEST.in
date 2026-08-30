@@ -1,6 +1,7 @@
 include INSTALL LICENSE VERSION
 include README.md USAGE.md history.md building.md
 include system_info.sample.h
+include posix_ipc.pyi
 # The 'graft src' command has the useful flexibility of copying a custom
 # system_info.h if one exists, and not fussing if there isn't one present.
 graft src

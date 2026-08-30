@@ -344,6 +344,10 @@ python -m unittest discover
 
 This module comes with five sets of demonstration code, all [in the `demos` directory](https://github.com/osvenskan/posix_ipc/tree/develop/demos). The first (in the directory `demo1`) shows how to use shared memory and semaphores. The second (in the directory `demo2`) shows how to use message queues. The third (`demo3`) shows how to use message queue notifications. The fourth (`demo4`) shows how to use a semaphore in a context manager. The fifth (`demo5`) demonstrates use of message queues in combination with Python's `selectors` module.
 
+### Typing
+
+Type hints exist but should be considered a beta-level feature with known imperfections. See #108 for details.
+
 ### Nobody Likes a Mr. Messy
 
 IPC objects are a little different from most Python objects and therefore require a little more care on the part of the programmer. When a program creates a IPC object, it creates something that resides *outside of its own process*, just like a file on a hard drive. It won't go away when your process ends unless you explicitly remove it. And since many operating systems don't even give you a way to enumerate existing POSIX IPC entities, it might be hard to figure out what you're leaving behind.
