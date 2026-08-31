@@ -59,15 +59,15 @@ class Base(unittest.TestCase):
         https://github.com/osvenskan/sysv_ipc/issues/68
         '''
         # Extract the class name. str() returns something like this --
-        #    <class 'sysv_ipc.SharedMemory'>
+        #    <class 'posix_ipc.SharedMemory'>
         # From that, I only want this bit --
-        #    sysv_ipc.SharedMemory
+        #    posix_ipc.SharedMemory
         class_name = str(an_object.__class__)[8:-2]
 
         # Under PyPy, the module prefix doesn't appear in the exception message that I see in
         # assertWriteToReadOnlyPropertyFails().
         if IS_PYPY:
-            class_name = class_name[9:]
+            class_name = class_name[10:]
 
         return class_name
 
