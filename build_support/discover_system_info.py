@@ -191,8 +191,9 @@ def sniff_page_size():
 
     # When cross compiling under cibuildwheel, I need to rely on their custom env var to set the
     # page size correctly. See https://github.com/osvenskan/posix_ipc/issues/58
-    if 'arm' in os.getenv('_PYTHON_HOST_PLATFORM', ''):
-        page_size = 16384
+    if os.getenv('CIBUILDWHEEL', '') == '1':
+        if 'arm' in os.getenv('_PYTHON_HOST_PLATFORM', ''):
+            page_size = 16384
 
     if not page_size:
         # Page size should be present in sysconf() on POSIX-compliant systems, and checking
