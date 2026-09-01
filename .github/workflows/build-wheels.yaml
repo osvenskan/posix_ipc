@@ -15,7 +15,7 @@ concurrency:
 jobs:
   build_wheels:
     name: ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.runs-on }}
     strategy:
       fail-fast: false
       matrix:
