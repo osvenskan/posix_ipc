@@ -57,7 +57,7 @@ def does_build_succeed(filename, linker_options=""):
            '-o',
            f'./build_support/src/{filename[:-2]}',
            f'./build_support/src/{filename}',
-           linker_options,
+           *shlex.split(linker_options),
            '-lpthread'
            ]
     p = subprocess.Popen(cmd, stdout=STDOUT, stderr=STDERR)
